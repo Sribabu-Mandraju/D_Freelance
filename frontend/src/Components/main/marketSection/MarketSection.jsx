@@ -6,64 +6,70 @@ import { useNavigate } from "react-router-dom";
 // ✅ Static freelance project data
 const projects = [
   {
-    title: "Build a React Portfolio Website",
-    budget: 5000,
-    proposals: 12,
-    trend: "up",
-    data: [
-      { value: 100 }, { value: 200 }, { value: 300 },
-      { value: 250 }, { value: 400 }, { value: 450 },
-    ],
+    name: "Anjali Verma",
+    level: "Top Rated Seller ★",
+    description: "I will create responsive WordPress websites with Elementor",
+    rating: 5.0,
+    reviews: 1420,
+    budget: 12500,
+    profileImage: "https://randomuser.me/api/portraits/women/68.jpg",
+    bannerImage:
+      "https://tse2.mm.bing.net/th/id/OIP.ZVD87RQADtYXJekElacXzAHaEK?pid=Api&P=0&h=180",
   },
   {
-    title: "Write SEO Blog Articles",
-    budget: 1500,
-    proposals: 30,
-    trend: "down",
-    data: [
-      { value: 300 }, { value: 250 }, { value: 200 },
-      { value: 180 }, { value: 220 }, { value: 210 },
-    ],
+    name: "Daniel Lee",
+    level: "Level 1 ♦",
+    description: "I will create responsive WordPress websites with Elementor",
+    rating: 4.8,
+    reviews: 350,
+    budget: 9200,
+    profileImage: "https://randomuser.me/api/portraits/men/33.jpg",
+    bannerImage:
+      "https://tse2.mm.bing.net/th/id/OIP.ZVD87RQADtYXJekElacXzAHaEK?pid=Api&P=0&h=180",
   },
   {
-    title: "Develop a Mobile App UI (Figma)",
-    budget: 8000,
-    proposals: 8,
-    trend: "up",
-    data: [
-      { value: 150 }, { value: 300 }, { value: 320 },
-      { value: 340 }, { value: 380 }, { value: 420 },
-    ],
+    name: "Fatima Noor",
+    level: "Level 2 ♦♦",
+    description: "I will create responsive WordPress websites with Elementor",
+    rating: 4.9,
+    reviews: 790,
+    budget: 10800,
+    profileImage: "https://randomuser.me/api/portraits/women/52.jpg",
+    bannerImage:
+      "https://tse2.mm.bing.net/th/id/OIP.ZVD87RQADtYXJekElacXzAHaEK?pid=Api&P=0&h=180",
   },
   {
-    title: "Set up WordPress Website",
-    budget: 4000,
-    proposals: 18,
-    trend: "down",
-    data: [
-      { value: 200 }, { value: 190 }, { value: 180 },
-      { value: 185 }, { value: 170 }, { value: 160 },
-    ],
+    name: "Omar Khaled",
+    level: "Top Rated Seller ★",
+    description: "I will create responsive WordPress websites with Elementor",
+    rating: 5.0,
+    reviews: 1150,
+    budget: 8900,
+    profileImage: "https://randomuser.me/api/portraits/men/78.jpg",
+    bannerImage:
+      "https://tse2.mm.bing.net/th/id/OIP.ZVD87RQADtYXJekElacXzAHaEK?pid=Api&P=0&h=180",
   },
   {
-    title: "Design a Company Logo",
-    budget: 2000,
-    proposals: 25,
-    trend: "up",
-    data: [
-      { value: 100 }, { value: 150 }, { value: 180 },
-      { value: 160 }, { value: 200 }, { value: 230 },
-    ],
+    name: "Sakura Tanaka",
+    level: "Level 1 ♦",
+    description: "I will create responsive WordPress websites with Elementor",
+    rating: 4.7,
+    reviews: 410,
+    budget: 13400,
+    profileImage: "https://randomuser.me/api/portraits/women/44.jpg",
+    bannerImage:
+      "https://tse2.mm.bing.net/th/id/OIP.ZVD87RQADtYXJekElacXzAHaEK?pid=Api&P=0&h=180",
   },
   {
-    title: "Create Social Media Ad Banners",
-    budget: 2500,
-    proposals: 20,
-    trend: "down",
-    data: [
-      { value: 180 }, { value: 160 }, { value: 170 },
-      { value: 150 }, { value: 140 }, { value: 130 },
-    ],
+    name: "Liam Martinez",
+    level: "New Seller",
+    description: "I will create responsive WordPress websites with Elementor",
+    rating: 4.6,
+    reviews: 72,
+    budget: 4800,
+    profileImage: "https://randomuser.me/api/portraits/men/19.jpg",
+    bannerImage:
+      "https://tse2.mm.bing.net/th/id/OIP.ZVD87RQADtYXJekElacXzAHaEK?pid=Api&P=0&h=180",
   },
 ];
 
@@ -72,7 +78,7 @@ function MarketSection() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   return (
-    <div className="text-white w-full max-w-7xl pt-12 mx-auto" id="trending">
+    <div className="text-white w-full max-w-7xl  mx-auto" id="trending">
       <div className="mb-8 text-center mt-4">
         <h2 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
           Kickstart Your Freelance Journey
@@ -82,7 +88,7 @@ function MarketSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 w-[95%] md:w-[92%] mx-auto sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="flex flex-wrap w-[95%] md:w-full items-center justify-center mx-auto  gap-8">
         {projects.map((project, index) => (
           <motion.div
             key={index}
@@ -95,13 +101,15 @@ function MarketSection() {
             }}
             viewport={{ once: true }}
           >
-            <MarketCard market={project} index={index} />
+            <MarketCard service={project} index={index} />
           </motion.div>
         ))}
       </div>
 
       <div className="text-center mt-12">
-        <h3 className="text-2xl font-semibold">Ready to find your next project?</h3>
+        <h3 className="text-2xl font-semibold">
+          Ready to find your next project?
+        </h3>
         <p className="text-gray-400 mt-2">
           Join thousands of freelancers growing their careers every day.
         </p>

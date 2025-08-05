@@ -17,3 +17,16 @@ const App = () => {
 }
 
 export default App
+
+
+
+// import React from "react"
+// import Cloudinary from "./Components/main/Cloudinary"
+// const App=()=>{
+//   return(
+// <div>
+//   <Cloudinary/>
+// </div>
+//   )
+// }
+// export default App
