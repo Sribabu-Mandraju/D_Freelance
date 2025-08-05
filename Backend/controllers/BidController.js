@@ -1,10 +1,33 @@
 import Bid from '../models/BidModel.js';
+import mongoose from 'mongoose';
 
 // @desc    Create a bid
 // @route   POST /api/bids
 export const createBid = async (req, res) => {
   try {
-    const { wallet_address, cover_letter, bid_amount, proposal_id } = req.body;
+    let { wallet_address, cover_letter, bid_amount, proposal_id } = req.body;
+
+    // Validation
+    if (!wallet_address || !cover_letter || !bid_amount || !proposal_id) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Sanitization
+    wallet_address = wallet_address.trim();
+    cover_letter = cover_letter.trim();
+    bid_amount = Number(bid_amount);
+
+    if (wallet_address === '' || cover_letter === '') {
+      return res.status(400).json({ message: 'Wallet address and cover letter cannot be empty' });
+    }
+
+    if (isNaN(bid_amount) || bid_amount <= 0) {
+      return res.status(400).json({ message: 'Bid amount must be a positive number' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(proposal_id)) {
+      return res.status(400).json({ message: 'Invalid proposal ID' });
+    }
 
     const bid = new Bid({
       wallet_address,
@@ -35,7 +58,13 @@ export const getAllBids = async (req, res) => {
 // @route   GET /api/bids/:id
 export const getBidById = async (req, res) => {
   try {
-    const bid = await Bid.findById(req.params.id).populate('proposal_id');
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid bid ID' });
+    }
+
+    const bid = await Bid.findById(id).populate('proposal_id');
     if (!bid) return res.status(404).json({ message: 'Bid not found' });
     res.status(200).json(bid);
   } catch (error) {
@@ -47,7 +76,27 @@ export const getBidById = async (req, res) => {
 // @route   PUT /api/bids/:id
 export const updateBid = async (req, res) => {
   try {
-    const bid = await Bid.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid bid ID' });
+    }
+
+    const updateData = { ...req.body };
+
+    if (updateData.wallet_address) updateData.wallet_address = updateData.wallet_address.trim();
+    if (updateData.cover_letter) updateData.cover_letter = updateData.cover_letter.trim();
+    if (updateData.bid_amount) {
+      updateData.bid_amount = Number(updateData.bid_amount);
+      if (isNaN(updateData.bid_amount) || updateData.bid_amount <= 0) {
+        return res.status(400).json({ message: 'Bid amount must be a positive number' });
+      }
+    }
+    if (updateData.proposal_id && !mongoose.Types.ObjectId.isValid(updateData.proposal_id)) {
+      return res.status(400).json({ message: 'Invalid proposal ID' });
+    }
+
+    const bid = await Bid.findByIdAndUpdate(id, updateData, { new: true });
     if (!bid) return res.status(404).json({ message: 'Bid not found' });
     res.status(200).json(bid);
   } catch (error) {
@@ -59,7 +108,13 @@ export const updateBid = async (req, res) => {
 // @route   DELETE /api/bids/:id
 export const deleteBid = async (req, res) => {
   try {
-    const bid = await Bid.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid bid ID' });
+    }
+
+    const bid = await Bid.findByIdAndDelete(id);
     if (!bid) return res.status(404).json({ message: 'Bid not found' });
     res.status(200).json({ message: 'Bid deleted successfully' });
   } catch (error) {
