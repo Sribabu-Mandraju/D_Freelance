@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function HeroSection() {
+const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeMarket, setActiveMarket] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -52,7 +52,7 @@ export default function HeroSection() {
       {/* Grid overlay */}
       <div className="absolute  inset-0 bg-grid-pattern opacity-10"></div>
 
-      <div className="container mx-auto relative z-10 ">
+      <div className=" relative z-10">
         {/* Top stats bar */}
         <div className="bg-gray-800/60 backdrop-blur-md rounded-lg p-2 mb-4 mt-2  sm:mb-4 border border-gray-700/50 shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm overflow-x-auto">
@@ -87,13 +87,13 @@ export default function HeroSection() {
         </div>
 
         {/* Hero content */}
-        <div className="flex w-full max-w-7xl mx-auto flex-col lg:flex-row gap-8 sm:gap-12 items-center">
+        <div className="flex w-full mx-auto flex-col lg:flex-row md:mt-[-70px] gap-8 sm:gap-12 items-center">
           {/* Left side - Main content */}
           <div
-            className={`w-full lg:w-1/2 scale-[0.8] transition-all duration-800 ${
+            className={`w-full lg:w-1/2 md:scale-[0.7]  transition-all duration-800 ${
               isVisible
                 ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-20"
+                : "opacity-0 translate-y-30"
             }`}
           >
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
@@ -198,7 +198,7 @@ export default function HeroSection() {
 
           {/* Right side - Market preview */}
           <div
-            className={`w-full lg:w-1/2 scale-[0.8] transition-all duration-800 ${
+            className={`w-full lg:w-1/2 md:scale-[0.7] transition-all duration-800 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-20"
@@ -372,7 +372,7 @@ export default function HeroSection() {
     </div>
   );
 }
-
+export default  HeroSection
 // Add this to your CSS to support extra small screens
 // @media (min-width: 475px) {
 //   .xs\:grid-cols-3 {
