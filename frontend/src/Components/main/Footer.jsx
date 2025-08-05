@@ -1,10 +1,11 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 border-t border-gray-800 py-12 px-4">
-      <div className="container mx-auto">
+    <footer className="w-full bg-gray-950 border-t border-gray-800 py-12 px-4">
+      <div className="w-full px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand & About */}
           <div>
-            <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500   hover:opacity-80 transition-opacity cursor-pointer   mb-4">
+            <div className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500 hover:opacity-80 transition-opacity cursor-pointer mb-4">
               FuturaX
             </div>
             <p className="text-gray-400 mb-4">
@@ -18,6 +19,7 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Quick Links */}
           <FooterLinks
             title="Quick Links"
             links={[
@@ -28,6 +30,7 @@ export default function Footer() {
             ]}
           />
 
+          {/* Resources */}
           <FooterLinks
             title="Resources"
             links={[
@@ -38,6 +41,7 @@ export default function Footer() {
             ]}
           />
 
+          {/* Legal */}
           <FooterLinks
             title="Legal"
             links={[
@@ -49,10 +53,11 @@ export default function Footer() {
           />
         </div>
 
+        {/* Bottom Copy */}
         <div className="mt-12 pt-8 border-t border-gray-800 text-center">
           <p className="text-gray-500">
             &copy; {new Date().getFullYear()}{" "}
-            <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400 mb-4">
+            <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-cyan-400">
               FuturaX
             </span>{" "}
             All rights reserved.
