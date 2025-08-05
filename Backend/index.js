@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import ProposalRoutes from "./Routes/ProposalRoutes.js";
 import BidRoutes from "./routes/BidRoutes.js";
+import UserRoutes from "./routes/UserRoutes.js";
 // Load environment variables
 dotenv.config();
 
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
+app.use("/api/users", UserRoutes);
 
 // Default route
 app.get("/", (req, res) => {
