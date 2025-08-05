@@ -14,7 +14,7 @@ export default function Hero({ personalInfo }) {
           <div className="flex flex-col lg:flex-row items-start gap-6">
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-3xl lg:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl lg:text-4xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
                 {personalInfo.name}
               </h1>
               <p className="text-lg lg:text-xl text-gray-300 mb-4">
@@ -80,7 +80,7 @@ export default function Hero({ personalInfo }) {
           </div>
 
           {/* Mission Statement */}
-          <div className="mt-6 p-4 bg-gray-800 border border-gray-600 rounded-lg">
+          <div className="mt-6 p-4 bg-gray-900 border border-gray-800 rounded-lg">
             <p className="text-gray-300 leading-relaxed">
               <span className="text-blue-400 font-semibold">Mission:</span> {personalInfo.mission}
             </p>

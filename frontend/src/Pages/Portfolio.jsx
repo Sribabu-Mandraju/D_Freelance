@@ -265,21 +265,24 @@ function Portfolio() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {featuredProjects.map((project) => (
                     <div key={project.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-gray-500 transition-colors duration-200">
-                      <div className="flex items-start gap-3 mb-3">
-                        <span className="text-2xl">{project.icon}</span>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-white mb-1">{project.name}</h3>
-                          <p className="text-sm text-gray-400 leading-relaxed">{project.description}</p>
+                      <div className="flex items-start flex-col gap-3 mb-3">
+                        
+                        <div className="flex flex-row items-center gap-2">
+                          <span className="text-2xl">{project.icon}</span>
+                          <h3 className="font-semibold text-white ">{project.name}</h3>
+                          
+                          
                         </div>
+                        <p className="text-sm text-gray-400 leading-relaxed">{project.description}</p>
                       </div>
                       <div className="flex flex-wrap gap-1 mb-3">
                         {project.technologies.slice(0, 3).map((tech) => (
-                          <span key={tech} className="bg-gray-600 text-gray-300 text-xs px-2 py-1 rounded">
+                          <span key={tech} className="bg-gray-900 text-gray-300 text-xs px-2 py-1 rounded">
                             {tech}
                           </span>
                         ))}
                         {project.technologies.length > 3 && (
-                          <span className="bg-gray-600 text-gray-400 text-xs px-2 py-1 rounded">
+                          <span className="bg-gray-900 text-gray-400 text-xs px-2 py-1 rounded">
                             +{project.technologies.length - 3}
                           </span>
                         )}
@@ -289,7 +292,7 @@ function Portfolio() {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 px-3 py-1 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition-colors duration-200"
+                          className="flex items-center gap-1 px-3 py-1 bg-gray-900 hover:bg-gray-500 text-white text-xs rounded transition-colors duration-200"
                         >
                           <Github className="w-3 h-3" />
                           Code
