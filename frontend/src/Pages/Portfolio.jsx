@@ -5,7 +5,7 @@ import Experience from "../Components/portfolio/Experience"
 import Education from "../Components/portfolio/Education"
 import SkillProgress from "../Components/portfolio/SkillProgress"
 import ContactInfo from "../Components/portfolio/ContactInfo"
-import Navbar from "../Components/main/Navbar"
+import Navbar from "../Components/Navbar"
 import { User, Code, Briefcase, GraduationCap, TrendingUp, Mail, Github, Linkedin, Globe, Phone, MapPin } from 'lucide-react'
 
 // Personal information
