@@ -1,82 +1,64 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { Heart } from "lucide-react";
 
-export default function MarketCard({ market, index }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const chartRef = useRef(null);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsVisible(true);
-    }, index * 100);
-
-    // Canvas chart visualization for project activity or budget trend (optional)
-    if (chartRef.current && market.data?.length) {
-      const canvas = chartRef.current;
-      const ctx = canvas.getContext("2d");
-      const width = canvas.width;
-      const height = canvas.height;
-
-      ctx.clearRect(0, 0, width, height);
-
-      ctx.beginPath();
-      ctx.strokeStyle = market.trend === "up" ? "#10b981" : "#ef4444";
-      ctx.lineWidth = 2;
-
-      const dataPoints = market.data;
-      const maxValue = Math.max(...dataPoints.map((d) => d.value));
-      const minValue = Math.min(...dataPoints.map((d) => d.value));
-      const range = maxValue - minValue || 1;
-
-      dataPoints.forEach((point, i) => {
-        const x = (i / (dataPoints.length - 1)) * width;
-        const y = height - ((point.value - minValue) / range) * (height * 0.8);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-
-      ctx.stroke();
-    }
-  }, [market, index]);
+export default function MarketCard({ service }) {
+  const [liked, setLiked] = useState(false);
 
   return (
-    <div
-      className={` backdrop-blur-md border border-gray-800 rounded-2xl p-8 h-full 
+    <div className="w-[300px] rounded-xl overflow-hidden shadow-lg bg-gray-900 text-white relative group border-2 border-gray-800  bg-gray-900/70 backdrop-blur-md  h-full 
                      hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 
-                     transition-all duration-500 ease-in-out bg-gray-900/50   overflow-hidden ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-      }`}
-    >
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-4 ">
-          <h3 className="text-xl w-[70%] font-bold ">{market.title}</h3>
-          <div
-            className={
-              market.trend === "up"
-                ? "bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs  font-medium"
-                : "bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs font-medium"
-            }
-          >
-            {market.trend === "up" ? "High Demand" : "Low Demand"}
-          </div>
-        </div>
-
-        <div className="flex justify-between mb-6">
-          <div>
-            <p className="text-gray-500 text-sm">Budget</p>
-            <p className="text-2xl font-bold">₹{market.budget}</p>
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Proposals</p>
-            <p className="text-2xl font-bold">{market.proposals || 0}</p>
-          </div>
-        </div>
-
-        <div className="h-32 w-full">
-          <canvas ref={chartRef} width="300" height="120" className="w-full h-full"></canvas>
-        </div>
-
-        <button className="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-md">
-          View Project
+                     transition-all duration-300 ease-in-out">
+      {/* Banner Image with Wishlist Icon */}
+      <div className="relative">
+        <img
+          src={service.bannerImage}
+          alt="Service Banner"
+          className="w-full h-48 object-cover"
+        />
+        <button
+          onClick={() => setLiked(!liked)}
+          className="absolute top-2 right-2 bg-gray-800 hover:bg-gray-700 p-1.5 rounded-full shadow-md transition-all"
+        >
+          <Heart
+            className={`w-5 h-5 ${
+              liked ? "fill-red-500 text-red-500" : "text-gray-300"
+            }`}
+          />
         </button>
+      </div>
+
+      {/* Details */}
+      <div className="p-4">
+        {/* Profile + Name + Level */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <img
+              src={service.profileImage}
+              alt={service.name}
+              className="w-8 h-8 rounded-full"
+            />
+            <p className="text-md font-semibold  bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">{service.name}</p>
+          </div>
+          <span className="text-xs font-medium text-green-400 bg-gray-800 px-2 py-1 rounded-full">
+            {service.level}
+          </span>
+        </div>
+
+        {/* Description */}
+        <p className="text-sm text-gray-400 mb-3">{service.description}</p>
+
+        {/* Rating + Price */}
+        <div className="flex items-start flex-col gap-2 justify-between">
+          <div className="text-sm text-yellow-400 ">
+            ★ {service.rating}{" "}
+            <span className="text-gray-400 font-normal">
+              ({service.reviews})
+            </span>
+          </div>
+          <p className="font-semibold  text-blue-600">
+            From ₹{service.budget}
+          </p>
+        </div>
       </div>
     </div>
   );
