@@ -5,7 +5,7 @@ export default function MarketCard({ service }) {
   const [liked, setLiked] = useState(false);
 
   return (
-    <div className="w-[300px] rounded-xl overflow-hidden shadow-lg bg-gray-900 text-white relative group border-2 border-gray-800  bg-gray-900/70 backdrop-blur-md  h-full 
+    <div className="w-[350px] cursor-pointer rounded-xl overflow-hidden shadow-lg bg-gray-900 text-white relative group border-2 border-gray-800  bg-gray-900/70 backdrop-blur-lg  h-full 
                      hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 
                      transition-all duration-300 ease-in-out">
       {/* Banner Image with Wishlist Icon */}

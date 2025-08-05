@@ -88,7 +88,7 @@ function MarketSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 w-[95%] md:w-full mx-auto sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="flex flex-wrap w-[95%] md:w-full items-center justify-center mx-auto  gap-8">
         {projects.map((project, index) => (
           <motion.div
             key={index}
