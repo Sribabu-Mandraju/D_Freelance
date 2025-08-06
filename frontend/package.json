@@ -16,6 +16,7 @@
     "@web3modal/wagmi": "^5.1.11",
     "dotenv": "^17.2.1",
     "framer-motion": "^12.23.12",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.536.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
