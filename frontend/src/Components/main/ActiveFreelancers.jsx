@@ -122,148 +122,191 @@
 import { useState } from "react"
 import { Star, CheckCircle, MapPin, Clock, Award } from "lucide-react"
 
+
+
 const freelancerData = [
   {
     name: "Aarav Mehta",
-    title: "Full-Stack Web3 Developer",
-    skills: ["React", "Solidity", "Node.js", "Web3"],
-    rating: 4.9,
-    projects: 47,
-    hourlyRate: 65,
+    title: "UI/UX Designer",
+    skills: ["UI/UX", "React", "Tailwind"],
+    badges: ["Expert Verified"],
+    rating: 4.8,
+    projects: 32,
     status: "Available",
-    avatar: "https://i.pravatar.cc/150?img=32",
     location: "Mumbai, India",
-    responseTime: "< 1 hour",
-    successRate: 98,
-    totalEarned: "$45,200",
-    badges: ["Top Rated", "Rising Talent"],
+    hourlyRate: 50,
+    responseTime: "1h",
+    successRate: 95,
+    avatar: "https://i.pravatar.cc/150?img=32",
   },
   {
-    name: "Elena Rodriguez",
-    title: "Smart Contract Auditor",
-    skills: ["Solidity", "Security", "DeFi", "Testing"],
-    rating: 5.0,
-    projects: 23,
-    hourlyRate: 85,
-    status: "Available",
+    name: "Diya Sharma",
+    title: "Backend Developer",
+    skills: ["Node.js", "MongoDB", "Express"],
+    badges: ["Top Rated"],
+    rating: 4.5,
+    projects: 28,
+    status: "Busy",
+    location: "Bangalore, India",
+    hourlyRate: 45,
+    responseTime: "2h",
+    successRate: 90,
     avatar: "https://i.pravatar.cc/150?img=47",
-    location: "Barcelona, Spain",
-    responseTime: "< 30 min",
-    successRate: 100,
-    totalEarned: "$67,800",
-    badges: ["Expert Verified", "Top Rated"],
   },
   {
     name: "Karan Patel",
-    title: "Mobile App Developer",
-    skills: ["Flutter", "React Native", "Firebase", "UI/UX"],
-    rating: 4.8,
-    projects: 62,
-    hourlyRate: 45,
-    status: "Busy",
-    avatar: "https://i.pravatar.cc/150?img=12",
-    location: "Toronto, Canada",
-    responseTime: "< 2 hours",
-    successRate: 96,
-    totalEarned: "$38,900",
-    badges: ["Rising Talent"],
-  },
-  {
-    name: "Yuki Tanaka",
-    title: "UI/UX Designer",
-    skills: ["Figma", "Adobe XD", "Prototyping", "Web3 UX"],
+    title: "Mobile Developer",
+    skills: ["Flutter", "Firebase", "Dart"],
+    badges: ["Expert Verified"],
     rating: 4.9,
-    projects: 89,
-    hourlyRate: 55,
+    projects: 41,
     status: "Available",
-    avatar: "https://i.pravatar.cc/150?img=44",
-    location: "Tokyo, Japan",
-    responseTime: "< 1 hour",
-    successRate: 97,
-    totalEarned: "$52,300",
-    badges: ["Top Rated", "Design Expert"],
+    location: "Ahmedabad, India",
+    hourlyRate: 60,
+    responseTime: "1h",
+    successRate: 98,
+    avatar: "https://i.pravatar.cc/150?img=12",
   },
-  {
-    name: "Marcus Johnson",
-    title: "AI/ML Engineer",
-    skills: ["Python", "TensorFlow", "PyTorch", "Data Science"],
-    rating: 4.7,
-    projects: 34,
-    hourlyRate: 70,
-    status: "Available",
-    avatar: "https://i.pravatar.cc/150?img=19",
-    location: "San Francisco, USA",
-    responseTime: "< 3 hours",
-    successRate: 94,
-    totalEarned: "$41,600",
-    badges: ["AI Specialist"],
-  },
-  {
-    name: "Sofia Andersson",
-    title: "Content Strategist",
-    skills: ["Technical Writing", "SEO", "Blockchain", "Marketing"],
-    rating: 4.8,
-    projects: 156,
-    hourlyRate: 35,
-    status: "Available",
-    avatar: "https://i.pravatar.cc/150?img=68",
-    location: "Stockholm, Sweden",
-    responseTime: "< 1 hour",
-    successRate: 99,
-    totalEarned: "$29,800",
-    badges: ["Content Expert", "Top Rated"],
-  },
-]
+];
 
-const ActiveFreelancers = () => {
-  const [selectedFreelancer, setSelectedFreelancer] = useState(null)
-
+export default function ActiveFreelancers() {
   return (
-    <section className="py-20 px-4 relative overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-600/5 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-cyan-600/5 rounded-full filter blur-3xl"></div>
-      </div>
+    <section className="py-20 px-4 md:px-8 lg:px-16 relative overflow-hidden bg-black">
+      {/* Background gradients and grid overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-cyan-900/20 rounded-xl animate-pulse" />
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-sm" />
+      <div className="absolute inset-[1px] rounded-xl bg-black" />
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: "20px 20px",
+        }}
+      />
 
-      <div className="mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <div className="inline-block mb-4 px-4 py-1 border border-green-500 text-green-400 rounded-full text-sm font-medium">
-            TOP FREELANCERS
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
-            Meet Our Elite Talent
+      <div className="relative z-10 container mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-white flex items-center justify-center gap-3">
+            <Star className="w-6 h-6 text-cyan-400 drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
+              Meet Our Top Active Freelancers
+            </span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Connect with verified professionals who are ready to bring your projects to life. All freelancers are vetted
-            and have proven track records.
+          <p className="text-gray-300 max-w-2xl mx-auto mt-2">
+            Skilled professionals currently working on high-impact Web3 projects.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {freelancerData.map((freelancer, idx) => (
-            <FreelancerCard key={idx} freelancer={freelancer} onClick={() => setSelectedFreelancer(freelancer)} />
-          ))}
-        </div>
+            <div
+              key={idx}
+              className="relative bg-gray-900/70 border border-cyan-500/30 rounded-xl p-6 shadow-2xl shadow-cyan-500/20 hover:border-cyan-400/70 hover:shadow-cyan-500/30 transition-all duration-300 group"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
+              <div className="absolute top-2 right-4">
+                <span
+                  className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
+                    freelancer.status === "Available"
+                      ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                      : "bg-red-500/10 text-red-400 border border-red-500/20"
+                  }`}
+                >
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      freelancer.status === "Available" ? "bg-green-400 animate-pulse" : "bg-red-400"
+                    }`}
+                  />
+                  {freelancer.status}
+                </span>
+              </div>
 
-        <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">Ready to hire top talent?</h3>
-          <p className="text-gray-400 mb-6">
-            Join thousands of clients who have found their perfect freelancer match on CryptoLance.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-8 py-3 rounded-lg font-semibold transition-all">
-              Browse All Freelancers
-            </button>
-            <button className="border border-gray-600 hover:border-purple-500 text-gray-200 hover:text-white px-8 py-3 rounded-lg transition-all">
-              Post a Job
-            </button>
-          </div>
+              <div className="flex items-start gap-4 mb-4 mt-3">
+                <div className="relative">
+                  <img
+                    src={freelancer.avatar || "/placeholder.svg"}
+                    alt={freelancer.name}
+                    className="w-16 h-16 rounded-full border-2 border-gray-700 object-cover group-hover:border-cyan-500/50 transition-colors"
+                  />
+                  {freelancer.badges.includes("Expert Verified") && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">
+                    {freelancer.name}
+                  </h3>
+                  <p className="text-gray-300 text-sm mb-2">{freelancer.title}</p>
+                  <div className="flex items-center gap-2 text-xs text-gray-300">
+                    <MapPin className="w-3 h-3" />
+                    {freelancer.location}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-1 mb-4">
+                {freelancer.badges.map((badge, i) => (
+                  <span
+                    key={i}
+                    className="text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded-full border border-purple-500/20"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-1 mb-4">
+                {freelancer.skills.slice(0, 4).map((skill, i) => (
+                  <span key={i} className="text-xs bg-gray-800/60 text-gray-300 px-2 py-1 rounded-full border border-gray-600/50 group-hover:border-cyan-500/50">
+                    {skill}
+                  </span>
+                ))}
+                {freelancer.skills.length > 4 && (
+                  <span className="text-xs text-gray-300">+{freelancer.skills.length - 4} more</span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <div className="flex items-center gap-1 text-yellow-400 font-semibold text-sm">
+                    <Star className="w-4 h-4 fill-yellow-400" />
+                    {freelancer.rating}
+                  </div>
+                  <p className="text-xs text-gray-300">{freelancer.projects} projects</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-white font-semibold">${freelancer.hourlyRate}/hr</p>
+                  <p className="text-xs text-gray-300">Hourly rate</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-gray-300 mb-4">
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {freelancer.responseTime}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Award className="w-3 h-3" />
+                  {freelancer.successRate}% success
+                </div>
+              </div>
+
+              <button className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white text-sm py-2 rounded-lg transition-colors">
+                View Profile
+              </button>
+            </div>
+          ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
-export default ActiveFreelancers;
 function FreelancerCard({ freelancer, onClick }) {
   return (
     <div
@@ -287,7 +330,7 @@ function FreelancerCard({ freelancer, onClick }) {
         </span>
       </div>
 
-      <div className="flex items-start gap-4 mb-4 mt-3 md:mt-0">
+      <div className="flex items-start gap-4 mb-4 mt-3 md:mt-0 back">
         <div className="relative">
           <img
             src={freelancer.avatar || "/placeholder.svg"}
