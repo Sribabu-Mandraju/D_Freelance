@@ -18,7 +18,7 @@ const categories = [
     icon: <Code className="w-8 h-8" />,
     jobs: 1247,
     avgPrice: "$2,500",
-    color: "from-purple-500 to-cyan-500",
+    color: "from-purple-500 to-pink-500",
     description: "Full-stack development, React, Node.js, and more",
   },
   {
@@ -26,7 +26,7 @@ const categories = [
     icon: <Database className="w-8 h-8" />,
     jobs: 892,
     avgPrice: "$5,000",
-    color: "from-cyan-500 to-blue-500",
+    color: "from-purple-500 to-pink-500",
     description: "Solidity, Web3, DeFi, and blockchain solutions",
   },
   {
@@ -34,7 +34,7 @@ const categories = [
     icon: <Palette className="w-8 h-8" />,
     jobs: 1156,
     avgPrice: "$1,800",
-    color: "from-blue-500 to-purple-500",
+    color: "from-purple-500 to-pink-500",
     description: "User interface design, prototyping, user research",
   },
   {
@@ -50,7 +50,7 @@ const categories = [
     icon: <Smartphone className="w-8 h-8" />,
     jobs: 743,
     avgPrice: "$3,200",
-    color: "from-pink-500 to-cyan-500",
+    color: "from-purple-500 to-pink-500",
     description: "iOS, Android, React Native, Flutter",
   },
   {
@@ -58,7 +58,7 @@ const categories = [
     icon: <Brain className="w-8 h-8" />,
     jobs: 456,
     avgPrice: "$4,500",
-    color: "from-cyan-500 to-purple-500",
+    color: "from-purple-500 to-pink-500",
     description: "Machine learning, data science, AI integration",
   },
   {
@@ -66,7 +66,7 @@ const categories = [
     icon: <Search className="w-8 h-8" />,
     jobs: 1834,
     avgPrice: "$800",
-    color: "from-purple-500 to-blue-500",
+    color: "from-purple-500 to-pink-500",
     description: "Search optimization, social media, marketing",
   },
   {
@@ -74,7 +74,7 @@ const categories = [
     icon: <Video className="w-8 h-8" />,
     jobs: 567,
     avgPrice: "$1,200",
-    color: "from-blue-500 to-cyan-500",
+    color: "from-purple-500 to-pink-500",
     description: "Video production, motion graphics, animation",
   },
 ];
@@ -112,16 +112,15 @@ const PopularCategories = () => {
               onMouseLeave={() => setHoveredCategory(null)}
             >
               {/* Icon with gradient background */}
-              <div
-                className={`inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
-              >
-                <div
-                  className={`p-3 rounded-lg bg-gradient-to-r ${category.color}`}
-                >
+              <div className="inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="relative w-12 h-12 rounded-lg">
+                  {/* Background with opacity (only behind icon) */}
                   <div
-                    className="text-white text-xl"
-                    style={{ backgroundColor: "transparent" }}
-                  >
+                    className={`absolute inset-0 rounded-lg bg-gradient-to-r ${category.color} opacity-20 z-0`}
+                  />
+
+                  {/* Icon centered in the box */}
+                  <div className="relative z-10 text-white text-xl flex items-center justify-center h-full w-full">
                     {category.icon}
                   </div>
                 </div>
@@ -185,5 +184,5 @@ const PopularCategories = () => {
       </div>
     </section>
   );
-}
+};
 export default PopularCategories;

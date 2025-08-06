@@ -52,7 +52,7 @@ const HeroSection = () => {
       {/* Grid overlay */}
       <div className="absolute  inset-0 bg-grid-pattern opacity-10"></div>
 
-      <div className="container mx-auto relative z-10 ">
+      <div className=" relative z-10">
         {/* Top stats bar */}
         <div className="bg-gray-800/60 backdrop-blur-md rounded-lg p-2 mb-4 mt-2  sm:mb-4 border border-gray-700/50 shadow-lg">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm overflow-x-auto">
@@ -87,10 +87,10 @@ const HeroSection = () => {
         </div>
 
         {/* Hero content */}
-        <div className="flex w-full mx-auto flex-col lg:flex-row mt-[-70px] gap-8 sm:gap-12 items-center">
+        <div className="flex w-full mx-auto flex-col lg:flex-row md:mt-[-70px] gap-8 sm:gap-12 items-center">
           {/* Left side - Main content */}
           <div
-            className={`w-full lg:w-1/2 scale-[0.7]  transition-all duration-800 ${
+            className={`w-full lg:w-1/2 md:scale-[0.7]  transition-all duration-800 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-30"
@@ -198,7 +198,7 @@ const HeroSection = () => {
 
           {/* Right side - Market preview */}
           <div
-            className={`w-full lg:w-1/2 scale-[0.7] transition-all duration-800 ${
+            className={`w-full lg:w-1/2 md:scale-[0.7] transition-all duration-800 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-20"
