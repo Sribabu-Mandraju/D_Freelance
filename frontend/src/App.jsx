@@ -9,6 +9,7 @@ import ClientDashboard from "./Pages/ClientDashboard";
 import HelpDocs from "./Pages/HelpDocs";
 import WalletConnect from "./Components/walletConnection/WalletConnect";
 import Authenticate from "./Components/walletConnection/Authenticate";
+import GigPage from "./Pages/gig/gigpage";
 const App = () => {
   const handleAuthSuccess = () => {
     return;
@@ -27,6 +28,7 @@ const App = () => {
           path="/connect"
           element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
         />
+        <Route path="/gigpage" element={<GigPage/>}/>
         {/* Add more routes as needed */}
       </Routes>
     </Router>
