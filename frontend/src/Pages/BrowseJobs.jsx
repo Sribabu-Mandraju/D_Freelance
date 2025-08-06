@@ -11,6 +11,7 @@ import {
   Star,
   Bookmark,
 } from "lucide-react";
+import Navbar from "../Components/Navbar";
 
 const jobsData = [
   {
@@ -122,6 +123,7 @@ const BrowseJobs = () => {
   const [priceRange, setPriceRange] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
   const [savedJobs, setSavedJobs] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(false);
 
   const categories = [
     "All",
@@ -161,7 +163,13 @@ const BrowseJobs = () => {
           )
       );
 
-    return matchesSearch && matchesCategory;
+    const matchesPrice =
+      priceRange === "All" ||
+      job.budget.includes(priceRange.split(" ")[0]) ||
+      (priceRange === "$10,000+" &&
+        parseInt(job.budget.split("-")[0].replace(/[^0-9]/g, "")) >= 10000);
+
+    return matchesSearch && matchesCategory && matchesPrice;
   });
 
   const toggleSaveJob = (jobId) => {
@@ -174,6 +182,14 @@ const BrowseJobs = () => {
     setSavedJobs(newSavedJobs);
   };
 
+  const handleLoadMore = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setJobs([...jobs, ...jobsData.slice(0, 3)]);
+    }, 1000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden">
       {/* Animated background elements */}
@@ -183,31 +199,34 @@ const BrowseJobs = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
-      <div className="max-h-[90vh] overflow-y-auto pt-16 pb-8 px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Navbar */}
+        <Navbar />
+
+      <div className=" pt-8 pb-6 px-4 sm:px-6  lg:px-8 relative z-10">
         <div className="container mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
               Browse Jobs
             </h1>
-            <p className="text-base text-gray-300 max-w-2xl mx-auto">
+            <p className="text-sm text-gray-300 max-w-xl mx-auto">
               Discover amazing opportunities from clients around the world
             </p>
           </div>
 
-          {/* Search and Filters */}
-          <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-4 mb-6 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
-            <div className="flex flex-col lg:flex-row gap-4">
+          {/* Sticky Search and Filters */}
+          <div className="sticky top-0 z-20 bg-black/60 backdrop-blur-xl   rounded-2xl p-4 mb-4 shadow-2xl shadow-cyan-500/10">
+            {/* <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div> */}
+            <div className="flex flex-col sm:flex-row gap-3 items-center">
               {/* Search Bar */}
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search jobs, skills, or keywords..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-900/50 border border-cyan-500/50 rounded-lg text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm"
+                  className="w-full pl-9 pr-4 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm"
                 />
               </div>
 
@@ -215,7 +234,7 @@ const BrowseJobs = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 bg-gray-900/50 border border-cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm"
+                className="px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm w-full sm:w-auto"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -227,16 +246,22 @@ const BrowseJobs = () => {
               {/* Filter Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 text-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 text-sm w-full sm:w-auto"
               >
                 <Filter className="w-4 h-4" />
-                Filters
+                {showFilters ? "Hide Filters" : "Show Filters"}
               </button>
             </div>
 
-            {/* Extended Filters */}
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-cyan-500/20 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Extended Filters with Animation */}
+            <div
+              className={`transition-all duration-300 ease-in-out ${
+                showFilters
+                  ? "max-h-96 opacity-100"
+                  : "max-h-0 opacity-0 overflow-hidden"
+              }`}
+            >
+              <div className="mt-3 pt-3   grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1">
                     Price Range
@@ -244,7 +269,7 @@ const BrowseJobs = () => {
                   <select
                     value={priceRange}
                     onChange={(e) => setPriceRange(e.target.value)}
-                    className="w-full px-3 py-2 bg-gray-900/50 border border-cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm"
+                    className="w-full px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm"
                   >
                     {priceRanges.map((range) => (
                       <option key={range} value={range}>
@@ -257,7 +282,7 @@ const BrowseJobs = () => {
                   <label className="block text-xs font-medium text-gray-300 mb-1">
                     Job Type
                   </label>
-                  <select className="w-full px-3 py-2 bg-gray-900/50 border border-cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm">
+                  <select className="w-full px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm">
                     <option>All Types</option>
                     <option>Fixed Price</option>
                     <option>Hourly</option>
@@ -267,7 +292,7 @@ const BrowseJobs = () => {
                   <label className="block text-xs font-medium text-gray-300 mb-1">
                     Experience Level
                   </label>
-                  <select className="w-full px-3 py-2 bg-gray-900/50 border border-cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm">
+                  <select className="w-full px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm">
                     <option>All Levels</option>
                     <option>Entry Level</option>
                     <option>Intermediate</option>
@@ -275,7 +300,7 @@ const BrowseJobs = () => {
                   </select>
                 </div>
               </div>
-            )}
+            </div>
           </div>
 
           {/* Results Summary */}
@@ -283,7 +308,7 @@ const BrowseJobs = () => {
             <p className="text-gray-400 text-sm">
               Showing {filteredJobs.length} of {jobs.length} jobs
             </p>
-            <select className="px-3 py-2 bg-gray-900/50 border border-cyan-500/50 rounded-lg text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <select className="px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
               <option>Most Recent</option>
               <option>Highest Budget</option>
               <option>Lowest Budget</option>
@@ -292,7 +317,7 @@ const BrowseJobs = () => {
           </div>
 
           {/* Job Listings */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredJobs.map((job) => (
               <JobCard
                 key={job.id}
@@ -304,9 +329,38 @@ const BrowseJobs = () => {
           </div>
 
           {/* Load More */}
-          <div className="text-center mt-8">
-            <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-300 shadow-lg transform hover:scale-105 text-sm">
-              Load More Jobs
+          <div className="text-center mt-6">
+            <button
+              onClick={handleLoadMore}
+              disabled={isLoading}
+              className={`bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg font-semibold transition-all duration-300 shadow-lg transform hover:scale-105 text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Loading...
+                </span>
+              ) : (
+                "Load More Jobs"
+              )}
             </button>
           </div>
         </div>
@@ -317,14 +371,13 @@ const BrowseJobs = () => {
 
 function JobCard({ job, isSaved, onToggleSave }) {
   return (
+
+    // ${
+    //     job.featured ? "bg-cyan-500/5" : "bg-black/40"
+    //   }
     <div
-      className={`bg-black/40 backdrop-blur-xl border rounded-2xl p-4 hover:border-cyan-500/50 transition-all duration-300 shadow-2xl shadow-cyan-500/10 relative overflow-hidden ${
-        job.featured
-          ? "border-cyan-500/30 bg-cyan-500/5"
-          : "border-gray-700/30"
-      }`}
+      className={`bg-black/40 mt-[] backdrop-blur-xl rounded-2xl p-4 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-cyan-500/10 relative overflow-hidden `}
     >
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
       {job.featured && (
         <div className="inline-flex items-center gap-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs px-2 py-1 rounded-full mb-3">
           <Star className="w-3 h-3" />
@@ -332,18 +385,18 @@ function JobCard({ job, isSaved, onToggleSave }) {
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
-          <h3 className="text-lg font-bold text-white mb-2 hover:text-cyan-300 cursor-pointer transition-colors">
+          <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 mb-1 hover:bg-gradient-to-r hover:from-cyan-300 hover:to-blue-400 cursor-pointer transition-all duration-300">
             {job.title}
           </h3>
-          <p className="text-sm text-gray-300 leading-relaxed line-clamp-2">
+          <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">
             {job.description}
           </p>
         </div>
         <button
           onClick={onToggleSave}
-          className={`ml-4 p-2 rounded-lg transition-colors ${
+          className={`ml-3 p-2 rounded-lg transition-colors ${
             isSaved
               ? "bg-cyan-500 text-white"
               : "bg-gray-900/50 text-gray-400 hover:bg-cyan-500/20"
@@ -354,11 +407,11 @@ function JobCard({ job, isSaved, onToggleSave }) {
       </div>
 
       {/* Skills */}
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex flex-wrap gap-1.5 mb-2">
         {job.skills.map((skill, index) => (
           <span
             key={index}
-            className="bg-gray-900/50 text-gray-300 px-2 py-1 rounded-full text-xs border border-gray-700/50 hover:border-cyan-500/50 transition-colors"
+            className="bg-gray-900/50 text-cyan-300 px-2 py-0.5 rounded-full text-xs hover:text-cyan-200 transition-colors duration-200"
           >
             {skill}
           </span>
@@ -366,47 +419,49 @@ function JobCard({ job, isSaved, onToggleSave }) {
       </div>
 
       {/* Job Details */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 text-xs">
-        <div className="flex items-center gap-2 text-gray-400">
-          <DollarSign className="w-4 h-4" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2 text-xs">
+        <div className="flex items-center gap-1.5 text-gray-400">
+          <DollarSign className="w-3 h-3" />
           <span>{job.budget}</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-400">
-          <Clock className="w-4 h-4" />
+        <div className="flex items-center gap-1.5 text-gray-400">
+          <Clock className="w-3 h-3" />
           <span>{job.timeframe}</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-400">
-          <MapPin className="w-4 h-4" />
+        <div className="flex items-center gap-1.5 text-gray-400">
+          <MapPin className="w-3 h-3" />
           <span>{job.location}</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-400">
-          <Users className="w-4 h-4" />
+        <div className="flex items-center gap-1.5 text-gray-400">
+          <Users className="w-3 h-3" />
           <span>{job.proposals} proposals</span>
         </div>
       </div>
 
       {/* Client Info and Actions */}
-      <div className="flex justify-between items-center pt-3 border-t border-cyan-500/20">
-        <div className="flex items-center gap-3">
+      <div className="flex justify-between items-center pt-2">
+        <div className="flex items-center gap-2">
           <img
             src={job.client.avatar || "/placeholder.svg"}
             alt={job.client.name}
-            className="w-8 h-8 rounded-full border-2 border-cyan-500/50"
+            className="w-7 h-7 rounded-full"
           />
           <div>
-            <p className="text-white font-medium text-sm">{job.client.name}</p>
-            <div className="flex items-center gap-2 text-xs text-gray-400">
+            <p className="text-purple-400 font-medium text-xs hover:text-purple-300 transition-colors duration-200">
+              {job.client.name}
+            </p>
+            <div className="flex items-center gap-1.5 text-xs text-gray-400">
               <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
               <span>{job.client.rating}</span>
               <span>•</span>
-              <span>{job.client.jobsPosted} jobs posted</span>
+              <span>{job.client.jobsPosted} jobs</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <span className="text-xs text-gray-400">{job.postedTime}</span>
-          <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm shadow-lg">
+          <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-300 text-xs shadow-lg">
             Submit Proposal
           </button>
         </div>

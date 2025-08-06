@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, {   useState } from 'react';
 import { Heart, Share2, Clock, Check, ChevronDown, ChevronUp, Play, DollarSign, ChevronLeft, ChevronRight, Star, Shield, Zap, Award } from 'lucide-react';
+import Navbar from '../../Components/Navbar';
+
 
 const GigPage = () => {
   const [selectedTier, setSelectedTier] = useState('starter');
@@ -26,6 +28,8 @@ const GigPage = () => {
       return images[(currentIndex + 1) % images.length];
     });
   };
+
+  
 
   const serviceTiers = {
     starter: {
@@ -95,6 +99,7 @@ const GigPage = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
+      <Navbar />
 
       {/* Top Navigation */}
       {/* <div className="border-b border-cyan-500/20 backdrop-blur-xl bg-black/40">
@@ -104,7 +109,7 @@ const GigPage = () => {
       {/* Breadcrumb */}
      
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mt-[70px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main Content */}
           <div className="flex-1">

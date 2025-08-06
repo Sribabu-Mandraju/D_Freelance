@@ -39,75 +39,35 @@ export default function Navbar() {
 
   const navigationItems = [
     {
-      name: "Cryptocurrencies",
+      name: "Find talent",
       icon: Coins,
       items: [
-        "By Market Cap",
-        "New Cryptocurrencies",
-        "Biggest Gainers",
-        "Biggest Losers",
-        "DeFi Tokens",
-        "NFT Collections",
-        "Metaverse Coins",
-        "Gaming Tokens",
-        "Portfolio Tracker",
-        "Crypto API",
-        "Price Widgets",
-        "Market Analysis",
+        "Post a job and hire a pro",
+        "Browse and buy projects",
+        "Get advice from an industry expert",
+        
       ],
     },
-    // {
-    //   name: "DexScan",
-    //   icon: ArrowUpDown,
-    //   items: [
-    //     "Live Trades", "Top Pairs", "New Pairs", "Hot Tokens",
-    //     "Volume Analysis", "Liquidity Pools", "Yield Farming", "DEX Rankings",
-    //     "Swap Analytics", "Token Scanner", "Rug Check", "Contract Audit"
-    //   ]
-    // },
-    // {
-    //   name: "Exchanges",
-    //   icon: Building2,
-    //   items: [
-    //     "Top Exchanges", "Exchange Rankings", "Trading Fees", "Spot Trading",
-    //     "Futures Trading", "Options Trading", "Perpetuals", "Margin Trading",
-    //     "Uniswap", "PancakeSwap", "SushiSwap", "1inch Exchange"
-    //   ]
-    // },
     {
-      name: "Community",
+      name: "Find work",
       icon: Users,
       items: [
-        "Forums",
-        "Discord Server",
-        "Telegram Groups",
-        "Twitter Updates",
-        "Latest News",
-        "Market Articles",
-        "Video Content",
-        "Podcasts",
-        "Conferences",
-        "Meetups",
-        "Webinars",
-        "AMAs",
+        "Ways to learn",
+        "Find work for your skills",
+        "Win work with adds",
+        "Join freelancer plus",
+       
       ],
     },
     {
-      name: "Products",
+      name: "Why CryptoLance",
       icon: Package,
       items: [
-        "Mobile App",
-        "Desktop App",
-        "Browser Extension",
-        "API Access",
-        "Advertising",
-        "Consulting",
-        "Listing Services",
-        "Market Making",
-        "Institutional",
-        "White Label",
-        "Custom Solutions",
-        "Enterprise API",
+        "Success stories",
+        "Reviews",
+        "How to hire",
+        "How to find work",
+        
       ],
     },
   ];
@@ -148,7 +108,7 @@ export default function Navbar() {
           </div>
 
           {/* Navigation Menu */}
-          <nav className="hidden lg:flex items-center gap-0">
+          <nav className="hidden lg:flex items-center gap-4">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
               const [leftColumn, rightColumn] = splitItemsIntoColumns(
@@ -162,23 +122,17 @@ export default function Navbar() {
                   onMouseEnter={() => handleMouseEnter(item.name)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <button className="flex items-center space-x-1 text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group">
+                  <button className="flex items-center space-x-1 text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group">
                     <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
                     <span className="text-[14px]">{item.name}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-all duration-300 ${
-                        activeDropdown === item.name
-                          ? "rotate-180 text-cyan-400"
-                          : ""
-                      }`}
-                    />
+                   
                   </button>
 
                   {/* Dropdown Menu - Two Columns */}
                   {activeDropdown === item.name && (
-                    <div className="absolute top-[33px] left-0 mt-2 w-96 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
+                    <div className="absolute top-[33px] left-0 mt-2 w-72 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
                       <div className="p-6">
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 gap-4">
                           {/* Left Column */}
                           <div className="space-y-2">
                             {leftColumn.map((subItem, itemIndex) => (
@@ -215,21 +169,22 @@ export default function Navbar() {
         </div>
 
         {/* Right Side - Portfolio, Watchlist, Search, Login */}
-        <div className="flex items-center gap-2 ">
+        <div className="flex items-center md:gap-4 ">
           {/* Portfolio */}
           <Link
             to="/portfolio"
-            className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group"
+            className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group"
           >
             <Portfolio className="w-4 h-4 mr-2  group-hover:text-cyan-400 transition-colors duration-300" />
             Portfolio
           </Link>
 
           {/* Watchlist */}
-          <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group">
+          <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group">
             <Star className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
             Watchlist
           </button>
+          <div className="flex flex-row gap-1 items-center">
 
           {/* Search Bar with neon effect */}
           <div className="relative hidden md:block">
@@ -387,6 +342,7 @@ export default function Navbar() {
                 </div>
               </div>
             )}
+          </div>
           </div>
 
           {/* Mobile Menu */}

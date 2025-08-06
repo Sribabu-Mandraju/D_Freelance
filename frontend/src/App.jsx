@@ -18,23 +18,25 @@ const App = () => {
   };
   return (
     <>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/browse-jobs" element={<BrowseJobs />} />
-          <Route path="/post-job" element={<PostJob />} />
-          <Route path="/freelancer/:id" element={<FreelancerProfile />} />
-          <Route path="/dashboard" element={<ClientDashboard />} />
-          <Route path="/help" element={<HelpDocs />} />
-          <Route
-            path="/connect"
-            element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
-          />
-          <Route path="/gigpage" element={<GigPage />} />
-          {/* Add more routes as needed */}
-        </Routes>
-      </Router>
+      <div className="mt-[65px]">
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/browse-jobs" element={<BrowseJobs />} />
+            <Route path="/post-job" element={<PostJob />} />
+            <Route path="/freelancer/:id" element={<FreelancerProfile />} />
+            <Route path="/dashboard" element={<ClientDashboard />} />
+            <Route path="/help" element={<HelpDocs />} />
+            <Route
+              path="/connect"
+              element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
+            />
+            <Route path="/gigpage" element={<GigPage />} />
+            {/* Add more routes as needed */}
+          </Routes>
+        </Router>
+      </div>
       <Footer />
     </>
   );
