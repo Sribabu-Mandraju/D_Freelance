@@ -4,17 +4,23 @@ import dotenv from "dotenv";
 import ProposalRoutes from "./Routes/ProposalRoutes.js";
 import BidRoutes from "./routes/BidRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
+import authRoutes from "./routes/AuthRoutes.js";
+import cors from "cors"
+
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(cors())
+
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
 app.use("/api/users", UserRoutes);
+app.use("/api/auth",authRoutes)
 
 // Default route
 app.get("/", (req, res) => {
