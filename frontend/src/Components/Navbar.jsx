@@ -407,8 +407,8 @@ const  Navbar = () => {
     <>
       {/* Main Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 bg-[#17171A] border-b border-gray-800">
-        <div className=" mx-auto px-4">
-          <div className="flex items-center h-16">
+        <div className="flex justify-between  px-4">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <div className="relative overflow-hidden rounded-full w-8 h-8 bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">

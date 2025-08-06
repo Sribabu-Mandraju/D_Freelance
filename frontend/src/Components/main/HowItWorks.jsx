@@ -408,6 +408,7 @@
 
 import { useState, useEffect } from "react"
 import { Wallet, Search, FileText, Code, DollarSign, Star, Shield, Zap, Globe } from "lucide-react"
+import { FaDatabase } from "react-icons/fa";
 
  const HowItWorksSection = () => {
   const steps = [
@@ -485,7 +486,7 @@ import { Wallet, Search, FileText, Code, DollarSign, Star, Shield, Zap, Globe } 
           ))}
         </div>
 
-        <div className="mt-20 bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-8 md:p-12">
+        <div className="mt-20 bg-gray-900/50 backdrop-blur-sm sm:border sm:border-gray-800 rounded-xl md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
               <h3 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
@@ -528,34 +529,37 @@ function StepCard({ step, index }) {
   }, [index])
 
   return (
-    <div
-      className={`relative transition-all duration-700 ease-out ${
-        isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-24 scale-95"
-      } group`}
-    >
-      <div className="relative bg-gray-900/70 backdrop-blur-md border border-gray-800 rounded-2xl p-6 h-full hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ease-in-out">
-        {/* Step number */}
-        <div className="absolute -top-4 -left-4 w-8 h-8 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-          {step.number}
-        </div>
+ <div
+  className={`relative transition-all duration-700 ease-out ${
+    isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-24 scale-95"
+  } group`}
+>
+  <div
+    className="relative bg-gray-900/70 backdrop-blur-md shadow-lg rounded-2xl p-6 h-full hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ease-in-out"
+    style={{
+      clipPath: "polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0% 100%)"
+    }}
+  >
+    {/* Step number */}
 
-        {/* Icon */}
-        <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${step.color} bg-opacity-20 mb-4`}>
-          <div className={`bg-gradient-to-r ${step.color} bg-clip-text text-transparent`}>{step.icon}</div>
-        </div>
-
-        {/* Content */}
-        <div>
-          <h3 className="text-xl font-bold mb-3 text-white group-hover:text-purple-300 transition-colors duration-300">
-            {step.title}
-          </h3>
-          <p className="text-gray-300 leading-relaxed text-sm">{step.description}</p>
-        </div>
-
-        {/* Decorative element */}
-        <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-purple-500/10 to-cyan-500/10 rounded-tl-full opacity-50 group-hover:opacity-80 transition-opacity duration-300" />
-      </div>
+    {/* Icon */}
+    <div className={`inline-flex p-3 rounded-lg bg-opacity-20 mb-4`}>
+      <div className={``}>{step.icon}</div>
     </div>
+
+    {/* Content */}
+    <div>
+      <h3 className="text-xl font-bold mb-3 text-white group-hover:text-purple-300 transition-colors duration-300">
+        {step.title}
+      </h3>
+      <p className="text-gray-300 leading-relaxed text-sm">{step.description}</p>
+    </div>
+
+    {/* Decorative element */}
+    <div className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-purple-500/10 to-cyan-500/10 rounded-tl-full opacity-50 group-hover:opacity-80 transition-opacity duration-300" />
+  </div>
+</div>
+
   )
 }
 

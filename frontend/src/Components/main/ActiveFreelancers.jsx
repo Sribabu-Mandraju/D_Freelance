@@ -267,19 +267,19 @@ export default ActiveFreelancers;
 function FreelancerCard({ freelancer, onClick }) {
   return (
     <div
-      className="relative backdrop-blur-md bg-gray-900/70 border border-gray-800 rounded-2xl p-6 h-full hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ease-in-out cursor-pointer group"
+      className="relative  backdrop-blur-md bg-gray-900/70 border border-gray-800 rounded-2xl p-6 h-full hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ease-in-out cursor-pointer group"
       onClick={onClick}
     >
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-2 md:top-4 right-4 ">
         <span
-          className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
+          className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1  rounded-full ${
             freelancer.status === "Available"
               ? "bg-green-500/10 text-green-400 border border-green-500/20"
               : "bg-red-500/10 text-red-400 border border-red-500/20"
           }`}
         >
           <div
-            className={`w-2 h-2 rounded-full ${
+            className={`w-2 h-2 rounded-full  ${
               freelancer.status === "Available" ? "bg-green-400 animate-pulse" : "bg-red-400"
             }`}
           />
@@ -287,7 +287,7 @@ function FreelancerCard({ freelancer, onClick }) {
         </span>
       </div>
 
-      <div className="flex items-start gap-4 mb-4">
+      <div className="flex items-start gap-4 mb-4 mt-3 md:mt-0">
         <div className="relative">
           <img
             src={freelancer.avatar || "/placeholder.svg"}
