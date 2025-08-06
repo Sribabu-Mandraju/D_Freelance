@@ -10,73 +10,74 @@ const FreelancerProfile = () => {
   const [activeTab, setActiveTab] = useState("overview")
 
   // Mock freelancer data
-  const freelancer = {
-    id: 1,
-    name: "Sarah Chen",
-    title: "Full-Stack Web3 Developer",
-    avatar: "https://i.pravatar.cc/150?img=47",
-    location: "San Francisco, CA",
-    hourlyRate: 75,
-    totalEarned: "$127,500",
-    jobsCompleted: 89,
-    rating: 4.9,
-    reviews: 67,
-    responseTime: "< 1 hour",
-    languages: ["English (Native)", "Mandarin (Fluent)"],
-    memberSince: "2022",
-    lastActive: "2 hours ago",
-    badges: ["Top Rated", "Expert Verified", "Rising Talent"],
-    skills: [
-      "React",
-      "Node.js",
-      "Solidity",
-      "Web3",
-      "JavaScript",
-      "TypeScript",
-      "Smart Contracts",
-      "DeFi",
-      "NFTs",
-      "Blockchain",
-      "MongoDB",
-      "PostgreSQL",
-    ],
-    bio: "Passionate full-stack developer with 5+ years of experience building scalable web applications and 2+ years specializing in Web3 development. I help startups and enterprises build secure, user-friendly decentralized applications.",
-    portfolio: [
-      {
-        id: 1,
-        title: "DeFi Trading Platform",
-        image: "https://via.placeholder.com/400x300",
-        description: "Built a comprehensive DeFi trading platform with real-time data",
-        technologies: ["React", "Solidity", "Web3"],
-      },
-      {
-        id: 2,
-        title: "NFT Marketplace",
-        image: "https://via.placeholder.com/400x300",
-        description: "Created a full-featured NFT marketplace with minting capabilities",
-        technologies: ["Next.js", "Smart Contracts", "IPFS"],
-      },
-    ],
-    reviews: [
-      {
-        id: 1,
-        client: "TechCorp Inc",
-        rating: 5,
-        comment:
-          "Sarah delivered exceptional work on our DeFi project. Her expertise in Web3 development is outstanding.",
-        project: "DeFi Dashboard Development",
-        date: "2 weeks ago",
-      },
-      {
-        id: 2,
-        client: "Crypto Startup",
-        rating: 5,
-        comment: "Amazing developer! Completed the smart contract audit ahead of schedule with detailed documentation.",
-        project: "Smart Contract Audit",
-        date: "1 month ago",
-      },
-    ],
-  }
+const freelancer = {
+  id: 1,
+  name: "Sarah Chen",
+  title: "Full-Stack Web3 Developer",
+  avatar: "https://i.pravatar.cc/150?img=47",
+  location: "San Francisco, CA",
+  hourlyRate: 75,
+  totalEarned: "$127,500",
+  jobsCompleted: 89,
+  rating: 4.9,
+  totalReviews: 67,
+  responseTime: "< 1 hour",
+  languages: ["English (Native)", "Mandarin (Fluent)"],
+  memberSince: "2022",
+  lastActive: "2 hours ago",
+  badges: ["Top Rated", "Expert Verified", "Rising Talent"],
+  skills: [
+    "React",
+    "Node.js",
+    "Solidity",
+    "Web3",
+    "JavaScript",
+    "TypeScript",
+    "Smart Contracts",
+    "DeFi",
+    "NFTs",
+    "Blockchain",
+    "MongoDB",
+    "PostgreSQL",
+  ],
+  bio: "Passionate full-stack developer with 5+ years of experience...",
+  portfolio: [
+    {
+      id: 1,
+      title: "DeFi Trading Platform",
+      image: "https://via.placeholder.com/400x300",
+      description: "Built a comprehensive DeFi trading platform...",
+      technologies: ["React", "Solidity", "Web3"],
+    },
+    {
+      id: 2,
+      title: "NFT Marketplace",
+      image: "https://via.placeholder.com/400x300",
+      description: "Created a full-featured NFT marketplace...",
+      technologies: ["Next.js", "Smart Contracts", "IPFS"],
+    },
+  ],
+  clientReviews: [
+    {
+      id: 1,
+      client: "TechCorp Inc",
+      rating: 5,
+      comment:
+        "Sarah delivered exceptional work...",
+      project: "DeFi Dashboard Development",
+      date: "2 weeks ago",
+    },
+    {
+      id: 2,
+      client: "Crypto Startup",
+      rating: 5,
+      comment: "Amazing developer...",
+      project: "Smart Contract Audit",
+      date: "1 month ago",
+    },
+  ],
+};
+
 
   return (
     <div className="min-h-screen bg-gray-900">
