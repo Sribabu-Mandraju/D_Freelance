@@ -46,8 +46,9 @@ const verifySignature = async (req, res, next) => {
       const userExists = !!user;
 
       const token = jwt.sign({ address: address.toLowerCase() }, process.env.JWT_SECRET, {
-        expiresIn: '1h',
+        expiresIn: '24h',
       });
+      console.log(token)
 
       res.json({
         success: true,
