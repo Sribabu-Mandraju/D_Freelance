@@ -511,34 +511,25 @@ function TestimonialCard({ testimonial, index }) {
   }, [index])
 
   return (
-    <div
-      className={`bg-gray-900/30 backdrop-blur-md border border-gray-800/50 rounded-xl p-6 hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-500 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-      }`}
-    >
-      <div className="flex items-center mb-4">
-        <img
-          src={testimonial.avatar || "/placeholder.svg"}
-          alt={testimonial.name}
-          className="w-12 h-12 rounded-full border-2 border-gray-700 mr-4"
-        />
-        <div>
-          <p className="font-bold text-white">{testimonial.name}</p>
-          <p className="text-sm text-gray-400">{testimonial.role}</p>
-        </div>
-      </div>
-
-      <div className="flex mb-3">
-        {[...Array(testimonial.rating)].map((_, i) => (
-          <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-        ))}
-      </div>
-
-      <p className="text-gray-300 italic text-sm leading-relaxed">"{testimonial.content}"</p>
-
-      <div className="mt-4 pt-4 border-t border-gray-700">
-        <p className="text-purple-400 text-xs font-medium">{testimonial.project}</p>
-      </div>
+  <div className="bg-gray-900/70 backdrop-blur-md border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/70 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-500 group">
+  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
+  <div className="flex items-center mb-4">
+    <img
+      src={testimonial.avatar || "/placeholder.svg"}
+      alt={testimonial.name}
+      className="w-12 h-12 rounded-full border-2 border-gray-700 mr-4 group-hover:border-cyan-500/50 transition-colors"
+    />
+    <div>
+      <p className="font-bold text-white group-hover:text-cyan-300 transition-colors">{testimonial.name}</p>
+      <p className="text-sm text-gray-300">{testimonial.role}</p>
     </div>
+  </div>
+  <div className="flex mb-3">
+    {[...Array(testimonial.rating)].map((_, i) => (
+      <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400 drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]" />
+    ))}
+  </div>
+  <p className="text-gray-300 italic text-sm leading-relaxed">"{testimonial.content}"</p>
+</div>
   )
 }

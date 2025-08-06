@@ -112,43 +112,21 @@ const PopularCategories = () => {
               onMouseLeave={() => setHoveredCategory(null)}
             >
               {/* Icon with gradient background */}
-              <div className="inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                <div className="relative w-12 h-12 rounded-lg">
-                  {/* Background with opacity (only behind icon) */}
-                  <div
-                    className={`absolute inset-0 rounded-lg bg-gradient-to-r ${category.color} opacity-20 z-0`}
-                  />
-
-                  {/* Icon centered in the box */}
-                  <div className="relative z-10 text-white text-xl flex items-center justify-center h-full w-full">
-                    {category.icon}
-                  </div>
-                </div>
-              </div>
-
-              {/* Category info */}
-              <div className="mb-4">
-                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
-                  {category.name}
-                </h3>
-                <p className="text-gray-400 text-sm mb-3">
-                  {category.description}
-                </p>
-              </div>
-
-              {/* Stats */}
-              <div className="flex justify-between items-center text-sm">
-                <div>
-                  <p className="text-gray-400">Available Jobs</p>
-                  <p className="text-white font-semibold">{category.jobs}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-gray-400">Avg. Price</p>
-                  <p className="text-green-400 font-semibold">
-                    {category.avgPrice}
-                  </p>
-                </div>
-              </div>
+            <div className="group relative bg-gray-900/70 backdrop-blur-md border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/70 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 cursor-pointer">
+  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
+  <div className="inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+    <div className="relative w-12 h-12 rounded-lg">
+      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 opacity-20 z-0" />
+      <div className="relative z-10 text-white text-xl flex items-center justify-center h-full w-full">
+        {category.icon}
+      </div>
+    </div>
+  </div>
+  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+    {category.name}
+  </h3>
+  <p className="text-gray-300 text-sm mb-3">{category.description}</p>
+</div>
 
               {/* Hover effect overlay */}
               <div
