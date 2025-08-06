@@ -10,28 +10,33 @@ import HelpDocs from "./Pages/HelpDocs";
 import WalletConnect from "./Components/walletConnection/WalletConnect";
 import Authenticate from "./Components/walletConnection/Authenticate";
 import GigPage from "./Pages/gig/gigpage";
+import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
 const App = () => {
   const handleAuthSuccess = () => {
     return;
   };
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/portfolio" element={<Portfolio />} />
-        <Route path="/browse-jobs" element={<BrowseJobs />} />
-        <Route path="/post-job" element={<PostJob />} />
-        <Route path="/freelancer/:id" element={<FreelancerProfile />} />
-        <Route path="/dashboard" element={<ClientDashboard />} />
-        <Route path="/help" element={<HelpDocs />} />
-        <Route
-          path="/connect"
-          element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
-        />
-        <Route path="/gigpage" element={<GigPage/>}/>
-        {/* Add more routes as needed */}
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/browse-jobs" element={<BrowseJobs />} />
+          <Route path="/post-job" element={<PostJob />} />
+          <Route path="/freelancer/:id" element={<FreelancerProfile />} />
+          <Route path="/dashboard" element={<ClientDashboard />} />
+          <Route path="/help" element={<HelpDocs />} />
+          <Route
+            path="/connect"
+            element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
+          />
+          <Route path="/gigpage" element={<GigPage />} />
+          {/* Add more routes as needed */}
+        </Routes>
+      </Router>
+      <Footer />
+    </>
   );
 };
 

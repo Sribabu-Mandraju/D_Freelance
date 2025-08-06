@@ -29,7 +29,6 @@ export default function PostCryptoProject() {
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <Navbar />
       <div className="pt-32 pb-12">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Header */}
@@ -436,7 +435,6 @@ export default function PostCryptoProject() {
           </form>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

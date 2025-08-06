@@ -81,7 +81,6 @@ const freelancer = {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Navbar />
 
       <div className="pt-32 pb-12">
         <div className="container mx-auto px-4">
@@ -339,7 +338,6 @@ const freelancer = {
         </div>
       </div>
 
-      <Footer />
     </div>
   )
 }

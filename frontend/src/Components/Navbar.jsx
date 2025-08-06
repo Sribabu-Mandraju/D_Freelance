@@ -215,7 +215,7 @@ export default function Navbar() {
         </div>
 
         {/* Right Side - Portfolio, Watchlist, Search, Login */}
-        <div className="flex items-center md:gap-2 ">
+        <div className="flex items-center gap-2 ">
           {/* Portfolio */}
           <Link
             to="/portfolio"
