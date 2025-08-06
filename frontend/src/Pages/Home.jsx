@@ -7,6 +7,7 @@ import ActiveFreelancers from '../Components/main/ActiveFreelancers'
 import Footer from '../Components/Footer'
 import TestimonialsSection from '../Components/main/Testimonals'
 import PopularCategories from '../Components/main/PopularCategories'
+import Chatbot from '../Components/Chatbot'
 const Home = () => {
   return (
     <div>
@@ -17,6 +18,7 @@ const Home = () => {
         <PopularCategories/>
         <ActiveFreelancers/>
         <TestimonialsSection/>
+        <Chatbot/>
         <Footer/>
         
          {/* <Footer/> */}
