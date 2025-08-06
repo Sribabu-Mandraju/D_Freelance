@@ -36,7 +36,6 @@ function WalletConnect({ onAuthSuccess }) {
 
       try {
         console.log('Fetching nonce for address:', address);
-        alert('Triggering API call for nonce');
         const nonceResponse = await fetch('http://localhost:3001/api/auth/get-nonce', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -58,7 +57,6 @@ function WalletConnect({ onAuthSuccess }) {
         console.log('Signature obtained:', signature);
 
         console.log('Verifying signature');
-        alert('Triggering API call for verify');
         const verifyResponse = await fetch('http://localhost:3001/api/auth/verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -90,10 +88,10 @@ function WalletConnect({ onAuthSuccess }) {
 
   return (
     <div>
-      <h2>Connect Wallet</h2>
+      {/* <h2>Connect Wallet</h2> */}
       <w3m-button />
       {chainError && <p style={{ color: 'red' }}>{chainError}</p>}
-      {authStatus && <p>{authStatus}</p>}
+      {/* {authStatus && <p>{authStatus}</p>} */}
     </div>
   );
 }
