@@ -7,6 +7,8 @@ import BrowseJobs from './Pages/BrowseJobs';
 import FreelancerProfile from "./Pages/FreelancerProfile"
 import ClientDashboard from './Pages/ClientDashboard';
 import HelpDocs from './Pages/HelpDocs';
+import WalletConnect from './Components/walletConnection/WalletConnect';
+import Authenticate from './Components/walletConnection/Authenticate';
 const App = () => {
   return (
       <Router>
@@ -18,6 +20,7 @@ const App = () => {
           <Route path="/freelancer/:id" element={<FreelancerProfile />} />
           <Route path="/dashboard" element={<ClientDashboard />} />
           <Route path="/help" element={<HelpDocs />} />
+          <Route path="/connect" element={<WalletConnect />} />
             {/* Add more routes as needed */}
          
         </Routes>
