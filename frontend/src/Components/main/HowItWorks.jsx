@@ -536,17 +536,27 @@ function StepCard({ step, index }) {
 >
   <div
     className="relative bg-gray-900/70 backdrop-blur-md shadow-lg rounded-2xl p-6 h-full hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ease-in-out"
-    style={{
-      clipPath: "polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0% 100%)"
-    }}
+  style={{
+  clipPath: "polygon(0 0, 95% 0, 100% 5%, 100% 100%, 0% 100%)"
+}}
+
   >
     {/* Step number */}
 
     {/* Icon */}
-    <div className={`inline-flex p-3 rounded-lg bg-opacity-20 mb-4`}>
-      <div className={``}>{step.icon}</div>
-    </div>
+     <div className="inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <div className="relative w-12 h-12 rounded-lg">
+                  {/* Background with opacity (only behind icon) */}
+                  <div
+                    className={`absolute inset-0 rounded-lg bg-gradient-to-r ${step.color} opacity-20 z-0`}
+                  />
 
+                  {/* Icon centered in the box */}
+                  <div className="relative z-10 text-white text-xl flex items-center justify-center h-full w-full">
+                    {step.icon}
+                  </div>
+                </div>
+              </div>
     {/* Content */}
     <div>
       <h3 className="text-xl font-bold mb-3 text-white group-hover:text-purple-300 transition-colors duration-300">
