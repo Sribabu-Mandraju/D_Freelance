@@ -106,7 +106,7 @@ export default function Chatbot() {
   return (
     <>
       {/* Floating Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 md:right-6 right-4 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="w-14 h-14 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg hover:shadow-purple-500/25 transition-all duration-300 border-2 border-purple-400/30 flex items-center justify-center"
@@ -124,7 +124,7 @@ export default function Chatbot() {
 
       {/* Chat Interface */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-[380px] h-[430px] z-40">
+        <div className="fixed bottom-24 md:right-6 right-2 w-[300px] md:w-[380px] h-[430px] z-40">
           {/* outer: column layout, hidden overflow so only content area scrolls */}
           <div
             className="w-full h-full bg-gray-900/95 backdrop-blur-sm border border-purple-500/30 shadow-2xl rounded-lg flex flex-col overflow-hidden"
