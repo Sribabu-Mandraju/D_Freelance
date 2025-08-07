@@ -15,13 +15,13 @@ const Home = () => {
       <HeroSection />
       <MarketSection />
 
-      {/* <ActiveFreelancers /> */}
+      <ActiveFreelancers />
 
       <PopularCategories />
       <HowItWorksSection />
       <TestimonialsSection />
       <Chatbot />
-
+{/* // */}
       {/* <Footer/> */}
     </div>
   );
