@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAccount, useSignMessage, useSwitchChain } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
+import { verifyWalletAuth } from '../../store/authSlice/authSlice';
+import { useDispatch } from 'react-redux';
 
 function WalletConnect({ onAuthSuccess }) {
   const { address, isConnected, chain, status } = useAccount();
@@ -8,6 +10,7 @@ function WalletConnect({ onAuthSuccess }) {
   const { switchChain } = useSwitchChain();
   const [authStatus, setAuthStatus] = useState(null);
   const [chainError, setChainError] = useState(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log('useEffect triggered', { status, isConnected, address, chain: chain?.id });
@@ -57,27 +60,44 @@ function WalletConnect({ onAuthSuccess }) {
         console.log('Signature obtained:', signature);
 
         console.log('Verifying signature');
-        const verifyResponse = await fetch('http://localhost:3001/api/auth/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address, signature, nonce }),
-        });
-        console.log('Verify response status:', verifyResponse.status, verifyResponse.statusText);
-        if (!verifyResponse.ok) {
-          throw new Error(`Verify request failed: ${verifyResponse.statusText}`);
-        }
-        const verifyResult = await verifyResponse.json();
-        console.log('Verify response data:', verifyResult);
 
-        if (verifyResult.success) {
-          console.log('Authentication successful, storing JWT');
+        const resultAction = await dispatch(
+          verifyWalletAuth({ address, signature, nonce })
+        );
+        const verifyResult = resultAction.payload;
+        if (verifyResult?.token) {
           setAuthStatus('Authentication successful');
-          localStorage.setItem('authToken', verifyResult.token); // Store JWT
-          onAuthSuccess(verifyResult.token, verifyResult.userExists, verifyResult.user);
+          onAuthSuccess(
+            verifyResult.token,
+            verifyResult.userExists,
+            verifyResult.user
+          );
         } else {
-          setAuthStatus(verifyResult.message || 'Authentication failed');
+          setAuthStatus('Authentication failed');
         }
-      } catch (error) {
+      }
+      //   const verifyResponse = await fetch('http://localhost:3001/api/auth/verify', {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({ address, signature, nonce }),
+      //   });
+      //   console.log('Verify response status:', verifyResponse.status, verifyResponse.statusText);
+      //   if (!verifyResponse.ok) {
+      //     throw new Error(`Verify request failed: ${verifyResponse.statusText}`);
+      //   }
+      //   const verifyResult = await verifyResponse.json();
+      //   console.log('Verify response data:', verifyResult);
+
+      //   if (verifyResult.success) {
+      //     console.log('Authentication successful, storing JWT');
+      //     setAuthStatus('Authentication successful');
+      //     localStorage.setItem('authToken', verifyResult.token); // Store JWT
+      //     onAuthSuccess(verifyResult.token, verifyResult.userExists, verifyResult.user);
+      //   } else {
+      //     setAuthStatus(verifyResult.message || 'Authentication failed');
+      //   }
+      // } 
+      catch (error) {
         console.error('Authentication error:', error);
         setAuthStatus(`Authentication failed: ${error.message}`);
       }

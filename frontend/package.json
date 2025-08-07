@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@rainbow-me/rainbowkit": "^2.2.8",
+    "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.84.1",
     "@wagmi/core": "^2.18.1",
     "@web3modal/wagmi": "^5.1.11",
@@ -21,6 +22,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.7.1",
     "viem": "^2.33.2",
     "wagmi": "^2.16.1"
