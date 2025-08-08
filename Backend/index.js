@@ -5,7 +5,9 @@ import ProposalRoutes from "./Routes/ProposalRoutes.js";
 import BidRoutes from "./routes/BidRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import authRoutes from "./routes/AuthRoutes.js";
-import cors from "cors"
+import HFTtokenRoutes from "./routes/HFTtokenRoutes.js"
+
+import cors from "cors";
 
 // Load environment variables
 dotenv.config();
@@ -15,12 +17,13 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware to parse JSON and enable CORS
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
 app.use("/api/users", UserRoutes);
-app.use("/api/auth",authRoutes)
+app.use("/api/auth", authRoutes);
+app.use("/", HFTtokenRoutes);
 
 // Default route
 app.get("/", (req, res) => {
