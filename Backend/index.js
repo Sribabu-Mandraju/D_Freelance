@@ -23,7 +23,7 @@ app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
 app.use("/api/users", UserRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/", HFTtokenRoutes);
+app.use("/api/hftToken", HFTtokenRoutes);
 
 // Default route
 app.get("/", (req, res) => {
