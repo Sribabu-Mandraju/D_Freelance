@@ -1,21 +1,25 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Home from "./Pages/Home";
-import Portfolio from "./Pages/Portfolio";
-import PostJob from "./Pages/PostJob";
-import BrowseJobs from "./Pages/BrowseJobs";
-import FreelancerProfile from "./Pages/FreelancerProfile";
-import ClientDashboard from "./Pages/ClientDashboard";
-import HelpDocs from "./Pages/HelpDocs";
-import WalletConnect from "./Components/walletConnection/WalletConnect";
-import Authenticate from "./Components/walletConnection/Authenticate";
-import GigPage from "./Pages/gig/gigpage";
-import Navbar from "./Components/Navbar";
-import Footer from "./Components/Footer";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import Home from './Pages/Home';
+import Portfolio from './Pages/Portfolio';
+import PostJob from './Pages/PostJob';
+import BrowseJobs from './Pages/BrowseJobs';
+import FreelancerProfile from './Pages/FreelancerProfile';
+import ClientDashboard from './Pages/ClientDashboard';
+import HelpDocs from './Pages/HelpDocs';
+import WalletConnect from './Components/walletConnection/WalletConnect';
+import Authenticate from './Components/walletConnection/Authenticate';
+import GigPage from './Pages/gig/gigpage';
+import Navbar from './Components/Navbar';
+import Footer from './Components/Footer';
+import ClaimTokens from './Components/testingContracts/ClaimTokens';
+
 const App = () => {
   const handleAuthSuccess = () => {
     return;
   };
+
   return (
     <>
       <div className="mt-[65px]">
@@ -33,9 +37,36 @@ const App = () => {
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
-            {/* Add more routes as needed */}
+            <Route path="/placeBid" element={<ClaimTokens />} />
           </Routes>
         </Router>
+        {/* Add Toaster for toast notifications */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 3000, // Auto-close after 3 seconds
+            style: {
+              background: '#1a202c', // Dark theme background
+              color: '#f7fafc', // Light text
+              border: '1px solid #4a5568',
+              borderRadius: '8px',
+              padding: '12px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: { primary: '#48bb78', secondary: '#f7fafc' }, // Green icon
+            },
+            error: {
+              duration: 3000,
+              iconTheme: { primary: '#f56565', secondary: '#f7fafc' }, // Red icon
+            },
+            loading: {
+              duration: Infinity, // Persist for pending/confirming
+              iconTheme: { primary: '#63b3ed', secondary: '#f7fafc' }, // Blue spinner
+            },
+          }}
+        />
       </div>
       <Footer />
     </>
@@ -43,14 +74,3 @@ const App = () => {
 };
 
 export default App;
-
-// import React from "react"
-// import Cloudinary from "./Components/main/Cloudinary"
-// const App=()=>{
-//   return(
-// <div>
-//   <Cloudinary/>
-// </div>
-//   )
-// }
-// export default App

@@ -18,8 +18,10 @@ router.get("/", getAllBids);
 router.get('/hello/:id', (req, res) => {
   const id = req.params.id;
   res.send(`Hello from /bids/hello/${id}`);
-  
-});router.get("/token/:address", getUserLastClaimTime);
+
+});
+
+router.get("/token/:address", getUserLastClaimTime);
 
 // Define dynamic ones last
 router.get("/:id", getBidById);
