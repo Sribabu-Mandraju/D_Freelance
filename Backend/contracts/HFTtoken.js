@@ -10,7 +10,7 @@ const HFTtoken_contract = new ethers.Contract(
   provider
 );
 
-export const getUserLastClaimTime = async (req, res) => {
+export const getUserHFTtokenData = async (req, res) => {
   try {
     console.log("hello")
     const { address } = req.params;
@@ -23,6 +23,7 @@ export const getUserLastClaimTime = async (req, res) => {
     }
 
     const lastClaimTime = await HFTtoken_contract.lastClaimTime(address);
+    // const bidsAddresses = await HFTtoken_contract.
     
     return res.status(200).json({
       success: true,

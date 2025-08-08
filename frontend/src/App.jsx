@@ -37,7 +37,7 @@ const App = () => {
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
-            <Route path="/placeBid" element={<ClaimTokens />} />
+            <Route path="/claimTokens" element={<ClaimTokens />} />
           </Routes>
         </Router>
         {/* Add Toaster for toast notifications */}
