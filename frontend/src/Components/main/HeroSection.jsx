@@ -1,14 +1,60 @@
 import { useEffect, useState } from "react";
+import { useCountdown } from "../../hooks/useCountdown";
+import { DollarSign, Gem, Wallet, Zap, Copy } from "lucide-react";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeMarket, setActiveMarket] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const walletAddress = "F9ax9qQrFx.....QrVh2HDedW";
+  const targetDate = new Date(
+    Date.now() + 30 * 24 * 60 * 60 * 1000
+  ).toISOString();
+  const timeLeft = useCountdown(targetDate);
+  const [solAmount, setSolAmount] = useState("");
+  const [lyraAmount, setLyraAmount] = useState("");
+
+  const exchangeRate = 0.0001; // 1 LYRA = 0.0001 SOL
+
+  const handleSolChange = (e) => {
+    const value = e.target.value;
+    setSolAmount(value);
+    if (value) {
+      setLyraAmount((parseFloat(value) / exchangeRate).toFixed(4));
+    } else {
+      setLyraAmount("");
+    }
+  };
+
+  const handleLyraChange = (e) => {
+    const value = e.target.value;
+    setLyraAmount(value);
+    if (value) {
+      setSolAmount((parseFloat(value) * exchangeRate).toFixed(4));
+    } else {
+      setSolAmount("");
+    }
+  };
 
   const markets = [
-    { name: "Will Bitcoin's price decline to $73,000 by the end of this month, marking a significant market correction?", probability: 68, change: 2.4, volume: "1.2K " },
-    { name: "  Will the Royal Challengers Bengaluru, win their opening match on March 22?", probability: 42, change: -1.8, volume: "3.4k" },
-    { name: "Will Trump's call with Putin lead to progress in Ukraine peace talks?", probability: 73, change: 5.2, volume: "1.4K" },
+    {
+      name: "Will Bitcoin's price decline to $73,000 by the end of this month, marking a significant market correction?",
+      probability: 68,
+      change: 2.4,
+      volume: "1.2K ",
+    },
+    {
+      name: "  Will the Royal Challengers Bengaluru, win their opening match on March 22?",
+      probability: 42,
+      change: -1.8,
+      volume: "3.4k",
+    },
+    {
+      name: "Will Trump's call with Putin lead to progress in Ukraine peace talks?",
+      probability: 73,
+      change: 5.2,
+      volume: "1.4K",
+    },
     {
       name: "SpaceX Mars Landing",
       probability: 31,
@@ -35,7 +81,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <div className=" border-red-600 sm:pb-20 px-4 mt-[80px] relative overflow-hidden bg-gray-900">
+    <div className=" border-red-600 sm:pb-20 pb-10 px-4 mt-[80px] relative overflow-hidden bg-gray-900">
       {/* Background gradients */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 left-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-purple-600/20 rounded-full filter blur-3xl animate-pulse"></div>
@@ -107,7 +153,10 @@ const HeroSection = () => {
 
             {/* CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-3 mb-8">
-              <a href="#trending" className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white text-base sm:text-lg py-3 px-6 rounded-md flex items-center justify-center shadow-lg shadow-purple-500/20 transition-all hover:shadow-purple-500/40">
+              <a
+                href="#trending"
+                className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white text-base sm:text-lg py-3 px-6 rounded-md flex items-center justify-center shadow-lg shadow-purple-500/20 transition-all hover:shadow-purple-500/40"
+              >
                 Start Trading
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +171,10 @@ const HeroSection = () => {
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </a>
-              <a href="markets" className="border border-gray-700 hover:bg-gray-800 text-gray-200 text-base sm:text-lg py-3 px-6 rounded-md transition-all">
+              <a
+                href="markets"
+                className="border border-gray-700 hover:bg-gray-800 text-gray-200 text-base sm:text-lg py-3 px-6 rounded-md transition-all"
+              >
                 Explore Markets
               </a>
             </div>
@@ -205,165 +257,135 @@ const HeroSection = () => {
             }`}
             style={{ transitionDelay: "200ms" }}
           >
-            <div className="bg-gray-800/60 backdrop-blur-md rounded-xl border border-gray-700/50 shadow-xl overflow-hidden">
-              {/* Market header */}
-              <div className="bg-gray-800 border-b border-gray-700 p-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg sm:text-xl font-semibold text-white">
-                    Trending Markets
-                  </h3>
-                  <div className="flex space-x-2">
-                    <button className="p-2 rounded-md hover:bg-gray-700 text-gray-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 6h18M3 12h18M3 18h18" />
-                      </svg>
-                    </button>
-                    <button className="p-2 rounded-md hover:bg-gray-700 text-gray-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <div className="relative w-full  bg-gradient-to-br from-gray-900/70 to-black/70 backdrop-blur-xl rounded-xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-purple-500/30  shadow-purple-500/20  overflow-hidden">
+              <div
+                className="absolute inset-0 rounded-xl sm:rounded-3xl pointer-events-none"
+                style={{
+                  background:
+                    "linear-gradient(45deg, rgba(139, 92, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(232, 121, 249, 0.3) 100%)",
+                  mask: "linear-gradient(black, black) content-box, linear-gradient(black, black)",
+                  maskComposite: "exclude",
+                  WebkitMaskComposite: "exclude",
+                  padding: "1px",
+                }}
+              ></div>
 
-              {/* Featured market */}
-              <div className="p-4 sm:p-6 border-b border-gray-700/50 bg-gradient-to-r from-purple-900/20 to-cyan-900/20">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-start mb-3 gap-2">
-                  <div>
-                    <h4 className="text-lg sm:text-xl font-semibold text-white">
-                      {markets[activeMarket].name}
-                    </h4>
-                    <p className="text-gray-400 text-xs">
-                      Expires Dec 31, 2024
-                    </p>
-                  </div>
-                  <div className="bg-gray-700/50 rounded-lg px-2 py-1 self-start">
-                    <span className="text-xs sm:text-sm text-gray-300">
-                      Volume: {markets[activeMarket].volume}
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-8 text-purple-400 drop-shadow-lg shadow-purple-500/50">
+                Buy <span className="text-cyan-400">$LYRA</span> Presale
+              </h2>
+
+              {/* Countdown */}
+              <div className="grid grid-cols-4 gap-2 mb-4 sm:mb-8 text-center">
+                {Object.entries(timeLeft).map(([unit, value]) => (
+                  <div key={unit} className="flex flex-col items-center">
+                    <span className="text-gray-400 text-xs sm:text-sm uppercase mb-1">
+                      {unit}
+                    </span>
+                    <span className="text-3xl sm:text-5xl font-extrabold text-purple-300 drop-shadow-lg shadow-purple-500/50">
+                      {String(value).padStart(2, "0")}
                     </span>
                   </div>
-                </div>
+                ))}
+              </div>
 
-                <div className="flex items-end gap-3 mb-3">
-                  <div>
-                    <p className="text-gray-400 text-xs mb-1">
-                      Current Probability
-                    </p>
-                    <p className="text-2xl sm:text-3xl font-bold text-white">
-                      {markets[activeMarket].probability}%
-                    </p>
-                  </div>
-                  <div
-                    className={`px-2 py-1 rounded text-xs ${
-                      markets[activeMarket].change > 0
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 rounded-lg mb-6 font-semibold text-sm shadow-lg shadow-purple-500/30">
+                PRESALE ENDS IN
+              </div>
+
+              <div className="text-center text-gray-300 mb-6 text-lg">
+                1 $LYRA ={" "}
+                <span className="font-semibold text-cyan-300">0.0001 SOL</span>
+                <div className="w-24 h-0.5 bg-gray-700 mx-auto mt-2 rounded-full"></div>
+              </div>
+
+              {/* SOL Selector */}
+              <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white py-2 sm:py-4 rounded-xl mb-6 text-lg font-semibold border border-gray-700 hover:border-cyan-500/50 transition-all duration-300 shadow-lg shadow-gray-900/50 hover:shadow-cyan-500/20">
+                <DollarSign className="w-6 h-6 text-cyan-400" />
+                SOL
+              </button>
+
+              {/* Input Fields */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div>
+                  <label
+                    htmlFor="sol-input"
+                    className="block text-gray-400 text-xs sm:text-sm mb-2"
                   >
-                    {markets[activeMarket].change > 0 ? "+" : ""}
-                    {markets[activeMarket].change}%
+                    SOL you pay (<span className="text-gray-500">$0.00</span>):
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="sol-input"
+                      type="number"
+                      value={solAmount}
+                      onChange={handleSolChange}
+                      placeholder="0"
+                      className="w-full bg-gray-800 text-white py-2 sm:py-3 pl-12 pr-4 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all duration-300 shadow-inner shadow-black/30"
+                    />
+                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400" />
                   </div>
                 </div>
-
-                {/* Chart placeholder */}
-                <div className="h-24 sm:h-32 bg-gray-800/60 rounded-lg mb-4 overflow-hidden">
-                  <svg viewBox="0 0 400 100" className="w-full h-full">
-                    <path
-                      d="M0,50 C50,30 100,60 150,40 C200,20 250,70 300,50 C350,30 400,40 400,50"
-                      fill="none"
-                      stroke="url(#gradient)"
-                      strokeWidth="2"
+                <div>
+                  <label
+                    htmlFor="lyra-input"
+                    className="block text-gray-400 text-xs sm:text-sm mb-2"
+                  >
+                    $LYRA You receive:
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="lyra-input"
+                      type="number"
+                      value={lyraAmount}
+                      onChange={handleLyraChange}
+                      placeholder="0"
+                      className="w-full bg-gray-800 text-white py-2 sm:py-3 pl-4 pr-12 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 shadow-inner shadow-black/30"
                     />
-                    <defs>
-                      <linearGradient
-                        id="gradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="0%"
-                      >
-                        <stop offset="0%" stopColor="#9333ea" />
-                        <stop offset="100%" stopColor="#06b6d4" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
+                    <Gem className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
+                  </div>
                 </div>
+              </div>
 
-                <div className="flex gap-3">
-                  <button className="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-400 py-2 rounded-md font-medium transition-colors">
-                    Buy YES
-                  </button>
-                  <button className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-400 py-2 rounded-md font-medium transition-colors">
-                    Buy NO
+              {/* Select Wallet Button */}
+              <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 sm:py-4 rounded-xl mb-6 text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70">
+                <Wallet className="w-5 h-5" />
+                Select Wallet
+              </button>
+
+              {/* Wallet Address */}
+              <div className="text-center text-gray-400 text-sm sm:mb-6 mb-2">
+                Trouble connecting? You can also send SOL to this wallet:
+                <div className="flex items-center justify-center mt-2">
+                  <a
+                    href={`https://solscan.io/address/${walletAddress.replace(
+                      ".....",
+                      ""
+                    )}`} // Example link, replace with actual explorer
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:text-cyan-300 font-mono text-sm break-all underline underline-offset-2 decoration-cyan-500/50 hover:decoration-cyan-500 transition-colors duration-300"
+                  >
+                    {walletAddress}
+                  </a>
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        walletAddress.replace(".....", "")
+                      )
+                    }
+                    className="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-cyan-400 transition-colors duration-200"
+                    aria-label="Copy wallet address"
+                  >
+                    <Copy className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Market list */}
-              <div className="p-3 sm:p-4">
-                <div className="text-xs sm:text-sm text-gray-400 grid grid-cols-12 gap-2 sm:gap-4 mb-2 px-2">
-                  <div className="col-span-6">Market</div>
-                  <div className="col-span-3 text-right">Prob.</div>
-                  <div className="col-span-3 text-right">Volume</div>
-                </div>
-
-                {markets.map((market, index) => (
-                  <div
-                    key={index}
-                    className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                      activeMarket === index
-                        ? "bg-gray-700/50"
-                        : "hover:bg-gray-700/30"
-                    }`}
-                    onClick={() => setActiveMarket(index)}
-                  >
-                    <div className="grid grid-cols-12 gap-2 sm:gap-4 items-center">
-                      <div className="col-span-6 font-medium text-gray-200 text-xs sm:text-sm truncate">
-                        {market.name}
-                      </div>
-                      <div className="col-span-3 text-right">
-                        <span className="text-white text-xs sm:text-sm">
-                          {market.probability}%
-                        </span>
-                        <span
-                          className={`ml-1 text-xs ${
-                            market.change > 0
-                              ? "text-green-400"
-                              : "text-red-400"
-                          }`}
-                        >
-                          {market.change > 0 ? "+" : ""}
-                          {market.change}%
-                        </span>
-                      </div>
-                      <div className="col-span-3 text-right text-gray-300 text-xs sm:text-sm">
-                        {market.volume}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              {/* Powered by */}
+              <div className="flex items-center justify-center text-gray-500 text-xs">
+                Powered by
+                <Zap className="w-3 h-3 mx-1 text-purple-400" />
+                Web3Payments
               </div>
             </div>
           </div>
@@ -371,8 +393,8 @@ const HeroSection = () => {
       </div>
     </div>
   );
-}
-export default  HeroSection
+};
+export default HeroSection;
 // Add this to your CSS to support extra small screens
 // @media (min-width: 475px) {
 //   .xs\:grid-cols-3 {
