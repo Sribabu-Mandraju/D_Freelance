@@ -175,6 +175,25 @@
         },
         {
             "type": "function",
+            "name": "getBidsOfUser",
+            "inputs": [
+                {
+                    "name": "_bidder",
+                    "type": "address",
+                    "internalType": "address"
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "_ids",
+                    "type": "uint256[]",
+                    "internalType": "uint256[]"
+                }
+            ],
+            "stateMutability": "view"
+        },
+        {
+            "type": "function",
             "name": "lastClaimTime",
             "inputs": [
                 {
