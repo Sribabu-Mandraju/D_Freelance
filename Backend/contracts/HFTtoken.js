@@ -4,6 +4,7 @@ import HFTtoken_ABI from '../abis/HFTtoken_ABI.json' with { type: 'json' };
 const provider = new ethers.JsonRpcProvider("https://sepolia.base.org");
 const HFTtoken_contractAddress = "0xd0D1B6E1dE2F705701FE370e91f8fb4731161d5a";
 
+
 const HFTtoken_contract = new ethers.Contract(
   HFTtoken_contractAddress,
   HFTtoken_ABI,

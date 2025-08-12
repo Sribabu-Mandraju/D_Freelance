@@ -9,9 +9,8 @@ import {
   getProposalCount,
   getImprovementProposals,
   getUserProposals
-} from '../contracts/ProposalManager';
+} from '../contracts/ProposalManager.js';
 
-import {getProposal} from  "../contracts/ProposalManager"
 
 const router = express.Router();
 
