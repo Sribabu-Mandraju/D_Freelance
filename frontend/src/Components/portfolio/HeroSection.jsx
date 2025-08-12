@@ -22,16 +22,16 @@ function HeroSection({ personalInfo, setPersonalInfo }) {
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden mb-6">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
+      {/* <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div> */}
 
       {/* Hero Content */}
-      <div className="text-center mb-8">
+      <div className=" mb-8">
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4">
           <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
             {personalInfo.name}
           </span>
         </h1>
-        <p className="text-xl sm:text-2xl text-gray-300 mb-6">{personalInfo.title}</p>
+        <p className="text-xl sm:text-1xl text-gray-300 mb-6">{personalInfo.title}</p>
         <p className="text-lg text-cyan-300 font-medium">{personalInfo.mission}</p>
       </div>
 
