@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 const experienceSchema = new mongoose.Schema({
   title: { type: String, required: true },
   timeline: { type: String }, // Can be a custom string like "Jan 2020 - Dec 2021"
