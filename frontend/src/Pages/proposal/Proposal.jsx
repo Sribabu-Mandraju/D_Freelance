@@ -87,7 +87,7 @@ export default function Proposal() {
       setSuccess(true);
       console.log("Proposal created:", data);
 
-      fetchProposals();
+      // fetchProposals();
 
       // Optionally reset form after success
       setFormData({
@@ -109,19 +109,19 @@ export default function Proposal() {
     }
   };
 
-  const fetchProposals = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/api/proposals");
-      const data = await res.json();
-      setProposals(data);
-    } catch (err) {
-      console.error("Error fetching proposals:", err);
-    }
-  };
+  // const fetchProposals = async () => {
+  //   try {
+  //     const res = await fetch("http://localhost:3001/api/proposals");
+  //     const data = await res.json();
+  //     setProposals(data);
+  //   } catch (err) {
+  //     console.error("Error fetching proposals:", err);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchProposals();
-  }, []);
+  // useEffect(() => {
+  //   fetchProposals();
+  // }, []);
 
   const CurrentStepComponent = steps.find(
     (step) => step.id === currentStep
@@ -129,52 +129,9 @@ export default function Proposal() {
 
   return (
     <div className="container mx-auto px-4 py-8 w-[95%] md:w-[70%] ">
-      {!showCreateForm ? (
-        <>
-          {/* Header with Create Button */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-white">Proposals</h1>
-            <button
-              className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:opacity-90 transition"
-              onClick={() => setShowCreateForm(true)}
-            >
-              Create Proposal
-            </button>
-          </div>
-
-          {/* Proposals List */}
-          {proposals.length > 0 ? (
-            <div className="grid gap-4">
-              {proposals.map((proposal) => (
-                <div
-                  key={proposal._id}
-                  className="bg-slate-800/50 p-4  rounded-xl border border-gray-700"
-                >
-                  <h2 className="text-xl font-semibold text-white">
-                    {proposal.title}
-                  </h2>
-                  <p className="text-gray-400 text-sm break-all">
-                    {proposal.description}
-                  </p>
-                  <p className="text-cyan-400 mt-2">
-                    Budget: ${proposal.budget}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-400">No proposals found.</p>
-          )}
-        </>
-      ) : (
-        <>
+    
           <div className="mb-4">
-            <button
-              className="flex items-center gap-2 text-gray-300 hover:text-white transition"
-              onClick={() => setShowCreateForm(false)}
-            >
-              ← Back to Proposals
-            </button>
+            
           </div>
           {/* Header */}
           <div className="text-center md:mb-8 mb-4">
@@ -226,8 +183,8 @@ export default function Proposal() {
             {error && <p className="text-red-400 mt-2">{error}</p>}
             {/* {success && <p className="text-green-400 mt-2">✅ Proposal created successfully!</p>} */}
           </div>
-        </>
-      )}
+       
+     
     </div>
   );
 }

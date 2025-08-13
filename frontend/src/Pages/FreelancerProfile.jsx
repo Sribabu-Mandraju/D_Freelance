@@ -8,7 +8,7 @@ import Footer from "../Components/Footer"
 const FreelancerProfile = () => {
   const { id } = useParams()
   const [activeTab, setActiveTab] = useState("overview")
-
+//atatu
   // Mock freelancer data
 const freelancer = {
   id: 1,

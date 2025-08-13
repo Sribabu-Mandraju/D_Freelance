@@ -88,18 +88,34 @@ function MarketSection() {
         </p>
       </div>
 
-      <div className="flex flex-wrap w-[95%] md:w-full items-center justify-center mx-auto  gap-8">
+      <div className="grid md:grid-cols-3 grid-cols-1  w-[95%] md:w-full items-center justify-center mx-auto  gap-8">
         {projects.map((project, index) => (
           <motion.div
             key={index}
-            whileInView={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 50 }}
-            transition={{
-              duration: 0.4,
-              delay: index * 0.1,
-              ease: "easeOut",
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              rotate: 0,
             }}
-            viewport={{ once: true }}
+            initial={{
+              opacity: 0,
+              y: index * 40, // small offset for slide
+              scale: 0.95, // slight zoom in
+              rotate: index % 2 === 0 ? 2 : -2, // subtle rotation
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 12,
+              delay: index * 0.08,
+            }}
+            whileHover={{
+              
+              rotate: 0,
+             
+            }}
+            className="transition-transform duration-200 ease-out"
           >
             <MarketCard service={project} index={index} />
           </motion.div>

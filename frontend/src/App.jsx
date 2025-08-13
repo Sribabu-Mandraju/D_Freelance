@@ -1,26 +1,28 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import Home from './Pages/Home';
-import PostJob from './Pages/PostJob';
-import BrowseJobs from './Pages/BrowseJobs';
-import FreelancerProfile from './Pages/FreelancerProfile';
-import ClientDashboard from './Pages/ClientDashboard';
-import HelpDocs from './Pages/HelpDocs';
-import WalletConnect from './Components/walletConnection/WalletConnect';
-import Authenticate from './Components/walletConnection/Authenticate';
-import GigPage from './Pages/gig/GigPage';
-import Portfolio from './Pages/portfolio/Portfolio';
-import Navbar from './Components/Navbar';
-import Footer from './Components/Footer';
-import ClaimTokens from './Components/testingContracts/ClaimTokens';
-import PurchaseTokens from './Components/testingContracts/PurchaseTokens';
-import CreateProposal from './Components/testingContracts/CreateProposal';
-import OpenProposalToBid from './Components/testingContracts/OpenProposalToBid';
-import AcceptBid from './Components/testingContracts/AcceptBid';
-import DepositBidAmount from './Components/testingContracts/DepositBidAmount';
-import PlaceBid from './Components/testingContracts/PlaceBid';
-import Proposal from './Pages/proposal/Proposal'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import Home from "./Pages/Home";
+import PostJob from "./Pages/PostJob";
+import BrowseJobs from "./Pages/BrowseJobs";
+import FreelancerProfile from "./Pages/FreelancerProfile";
+import ClientDashboard from "./Pages/ClientDashboard";
+import HelpDocs from "./Pages/HelpDocs";
+import WalletConnect from "./Components/walletConnection/WalletConnect";
+import Authenticate from "./Components/walletConnection/Authenticate";
+import GigPage from "./Pages/gig/GigPage";
+import Portfolio from "./Pages/portfolio/Portfolio";
+import Navbar from "./Components/Navbar";
+import Footer from "./Components/Footer";
+import ClaimTokens from "./Components/testingContracts/ClaimTokens";
+import PurchaseTokens from "./Components/testingContracts/PurchaseTokens";
+import CreateProposal from "./Components/testingContracts/CreateProposal";
+import OpenProposalToBid from "./Components/testingContracts/OpenProposalToBid";
+import AcceptBid from "./Components/testingContracts/AcceptBid";
+import DepositBidAmount from "./Components/testingContracts/DepositBidAmount";
+import PlaceBid from "./Components/testingContracts/PlaceBid";
+import Proposal from "./Pages/proposal/Proposal";
+import StartWork from "./Components/testingContracts/StartWork";
+
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -45,15 +47,22 @@ const App = () => {
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
-            <Route path="/purchaseTokens" element={<PurchaseTokens />} />
+
+
             <Route path="/claimTokens" element={<ClaimTokens />} />
+            <Route path="/purchaseTokens" element={<PurchaseTokens />} />
+
             <Route path="/createProposal" element={<CreateProposal />} />
             <Route path="/openProposalToBid" element={<OpenProposalToBid />} />
             <Route path="/acceptBid" element={<AcceptBid />} />
             <Route path="/depositBidAmount" element={<DepositBidAmount />} />
             <Route path="/placeBid" element={<PlaceBid />} />
-          </Routes>
+            <Route path="/startWork" element={<StartWork />} />
 
+
+
+            
+          </Routes>
         </Router>
         {/* Add Toaster for toast notifications */}
         <Toaster
@@ -61,24 +70,24 @@ const App = () => {
           toastOptions={{
             duration: 3000, // Auto-close after 3 seconds
             style: {
-              background: '#1a202c', // Dark theme background
-              color: '#f7fafc', // Light text
-              border: '1px solid #4a5568',
-              borderRadius: '8px',
-              padding: '12px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
+              background: "#1a202c", // Dark theme background
+              color: "#f7fafc", // Light text
+              border: "1px solid #4a5568",
+              borderRadius: "8px",
+              padding: "12px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.5)",
             },
             success: {
               duration: 3000,
-              iconTheme: { primary: '#48bb78', secondary: '#f7fafc' }, // Green icon
+              iconTheme: { primary: "#48bb78", secondary: "#f7fafc" }, // Green icon
             },
             error: {
               duration: 3000,
-              iconTheme: { primary: '#f56565', secondary: '#f7fafc' }, // Red icon
+              iconTheme: { primary: "#f56565", secondary: "#f7fafc" }, // Red icon
             },
             loading: {
               duration: Infinity, // Persist for pending/confirming
-              iconTheme: { primary: '#63b3ed', secondary: '#f7fafc' }, // Blue spinner
+              iconTheme: { primary: "#63b3ed", secondary: "#f7fafc" }, // Blue spinner
             },
           }}
         />
