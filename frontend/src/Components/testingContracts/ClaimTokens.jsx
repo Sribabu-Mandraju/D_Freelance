@@ -78,10 +78,10 @@ function ClaimTokens() {
       setErrorMessage("You can only claim tokens once every 30 days.");
       return;
     }
-    const toastId = toast.loading("Please sign the transaction in your wallet...");
+    // const toastId = toast.loading("Please sign the transaction in your wallet...");
     try {
       await claimTokens();
-      toast.success("Tokens claimed successfully! 1111", { id: toastId });
+      // toast.success("Tokens claimed successfully! ", { id: toastId });
     } catch (err) {
       toast.error(`Failed to claim tokens: ${err.message}`, { id: toastId });
     }

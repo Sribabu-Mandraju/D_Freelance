@@ -56,7 +56,7 @@ export const useClaimTokens = () => {
       });
     } catch (err) {
       console.error("Claim tokens error:", err);
-      throw new Error(parseError(err));
+      // throw new Error(parseError(err));
     }
   };
 
