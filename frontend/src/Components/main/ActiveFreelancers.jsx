@@ -51,11 +51,9 @@ const freelancerData = [
 
 export default function ActiveFreelancers() {
   return (
-    <section className="py-20 px-4 md:px-8 lg:px-16 relative overflow-hidden bg-black">
+    <section className="py-20 px-4 md:px-8 lg:px-16 relative overflow-hidden">
       {/* Background gradients and grid overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-cyan-900/20 rounded-xl animate-pulse" />
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-sm" />
-      <div className="absolute inset-[1px] rounded-xl bg-black" />
+      <div className="absolute inset-[1px] rounded-xl " />
       <div
         className="absolute inset-0 opacity-5"
         style={{
@@ -186,106 +184,4 @@ export default function ActiveFreelancers() {
       </div>
     </section>
   );
-}
-function FreelancerCard({ freelancer, onClick }) {
-  return (
-    <div
-      className="relative  backdrop-blur-md bg-gray-900/70 border border-gray-800 rounded-2xl p-6 h-full hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 ease-in-out cursor-pointer group"
-      onClick={onClick}
-    >
-      <div className="absolute top-2 md:top-4 right-4 ">
-        <span
-          className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1  rounded-full ${
-            freelancer.status === "Available"
-              ? "bg-green-500/10 text-green-400 border border-green-500/20"
-              : "bg-red-500/10 text-red-400 border border-red-500/20"
-          }`}
-        >
-          <div
-            className={`w-2 h-2 rounded-full  ${
-              freelancer.status === "Available" ? "bg-green-400 animate-pulse" : "bg-red-400"
-            }`}
-          />
-          {freelancer.status}
-        </span>
-      </div>
-
-      <div className="flex items-start gap-4 mb-4 mt-3 md:mt-0 back">
-        <div className="relative">
-          <img
-            src={freelancer.avatar || "/placeholder.svg"}
-            alt={freelancer.name}
-            className="w-16 h-16 rounded-full border-2 border-gray-700 object-cover group-hover:border-purple-500/50 transition-colors"
-          />
-          {freelancer.badges.includes("Expert Verified") && (
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 text-white" />
-            </div>
-          )}
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">
-            {freelancer.name}
-          </h3>
-          <p className="text-gray-400 text-sm mb-2">{freelancer.title}</p>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <MapPin className="w-3 h-3" />
-            {freelancer.location}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-1 mb-4">
-        {freelancer.badges.map((badge, i) => (
-          <span
-            key={i}
-            className="text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded-full border border-purple-500/20"
-          >
-            {badge}
-          </span>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap gap-1 mb-4">
-        {freelancer.skills.slice(0, 4).map((skill, i) => (
-          <span key={i} className="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded-full">
-            {skill}
-          </span>
-        ))}
-        {freelancer.skills.length > 4 && (
-          <span className="text-xs text-gray-500">+{freelancer.skills.length - 4} more</span>
-        )}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <div className="flex items-center gap-1 text-yellow-400 font-semibold text-sm">
-            <Star className="w-4 h-4 fill-yellow-400" />
-            {freelancer.rating}
-          </div>
-          <p className="text-xs text-gray-500">{freelancer.projects} projects</p>
-        </div>
-        <div className="text-right">
-          <p className="text-white font-semibold">${freelancer.hourlyRate}/hr</p>
-          <p className="text-xs text-gray-500">Hourly rate</p>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-        <div className="flex items-center gap-1">
-          <Clock className="w-3 h-3" />
-          {freelancer.responseTime}
-        </div>
-        <div className="flex items-center gap-1">
-          <Award className="w-3 h-3" />
-          {freelancer.successRate}% success
-        </div>
-      </div>
-
-      <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-2 rounded-lg transition-colors group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-cyan-500">
-        View Profile
-      </button>
-    </div>
-  )
 }

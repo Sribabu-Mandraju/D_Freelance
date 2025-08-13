@@ -6,8 +6,8 @@ export default function MarketCard({ service }) {
 
   return (
     <div
-      className="md:w-[350px] cursor-pointer rounded-sm overflow-hidden  text-white relative group h-full 
-                 hover:border-purple-500 hover:shadow-[0_0_15px_rgba(0,238,255,0.8)]
+      className="md:w-[350px] cursor-pointer rounded-t-xl overflow-hidden  text-white relative group h-full 
+                 hover:border-purple-500 hover:shadow-[0_0px_30px_10px_rgba(0,238,255,0.8)]
 
                  transition-all duration-300 ease-in-out transform hover:scale-[1.02] backdrop-blur-xl"
     >
