@@ -15,6 +15,11 @@ import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ClaimTokens from './Components/testingContracts/ClaimTokens';
 import PurchaseTokens from './Components/testingContracts/PurchaseTokens';
+import CreateProposal from './Components/testingContracts/CreateProposal';
+import OpenProposalToBid from './Components/testingContracts/OpenProposalToBid';
+import AcceptBid from './Components/testingContracts/AcceptBid';
+import DepositBidAmount from './Components/testingContracts/DepositBidAmount';
+import PlaceBid from './Components/testingContracts/PlaceBid';
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -40,7 +45,13 @@ const App = () => {
             <Route path="/gigpage" element={<GigPage />} />
             <Route path="/purchaseTokens" element={<PurchaseTokens />} />
             <Route path="/claimTokens" element={<ClaimTokens />} />
+            <Route path="/createProposal" element={<CreateProposal />} />
+            <Route path="/openProposalToBid" element={<OpenProposalToBid />} />
+            <Route path="/acceptBid" element={<AcceptBid />} />
+            <Route path="/depositBidAmount" element={<DepositBidAmount />} />
+            <Route path="/placeBid" element={<PlaceBid />} />
           </Routes>
+
         </Router>
         {/* Add Toaster for toast notifications */}
         <Toaster
