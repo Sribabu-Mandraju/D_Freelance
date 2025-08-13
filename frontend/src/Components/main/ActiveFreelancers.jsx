@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { Star, CheckCircle, MapPin, Clock, Award } from "lucide-react"
 
-
+import {motion} from "framer-motion"
 
 const freelancerData = [
   {
@@ -51,7 +51,7 @@ const freelancerData = [
 
 export default function ActiveFreelancers() {
   return (
-    <section className="py-20 px-4 md:px-8 lg:px-16 relative overflow-hidden">
+    <motion.section className="py-20 px-4 md:px-8 lg:px-16 relative overflow-hidden">
       {/* Background gradients and grid overlay */}
       <div className="absolute inset-[1px] rounded-xl " />
       <div
@@ -84,7 +84,7 @@ export default function ActiveFreelancers() {
               key={idx}
               className="relative bg-gray-900/70 border border-cyan-500/30 rounded-xl p-6 shadow-2xl shadow-cyan-500/20 hover:border-cyan-400/70 hover:shadow-cyan-500/30 transition-all duration-300 group"
             >
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
+              {/* <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" /> */}
               <div className="absolute top-2 right-4">
                 <span
                   className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
@@ -182,6 +182,6 @@ export default function ActiveFreelancers() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

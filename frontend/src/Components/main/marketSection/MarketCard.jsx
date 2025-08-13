@@ -7,11 +7,9 @@ export default function MarketCard({ service }) {
   return (
     <div
       className="md:w-[350px] cursor-pointer rounded-t-xl overflow-hidden  text-white relative group h-full 
-                 hover:border-purple-500 hover:shadow-[0_0px_30px_10px_rgba(0,238,255,0.8)]
-
+                 hover:border-purple-500 hover:shadow-cyan-500/30 
                  transition-all duration-300 ease-in-out transform hover:scale-[1.02] backdrop-blur-xl"
-    >
-      {/* Banner Image with Wishlist Icon */}
+    >           
       <div className="relative ">
         <img
           src="gig.jpg"
@@ -34,7 +32,7 @@ export default function MarketCard({ service }) {
       </div>
 
       {/* Details */}
-      <div className="p-4 backdrop-blur-lg bg-white/10 relative">
+      <div className="p-4 backdrop-blur-lg bg-white/5 relative">
         {/* Profile + Name + Level */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
