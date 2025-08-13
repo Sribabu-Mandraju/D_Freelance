@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Home from './Pages/Home';
-import Portfolio from './Pages/Portfolio';
 import PostJob from './Pages/PostJob';
 import BrowseJobs from './Pages/BrowseJobs';
 import FreelancerProfile from './Pages/FreelancerProfile';
@@ -10,10 +9,12 @@ import ClientDashboard from './Pages/ClientDashboard';
 import HelpDocs from './Pages/HelpDocs';
 import WalletConnect from './Components/walletConnection/WalletConnect';
 import Authenticate from './Components/walletConnection/Authenticate';
-import GigPage from './Pages/gig/gigpage';
+import GigPage from './Pages/gig/GigPage';
+import Portfolio from './Pages/portfolio/Portfolio';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ClaimTokens from './Components/testingContracts/ClaimTokens';
+import PurchaseTokens from './Components/testingContracts/PurchaseTokens';
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -22,7 +23,7 @@ const App = () => {
 
   return (
     <>
-      <div className="mt-[65px]">
+      <div className="">
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -37,6 +38,7 @@ const App = () => {
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
+            <Route path="/purchaseTokens" element={<PurchaseTokens />} />
             <Route path="/claimTokens" element={<ClaimTokens />} />
           </Routes>
         </Router>

@@ -13,7 +13,7 @@ import "./index.css"
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
@@ -23,7 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
 
 

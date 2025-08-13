@@ -6,6 +6,9 @@ import BidRoutes from "./routes/BidRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import authRoutes from "./routes/AuthRoutes.js";
 import HFTtokenRoutes from "./routes/HFTtokenRoutes.js"
+import TreasuryRoutes from "./routes/TreasuryRoutes.js"
+import EscrowRoutes from "./routes/EscrowRoutes.js"
+import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js"
 
 import cors from "cors";
 
@@ -24,7 +27,9 @@ app.use("/api/bids", BidRoutes);
 app.use("/api/users", UserRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/hftToken", HFTtokenRoutes);
-
+app.use("/api/treasury",TreasuryRoutes);
+app.use("/api/escrow",EscrowRoutes)
+app.use("/api/proposalManager",ProposalManagerRoutes)
 // Default route
 app.get("/", (req, res) => {
   res.send("API is running...");

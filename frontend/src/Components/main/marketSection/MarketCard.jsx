@@ -5,9 +5,11 @@ export default function MarketCard({ service }) {
   const [liked, setLiked] = useState(false);
 
   return (
-    <div className="w-[350px] cursor-pointer rounded-xl overflow-hidden shadow-lg bg-gray-900 text-white relative group border-2 border-gray-800  bg-gray-900/70 backdrop-blur-lg  h-full 
+    <div
+      className="w-[350px] cursor-pointer rounded-xl overflow-hidden shadow-lg bg-gray-900 text-white relative group border-2 border-gray-800  bg-gray-900/70 backdrop-blur-lg  h-full 
                      hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 
-                     transition-all duration-300 ease-in-out">
+                     transition-all duration-300 ease-in-out"
+    >
       {/* Banner Image with Wishlist Icon */}
       <div className="relative">
         <img
@@ -37,7 +39,9 @@ export default function MarketCard({ service }) {
               alt={service.name}
               className="w-8 h-8 rounded-full"
             />
-            <p className="text-md font-semibold  bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">{service.name}</p>
+            <p className="text-md font-semibold  bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+              {service.name}
+            </p>
           </div>
           <span className="text-xs font-medium text-green-400 bg-gray-800 px-2 py-1 rounded-full">
             {service.level}
@@ -55,9 +59,7 @@ export default function MarketCard({ service }) {
               ({service.reviews})
             </span>
           </div>
-          <p className="font-semibold  text-blue-600">
-            From ₹{service.budget}
-          </p>
+          <p className="font-semibold  text-blue-600">From ₹{service.budget}</p>
         </div>
       </div>
     </div>

@@ -6,7 +6,6 @@ import {
   updateBid,
   deleteBid,
 } from "../controllers/BidController.js";
-import { getUserLastClaimTime } from "../contracts/HFTtoken.js";
 
 const router = express.Router();
 
@@ -21,7 +20,6 @@ router.get('/hello/:id', (req, res) => {
 
 });
 
-router.get("/token/:address", getUserLastClaimTime);
 
 // Define dynamic ones last
 router.get("/:id", getBidById);
