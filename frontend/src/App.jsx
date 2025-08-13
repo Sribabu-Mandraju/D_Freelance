@@ -20,6 +20,7 @@ import OpenProposalToBid from './Components/testingContracts/OpenProposalToBid';
 import AcceptBid from './Components/testingContracts/AcceptBid';
 import DepositBidAmount from './Components/testingContracts/DepositBidAmount';
 import PlaceBid from './Components/testingContracts/PlaceBid';
+import Proposal from './Pages/proposal/Proposal'
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -35,6 +36,7 @@ const App = () => {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/browse-jobs" element={<BrowseJobs />} />
             <Route path="/post-job" element={<PostJob />} />
+            <Route path="/proposal" element={<Proposal />} />
             <Route path="/freelancer/:id" element={<FreelancerProfile />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/help" element={<HelpDocs />} />
