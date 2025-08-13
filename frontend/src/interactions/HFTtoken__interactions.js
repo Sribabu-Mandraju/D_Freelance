@@ -1,5 +1,4 @@
 import {
-  useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
   useAccount,
@@ -8,7 +7,7 @@ import HFTtokenABI from "../abis/HFTtoken_ABI.json"; // Import the ABI
 import { baseSepolia } from "wagmi/chains";
 
 // Replace with your deployed contract address
-const HFT_TOKEN_ADDRESS = "0x215f86e90db7671e8fC347a370908Db04038F535"; // Update with actual address
+const HFT_TOKEN_ADDRESS = "0xd0D1B6E1dE2F705701FE370e91f8fb4731161d5a"; // Update with actual address
 
 // Helper function to parse contract and gas-related errors
 const parseError = (err) => {
@@ -68,6 +67,37 @@ export const useClaimTokens = () => {
     isConfirmed,
     hash,
     error: error ? parseError(error) : null,
+  };
+};
+
+export const purchaseTokens = () => {
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+  } = useWaitForTransactionReceipt({ hash });
+  const { chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  const purchaseToken = async () => {
+    try {
+      await writeContract({
+        address: HFT_TOKEN_ADDRESS,
+        abi: HFTtokenABI,
+        functionName: "purchaseTokens",
+        chainId,
+      });
+    } catch (error) {
+      console.log("failed to purchase tokens :", error);
+    }
+    return {
+      purchaseToken,
+      isPending,
+      isConfirming,
+      isConfirmed,
+      hash,
+      error,
+    };
   };
 };
 
