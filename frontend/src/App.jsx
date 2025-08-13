@@ -14,6 +14,7 @@ import Portfolio from './Pages/portfolio/Portfolio';
 import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ClaimTokens from './Components/testingContracts/ClaimTokens';
+import PurchaseTokens from './Components/testingContracts/PurchaseTokens';
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -37,6 +38,7 @@ const App = () => {
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
+            <Route path="/purchaseTokens" element={<PurchaseTokens />} />
             <Route path="/claimTokens" element={<ClaimTokens />} />
           </Routes>
         </Router>
