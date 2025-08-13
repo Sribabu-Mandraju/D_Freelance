@@ -15,6 +15,7 @@ import Navbar from './Components/Navbar';
 import Footer from './Components/Footer';
 import ClaimTokens from './Components/testingContracts/ClaimTokens';
 import PurchaseTokens from './Components/testingContracts/PurchaseTokens';
+import Proposal from './Pages/proposal/Proposal'
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -30,6 +31,7 @@ const App = () => {
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/browse-jobs" element={<BrowseJobs />} />
             <Route path="/post-job" element={<PostJob />} />
+            <Route path="/proposal" element={<Proposal />} />
             <Route path="/freelancer/:id" element={<FreelancerProfile />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/help" element={<HelpDocs />} />

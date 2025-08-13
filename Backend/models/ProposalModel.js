@@ -20,6 +20,9 @@ const proposalSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    isEditable:{
+      type:Boolean,
+    }
   },
   { timestamps: true }
 );
