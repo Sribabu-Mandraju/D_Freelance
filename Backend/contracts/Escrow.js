@@ -4,6 +4,7 @@ import Escrow_ABI from '../abis/Escrow_ABI.json' with { type: 'json' };
 const provider = new ethers.JsonRpcProvider("https://sepolia.base.org");
 const Escrow_contractAddress = "0xb7eBD3c77C8c0B0Cf783b7C8930C01BCDf8c562C"; // Replace with your Escrow contract address
 
+
 const Escrow_contract = new ethers.Contract(
   Escrow_contractAddress,
   Escrow_ABI,
