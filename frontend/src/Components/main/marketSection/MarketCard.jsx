@@ -6,60 +6,66 @@ export default function MarketCard({ service }) {
 
   return (
     <div
-      className="w-[350px] cursor-pointer rounded-xl overflow-hidden shadow-lg bg-gray-900 text-white relative group border-2 border-gray-800  bg-gray-900/70 backdrop-blur-lg  h-full 
-                     hover:border-purple-500/60 hover:shadow-xl hover:shadow-purple-500/10 
-                     transition-all duration-300 ease-in-out"
+      className="md:w-[350px] cursor-pointer rounded-sm overflow-hidden  text-white relative group h-full 
+                 hover:border-purple-500 hover:shadow-[0_0_15px_rgba(0,238,255,0.8)]
+
+                 transition-all duration-300 ease-in-out transform hover:scale-[1.02] backdrop-blur-xl"
     >
       {/* Banner Image with Wishlist Icon */}
-      <div className="relative">
+      <div className="relative ">
         <img
-          src={service.bannerImage}
+          src="gig.jpg"
           alt="Service Banner"
-          className="w-full h-48 object-cover"
+          className="w-full h-62 object-cover group-hover:brightness-110 transition duration-300 rounded-t-xl"
         />
         <button
           onClick={() => setLiked(!liked)}
-          className="absolute top-2 right-2 bg-gray-800 hover:bg-gray-700 p-1.5 rounded-full shadow-md transition-all"
+          className="absolute top-2 right-2 bg-gray-900/70 hover:bg-purple-500/80 p-1.5 rounded-full shadow-lg backdrop-blur-sm 
+                     transition-all duration-300 border border-purple-500/50 hover:shadow-[0_0_10px_rgba(168,85,247,0.9)]"
         >
           <Heart
-            className={`w-5 h-5 ${
-              liked ? "fill-red-500 text-red-500" : "text-gray-300"
+            className={`w-5 h-5 transition-all duration-300 ${
+              liked
+                ? "fill-pink-500 text-pink-500 drop-shadow-[0_0_6px_rgba(236,72,153,0.8)]"
+                : "text-gray-300"
             }`}
           />
         </button>
       </div>
 
       {/* Details */}
-      <div className="p-4">
+      <div className="p-4 backdrop-blur-lg bg-white/10 relative">
         {/* Profile + Name + Level */}
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <img
               src={service.profileImage}
               alt={service.name}
-              className="w-8 h-8 rounded-full"
+              className="w-8 h-8 rounded-sm border border-purple-500/50 shadow-[0_0_8px_rgba(168,85,247,0.6)]"
             />
-            <p className="text-md font-semibold  bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+            <p className="text-md font-semibold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]">
               {service.name}
             </p>
           </div>
-          <span className="text-xs font-medium text-green-400 bg-gray-800 px-2 py-1 rounded-full">
+          <span className="text-xs font-medium text-green-400 bg-gray-800/60 px-2 py-1 rounded-full border border-green-400/50 shadow-[0_0_6px_rgba(34,197,94,0.8)]">
             {service.level}
           </span>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-400 mb-3">{service.description}</p>
+        <p className="text-sm text-gray-300/90 mb-4 leading-relaxed">
+          {service.description}
+        </p>
 
         {/* Rating + Price */}
-        <div className="flex items-start flex-col gap-2 justify-between">
-          <div className="text-sm text-yellow-400 ">
-            ★ {service.rating}{" "}
-            <span className="text-gray-400 font-normal">
-              ({service.reviews})
-            </span>
+        <div className="flex flex-col gap-2">
+          <div className="text-sm text-yellow-400 flex items-center gap-1">
+            <span className="drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]">★</span> {service.rating}
+            <span className="text-gray-400 font-normal">({service.reviews})</span>
           </div>
-          <p className="font-semibold  text-blue-600">From ₹{service.budget}</p>
+          <p className="font-semibold text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">
+            From ₹{service.budget}
+          </p>
         </div>
       </div>
     </div>
