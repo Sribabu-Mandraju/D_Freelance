@@ -819,7 +819,7 @@ function JobCard({ job, isSaved, onToggleSave, onClick }) {
 
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
-          <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 mb-1 hover:bg-gradient-to-r hover:from-cyan-300 hover:to-blue-400 cursor-pointer transition-all duration-300">
+          <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500 mb-1 hover:bg-gradient-to-r hover:from-purple-300 hover:to-blue-400 cursor-pointer transition-all duration-300">
             {job.title}
           </h3>
           <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">
