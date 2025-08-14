@@ -22,6 +22,7 @@ import DepositBidAmount from "./Components/testingContracts/DepositBidAmount";
 import PlaceBid from "./Components/testingContracts/PlaceBid";
 import Proposal from "./Pages/proposal/Proposal";
 import StartWork from "./Components/testingContracts/StartWork";
+import PortfolioForm from "./Components/portfolio/portfolioForm";
 
 
 const App = () => {
@@ -58,7 +59,7 @@ const App = () => {
             <Route path="/depositBidAmount" element={<DepositBidAmount />} />
             <Route path="/placeBid" element={<PlaceBid />} />
             <Route path="/startWork" element={<StartWork />} />
-
+            <Route path="/portfolioForm" element={<PortfolioForm/>}/>
 
 
             
