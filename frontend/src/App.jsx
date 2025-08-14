@@ -10,6 +10,8 @@ import HelpDocs from "./Pages/HelpDocs";
 import WalletConnect from "./Components/walletConnection/WalletConnect";
 import Authenticate from "./Components/walletConnection/Authenticate";
 import GigPage from "./Pages/gig/GigPage";
+import CreateGig from "./Pages/CreateGig";
+import EditGig from "./Pages/EditGig";
 import Portfolio from "./Pages/portfolio/Portfolio";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
@@ -47,6 +49,9 @@ const App = () => {
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
+            <Route path="/create-gig" element={<CreateGig />} />
+            <Route path="/edit-gig/:id" element={<EditGig />} />
+            <Route path="/gig/:id" element={<GigPage />} />
 
 
             <Route path="/claimTokens" element={<ClaimTokens />} />
