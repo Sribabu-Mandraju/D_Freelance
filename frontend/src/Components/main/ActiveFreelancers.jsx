@@ -80,6 +80,33 @@ export default function ActiveFreelancers() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {freelancerData.map((freelancer, idx) => (
+            <motion.div
+            key={idx}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              rotate: 0,
+            }}
+            initial={{
+              opacity: 0,
+              y: idx * 40, // small offset for slide
+              scale: 0.95, // slight zoom in
+              rotate: idx % 2 === 0 ? 2 : -2, // subtle rotation
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 12,
+              delay: idx * 0.08,
+            }}
+            whileHover={{
+              
+              rotate: 0,
+             
+            }}
+            className="transition-transform duration-200 ease-out"
+          >
             <div
               key={idx}
               className="relative bg-gray-900/70 border border-cyan-500/30 rounded-xl p-6 shadow-2xl shadow-cyan-500/20 hover:border-cyan-400/70 hover:shadow-cyan-500/30 transition-all duration-300 group"
@@ -179,6 +206,7 @@ export default function ActiveFreelancers() {
                 View Profile
               </button>
             </div>
+            </motion.div>
           ))}
         </div>
       </div>

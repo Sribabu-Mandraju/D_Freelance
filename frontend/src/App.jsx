@@ -23,7 +23,9 @@ import PlaceBid from "./Components/testingContracts/PlaceBid";
 import Proposal from "./Pages/proposal/Proposal";
 import StartWork from "./Components/testingContracts/StartWork";
 import PortfolioForm from "./Components/portfolio/portfolioForm";
+import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
 
+import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -43,16 +45,15 @@ const App = () => {
             <Route path="/freelancer/:id" element={<FreelancerProfile />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/help" element={<HelpDocs />} />
+            <Route path="/jobDetails/:id" element={<ProposalDetails />} />
             <Route
               path="/connect"
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
             <Route path="/gigpage" element={<GigPage />} />
 
-
             <Route path="/claimTokens" element={<ClaimTokens />} />
             <Route path="/purchaseTokens" element={<PurchaseTokens />} />
-
             <Route path="/createProposal" element={<CreateProposal />} />
             <Route path="/openProposalToBid" element={<OpenProposalToBid />} />
             <Route path="/acceptBid" element={<AcceptBid />} />
@@ -63,6 +64,7 @@ const App = () => {
 
 
             
+            <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />
           </Routes>
         </Router>
         {/* Add Toaster for toast notifications */}

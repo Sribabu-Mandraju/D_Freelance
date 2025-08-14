@@ -11,6 +11,9 @@ const router = express.Router();
 
 // Create new portfolio
 router.post('/', createPortfolio);
+
+
+
 // Get all portfolios
 router.get('/getAll', getAllPortfolios);
 router.get("/:id",getPortfolioById);

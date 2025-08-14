@@ -1,7 +1,7 @@
 import Proposal from "../models/ProposalModel.js";
 import { validationResult, body } from "express-validator";
 
-// ✅ Validation middleware (used inline)
+//  Validation middleware (used inline)
 export const validateProposal = [
   body("title").trim().notEmpty().withMessage("Title is required"),
   body("description").trim().notEmpty().withMessage("Description is required"),
@@ -19,7 +19,7 @@ export const validateProposal = [
     .withMessage("Skills requirement must be a non-empty array"),
 ];
 
-// ✅ Create Proposal
+//  Create Proposal
 export const createProposal = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
@@ -33,7 +33,7 @@ export const createProposal = async (req, res) => {
   }
 };
 
-// ✅ Get All Proposals
+//  Get All Proposals
 export const getAllProposals = async (req, res) => {
   try {
     const proposals = await Proposal.find()
@@ -45,7 +45,7 @@ export const getAllProposals = async (req, res) => {
   }
 };
 
-// ✅ Get Single Proposal
+//  Get Single Proposal
 export const getProposalById = async (req, res) => {
   try {
     const proposal = await Proposal.findById(req.params.id)
@@ -58,7 +58,7 @@ export const getProposalById = async (req, res) => {
   }
 };
 
-// ✅ Update Proposal
+//  Update Proposal
 export const updateProposal = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty())
@@ -75,7 +75,7 @@ export const updateProposal = async (req, res) => {
   }
 };
 
-// ✅ Delete Proposal
+//  Delete Proposal
 export const deleteProposal = async (req, res) => {
   try {
     const proposal = await Proposal.findByIdAndDelete(req.params.id);
@@ -86,7 +86,7 @@ export const deleteProposal = async (req, res) => {
   }
 };
 
-// ✅ Accept Bid
+//  Accept Bid
 export const acceptBid = async (req, res) => {
   const { id, bidId } = req.params;
   try {

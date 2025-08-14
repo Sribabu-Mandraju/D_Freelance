@@ -1,4 +1,4 @@
-"use client";
+
 
 import { useState, useEffect } from "react";
 import BasicInfoStep from "../../Components/proposal/BasicInfo";
@@ -7,7 +7,7 @@ import BudgetTimelineStep from "../../Components/proposal/BudgetTimeline";
 import SkillsTagsStep from "../../Components/proposal/SkillTags";
 import ReviewSubmitStep from "../../Components/proposal/ReviewSubmit";
 import ProgressIndicator from "./ProgressIndicator";
-
+import Navbar from "../../Components/Navbar";
 const steps = [
   { id: 1, title: "Basic Info", component: BasicInfoStep },
   { id: 2, title: "Project Details", component: ProjectDetailsStep },
@@ -128,8 +128,8 @@ export default function Proposal() {
   )?.component;
 
   return (
-    <div className="container mx-auto px-4 py-8 w-[95%] md:w-[70%] ">
-    
+    <div className=" mx-auto px-4 py-8 w-[95%] md:w-[70%] mt-[70px] md:mt-[50px] ">
+    <Navbar/>
           <div className="mb-4">
             
           </div>

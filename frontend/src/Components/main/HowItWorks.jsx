@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { Wallet, Search, FileText, Code, DollarSign, Star, Shield, Zap, Globe } from "lucide-react"
 import { FaDatabase } from "react-icons/fa";
+import { motion } from "framer-motion";
 
  const HowItWorksSection = () => {
   const steps = [
@@ -60,7 +61,7 @@ import { FaDatabase } from "react-icons/fa";
         <div className="absolute bottom-1/3 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl"></div>
       </div>
 
-      <div className="  mx-auto relative z-10">
+      <div className=" flex items-center flex-col mx-auto relative z-10">
         <div className="text-center mb-16">
           <div className="inline-block mb-4 px-4 py-1 border border-cyan-500 text-cyan-400 rounded-full text-sm font-medium">
             HOW IT WORKS
@@ -73,9 +74,37 @@ import { FaDatabase } from "react-icons/fa";
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 w-[95%] lg:grid-cols-3 gap-8 md:gap-8">
           {steps.map((step, index) => (
+            <motion.div
+            key={index}
+            whileInView={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              rotate: 0,
+            }}
+            initial={{
+              opacity: 0,
+              y: index * 40, // small offset for slide
+              scale: 0.95, // slight zoom in
+              rotate: index % 2 === 0 ? 2 : -2, // subtle rotation
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 12,
+              delay: index * 0.08,
+            }}
+            whileHover={{
+              
+              rotate: 0,
+             
+            }}
+            className="transition-transform duration-200 ease-out"
+          >
             <StepCard key={index} step={step} index={index} />
+            </motion.div>
           ))}
         </div>
 
