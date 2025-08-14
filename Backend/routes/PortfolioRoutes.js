@@ -3,19 +3,17 @@ import {
   createPortfolio,
   updatePortfolio,
   deletePortfolio,
-  getAllPortfolios
+  getAllPortfolios,
+  getPortfolioById
 } from "../controllers/PortfolioController.js"
 
 const router = express.Router();
 
 // Create new portfolio
-router.post('/create', createPortfolio);
-
-
-
+router.post('/', createPortfolio);
 // Get all portfolios
 router.get('/getAll', getAllPortfolios);
-
+router.get("/:id",getPortfolioById);
 // Update portfolio by ID
 router.put('/:id', updatePortfolio);
 

@@ -11,17 +11,13 @@ import EscrowRoutes from "./routes/EscrowRoutes.js"
 import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js"
 import PortfolioRoutes from "./routes/PortfolioRoutes.js"
 import cors from "cors";
-
 // Load environment variables
 dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 3001;
-
 // Middleware to parse JSON and enable CORS
 app.use(express.json());
 app.use(cors());
-
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
 app.use("/api/users", UserRoutes);
