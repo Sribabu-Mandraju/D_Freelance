@@ -14,6 +14,7 @@ import {
   CheckCircle,
   Target
 } from "lucide-react";
+import ChatComponent from "./ChatComponent";
 export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
   const [activeTab, setActiveTab] = useState("details");
   const [jobDetails, setJobDetails] = useState(job);
@@ -204,7 +205,7 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
               {/* Enhanced Tabs with neon effects */}
               <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-1 shadow-lg shadow-cyan-500/20 border border-cyan-500/20">
                 <div className="flex gap-1">
-                  {["details", "updates", "comments"].map((tab) => (
+                  {["details", "updates", "comments","chat"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -243,7 +244,7 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
                         {jobDetails?.timeline?.map((phase, index) => (
                           <div
                             key={index}
-                            className="relative flex items-start gap-3 sm:gap-4 lg:gap-6 group"
+                            className="relative flex items-start gap-3 sm:gap-4 lg:gap-6 group ml-[18px]"
                           >
                             <div className="relative z-10">
                               <div
@@ -383,6 +384,14 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
                   </p>
                 </div>
               )}
+                {activeTab === "chat" && (
+                  <ChatComponent
+                    currentUser={jobDetails?.client || { username: "Client", userWallet: "" }}
+                    recipient={jobDetails?.freelancer || { username: "Freelancer", userWallet: "" }}
+                    proposalId={jobDetails?._id || ""}
+                  />
+                )}
+             
             </div>
 
             {/* Enhanced Sidebar with more neon effects */}
