@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Mail,
 } from "lucide-react";
+import { toast } from "react-hot-toast"; // Import toast
 import HeroSection from "../../Components/portfolio/HeroSection";
 import FeaturedProjects from "../../Components/portfolio/FeaturesProjects";
 import TabNavigation from "../../Components/portfolio/TabNavigation";
@@ -35,6 +36,7 @@ function Portfolio() {
 
   useEffect(() => {
     const fetchPortfolio = async () => {
+      const toastId = toast.loading("Loading portfolio..."); // Show loading toast
       try {
         const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`);
         const result = await response.json();
@@ -43,9 +45,11 @@ function Portfolio() {
         }
         setPortfolioData(result.data);
         setLoading(false);
+        toast.success("Portfolio loaded successfully!", { id: toastId }); // Update loading toast to success
       } catch (err) {
         console.error("Error fetching portfolio:", err);
         setError(err.message);
+        toast.error(`Error: ${err.message}`, { id: toastId }); // Update loading toast to error
         setLoading(false);
       }
     };
@@ -55,13 +59,18 @@ function Portfolio() {
 
   useEffect(() => {
     const adjustHeights = () => {
-      if (mainRef.current && asideRef.current) {
-        const mainHeight = mainRef.current.scrollHeight;
-        const asideHeight = asideRef.current.scrollHeight;
-        const maxHeight = Math.max(mainHeight, asideHeight);
+      try {
+        if (mainRef.current && asideRef.current) {
+          const mainHeight = mainRef.current.scrollHeight;
+          const asideHeight = asideRef.current.scrollHeight;
+          const maxHeight = Math.max(mainHeight, asideHeight);
 
-        mainRef.current.style.height = `${maxHeight}px`;
-        asideRef.current.style.height = `${maxHeight}px`;
+          mainRef.current.style.height = `${maxHeight}px`;
+          asideRef.current.style.height = `${maxHeight}px`;
+        }
+      } catch (err) {
+        console.error("Error adjusting heights:", err);
+        toast.error("Failed to adjust layout heights"); // Show error toast
       }
     };
 
@@ -82,7 +91,7 @@ function Portfolio() {
   if (loading) {
     return (
       <div className={`${styles.container} flex items-center justify-center`}>
-        <p>Loading portfolio...</p>
+        <p>Loading portfolio...</p> {/* Optional: Keep UI loading state, toast handles notification */}
       </div>
     );
   }
@@ -90,7 +99,7 @@ function Portfolio() {
   if (error) {
     return (
       <div className={`${styles.container} flex items-center justify-center`}>
-        <p className="text-red-500">Error: {error}</p>
+        <p className="text-red-500">Error: {error}</p> {/* Optional: Keep UI error state, toast handles notification */}
       </div>
     );
   }

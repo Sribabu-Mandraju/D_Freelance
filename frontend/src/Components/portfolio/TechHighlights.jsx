@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Code, Edit, Save, X, Plus, Trash2 } from "lucide-react"
+import toast from "react-hot-toast"
 
 const portfolioId = "689d21754780b3f30cf4130b" // Replace with actual portfolio ID
 
@@ -9,16 +10,22 @@ function TechHighlights({ techHighlights, setTechHighlights }) {
   const [isEditingTech, setIsEditingTech] = useState(false)
   const [editTech, setEditTech] = useState([])
   const [isSaving, setIsSaving] = useState(false)
-  const [saveError, setSaveError] = useState("")
 
   const handleEditTech = () => {
     setIsEditingTech(true)
     setEditTech(techHighlights.map((t) => ({ ...t })))
+    toast.success("Edit mode enabled", {
+      icon: "✏️",
+      duration: 2000,
+    })
   }
 
   const handleSaveTech = async () => {
     setIsSaving(true)
-    setSaveError("")
+
+    const loadingToast = toast.loading("Saving tech highlights...", {
+      icon: "💾",
+    })
 
     try {
       const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`, {
@@ -39,9 +46,20 @@ function TechHighlights({ techHighlights, setTechHighlights }) {
       const updatedPortfolio = await response.json()
       setTechHighlights(editTech)
       setIsEditingTech(false)
+
+      toast.dismiss(loadingToast)
+      toast.success("Tech highlights saved successfully!", {
+        icon: "✅",
+        duration: 3000,
+      })
     } catch (error) {
       console.error("Error saving tech highlights:", error)
-      setSaveError(error.message || "Failed to save changes. Please try again.")
+
+      toast.dismiss(loadingToast)
+      toast.error(error.message || "Failed to save changes. Please try again.", {
+        icon: "❌",
+        duration: 4000,
+      })
     } finally {
       setIsSaving(false)
     }
@@ -50,7 +68,11 @@ function TechHighlights({ techHighlights, setTechHighlights }) {
   const handleCancelTech = () => {
     setEditTech(techHighlights.map((t) => ({ ...t })))
     setIsEditingTech(false)
-    setSaveError("")
+
+    toast("Changes cancelled", {
+      icon: "↩️",
+      duration: 2000,
+    })
   }
 
   const updateTech = (index, field, value) => {
@@ -59,7 +81,10 @@ function TechHighlights({ techHighlights, setTechHighlights }) {
 
   const addNewTech = () => {
     if (editTech.length >= 4) {
-      setSaveError("Maximum 4 tech highlights allowed")
+      toast.error("Maximum 4 tech highlights allowed", {
+        icon: "⚠️",
+        duration: 3000,
+      })
       return
     }
 
@@ -69,10 +94,21 @@ function TechHighlights({ techHighlights, setTechHighlights }) {
       description: "",
     }
     setEditTech([...editTech, newTech])
+
+    toast.success("New tech highlight added", {
+      icon: "➕",
+      duration: 2000,
+    })
   }
 
   const removeTech = (index) => {
+    const techName = editTech[index].technology || "Tech highlight"
     setEditTech((prev) => prev.filter((_, i) => i !== index))
+
+    toast.success(`${techName} removed`, {
+      icon: "🗑️",
+      duration: 2000,
+    })
   }
 
   return (
@@ -130,12 +166,6 @@ function TechHighlights({ techHighlights, setTechHighlights }) {
           </div>
         )}
       </div>
-
-      {saveError && (
-        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-          <p className="text-red-400 text-sm">{saveError}</p>
-        </div>
-      )}
 
       <div className="space-y-3">
         {(isEditingTech ? editTech : techHighlights).map((tech, index) => (
