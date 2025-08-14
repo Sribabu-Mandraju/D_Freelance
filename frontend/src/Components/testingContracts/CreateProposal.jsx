@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useState, useEffect, useRef } from "react";
+import { useAccount, useBalance } from "wagmi";
 import { useCreateProposal } from "../../interactions/ProposalManager_interactions";
 import { baseSepolia } from "wagmi/chains";
 import toast from "react-hot-toast";
@@ -8,7 +8,31 @@ function CreateProposal() {
   const { address, isConnected, chain } = useAccount();
   const [deadline, setDeadline] = useState("");
   const [budget, setBudget] = useState("");
-  const { createProposal, isPending, isConfirming, isConfirmed, error, hash } = useCreateProposal();
+  const {
+    createProposal,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    receipt,
+    error,
+    hash,
+    proposalEvent,
+  } = useCreateProposal();
+
+
+  console.log(receipt)
+
+  // Check ETH balance for gas (0.001 ETH threshold)
+  const { data: balanceData } = useBalance({ address });
+  const hasEnoughGas = balanceData && balanceData.value >= 0.001 * 10 ** 18;
+
+  // Convert inputs to numbers for validation
+  const deadlineTimestamp = parseInt(deadline) || 0;
+  const budgetValue = parseInt(budget) || 0;
+  const isCorrectNetwork = chain && chain.id === baseSepolia.id;
+
+  // Ref to track if toast has been shown
+  const hasShownToast = useRef(false);
 
   // Handle form submission
   const handleCreateProposal = async () => {
@@ -16,50 +40,75 @@ function CreateProposal() {
       toast.error("Please connect your wallet.");
       return;
     }
-    if (chain?.id !== baseSepolia.id) {
+    if (!isCorrectNetwork) {
       toast.error("Please switch to Base Sepolia network.");
       return;
     }
-
-    const deadlineUnix = Math.floor(new Date(deadline).getTime() / 1000); // Convert to Unix timestamp
-    const budgetValue = parseInt(budget);
+    if (!hasEnoughGas) {
+      toast.error("Insufficient ETH for gas fees (minimum 0.001 ETH).");
+      return;
+    }
+    if (!deadline || deadlineTimestamp <= Math.floor(Date.now() / 1000)) {
+      toast.error("Please enter a valid deadline in the future (Unix timestamp).");
+      return;
+    }
+    if (!budget || budgetValue <= 0) {
+      toast.error("Please enter a valid budget greater than 0 (in Wei).");
+      return;
+    }
 
     try {
-      await createProposal(BigInt(deadlineUnix), BigInt(budgetValue));
+      console.log("Calling createProposal with:", { deadline: deadlineTimestamp, budget: budgetValue });
+      hasShownToast.current = false; // Reset toast flag for new transaction
+      await createProposal(BigInt(deadlineTimestamp), BigInt(budgetValue));
     } catch (err) {
       console.error("Create proposal error:", err);
       // Toast handled in useEffect
     }
   };
 
-  // Toast notifications for transaction states
+  // Toast notifications for transaction states and event
   useEffect(() => {
     let toastId;
-    if (isPending) {
+    if (isPending && !hasShownToast.current) {
       toastId = toast.loading("Creating proposal...");
-    } else if (isConfirming) {
+      hasShownToast.current = true;
+    } else if (isConfirming && !hasShownToast.current) {
       toastId = toast.loading("Confirming proposal creation...");
-    } else if (isConfirmed) {
-      toastId = toast.success("Proposal created successfully!");
-    } else if (error) {
+      hasShownToast.current = true;
+    } else if (isConfirmed && proposalEvent && !hasShownToast.current) {
+      toastId = toast.success(
+        `Proposal created successfully! Proposal ID: ${proposalEvent.proposalId}`
+      );
+      hasShownToast.current = true;
+    } else if (isConfirmed && !proposalEvent && !hasShownToast.current) {
+      toastId = toast.error(
+        `Proposal created, but failed to fetch Proposal ID. Transaction hash: ${hash}. Check Base Sepolia explorer at https://sepolia.basescan.org/tx/${hash}.`
+      );
+      hasShownToast.current = true;
+    } else if (error && !hasShownToast.current) {
       const isCancelled = error.code === 4001 || /rejected|denied|cancelled/i.test(error.message);
-      toastId = toast.error(isCancelled ? "Transaction cancelled" : `Error: ${error.message}`);
+      toastId = toast.error(
+        isCancelled ? "Transaction cancelled" : `Error: ${error.message}`
+      );
+      hasShownToast.current = true;
     }
     return () => {
       if (toastId) toast.dismiss(toastId);
     };
-  }, [isPending, isConfirming, isConfirmed, error]);
+  }, [isPending, isConfirming, isConfirmed, error, hash, proposalEvent]);
 
   return (
     <div className="p-5 max-w-md mx-auto bg-gray-800 rounded-lg">
       <h3 className="text-xl font-semibold mb-4 text-gray-100">Create Proposal</h3>
       <div className="mb-4">
-        <label className="block text-gray-200 mb-2">Deadline (YYYY-MM-DD HH:MM)</label>
+        <label className="block text-gray-200 mb-2">Deadline (Unix Timestamp)</label>
         <input
-          type="datetime-local"
+          type="number"
           value={deadline}
           onChange={(e) => setDeadline(e.target.value)}
           className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
+          placeholder="Enter deadline (Unix timestamp)"
         />
       </div>
       <div className="mb-4">
@@ -69,17 +118,12 @@ function CreateProposal() {
           value={budget}
           onChange={(e) => setBudget(e.target.value)}
           className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
-          placeholder="Enter budget"
+          placeholder="Enter budget (in Wei)"
         />
       </div>
       <button
         onClick={handleCreateProposal}
-        disabled={isPending || isConfirming || !isConnected || chain?.id !== baseSepolia.id || !deadline || !budget}
-        className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-          isPending || isConfirming || !isConnected || chain?.id !== baseSepolia.id || !deadline || !budget
-            ? "bg-gray-600 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
+        className="w-full py-2 px-4 rounded-md text-white font-medium bg-blue-600 hover:bg-blue-700"
       >
         {isPending || isConfirming ? "Processing..." : "Create Proposal"}
       </button>

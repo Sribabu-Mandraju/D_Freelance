@@ -15,7 +15,7 @@ export const wagmiConfig = createConfig({
   ],
   transports: {
     [base.id]: http(import.meta.env.VITE_BASE_MAINNET || 'https://mainnet.base.org'),
-    [baseSepolia.id]: http(import.meta.env.VITE_BASE_SEPOLIA || 'https://sepolia.base.org'),
+    [baseSepolia.id]: http(import.meta.env.VITE_BASE_SEPOLIA || 'https://base-sepolia.g.alchemy.com/v2/lzIxPpJ8bHtK938K6Bnet'),
   },
 });
 
