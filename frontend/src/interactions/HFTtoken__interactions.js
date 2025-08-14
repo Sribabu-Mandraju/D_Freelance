@@ -44,6 +44,37 @@ const USDC_ABI = [
 ];
 
 
+const ERC20_ABI = [
+  {
+    constant: false,
+    inputs: [
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+    name: "approve",
+    outputs: [{ name: "", type: "bool" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
+    ],
+    name: "allowance",
+    outputs: [{ name: "", type: "uint256" }],
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [{ name: "account", type: "address" }],
+    name: "balanceOf",
+    outputs: [{ name: "", type: "uint256" }],
+    type: "function",
+  },
+];
+
+
 
 
 // Hook to call claimTokens
@@ -194,37 +225,129 @@ export const usePurchaseTokens = () => {
   };
 };
 // Hook to call placeBid
-export const usePlaceBid = () => {
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
-  const {
-    isLoading: isConfirming,
-    isSuccess: isConfirmed,
-  } = useWaitForTransactionReceipt({ hash });
 
-  const placeBid = async (proposalId) => {
-    if (!proposalId || isNaN(proposalId)) {
-      throw new Error("Invalid proposal ID");
+export const usePlaceBid = () => {
+  const { writeContract: writeApprove, data: approveHash, error: approveError, isPending: isApprovePending } = useWriteContract();
+  const { writeContract: writePlaceBid, data: bidHash, error: bidError, isPending: isBidPending } = useWriteContract();
+  const { isLoading: isApproveConfirming, isSuccess: isApproveConfirmed } = useWaitForTransactionReceipt({ hash: approveHash });
+  const { isLoading: isBidConfirming, isSuccess: isBidConfirmed } = useWaitForTransactionReceipt({ hash: bidHash });
+  const { address, chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  // Check HFT allowance for HFT_TOKEN_ADDRESS
+  const { data: allowanceData, error: allowanceError, refetch: refetchAllowance } = useReadContract({
+    address: HFT_TOKEN_ADDRESS,
+    abi: HFTtokenABI,
+    functionName: "allowance",
+    args: [address, HFT_TOKEN_ADDRESS],
+    query: { enabled: !!address },
+  });
+
+  // Check HFT balance
+  const { data: hftBalanceData, error: hftBalanceError } = useReadContract({
+    address: HFT_TOKEN_ADDRESS,
+    abi: HFTtokenABI,
+    functionName: "balanceOf",
+    args: [address],
+    query: { enabled: !!address },
+  });
+
+  const approveHFT = async (amount) => {
+    if (!amount || amount <= 0) {
+      throw new Error("Invalid HFT amount");
     }
     try {
-      await writeContract({
+      console.log("Initiating HFT approval...", { amount });
+      await writeApprove({
+        address: HFT_TOKEN_ADDRESS,
+        abi: ERC20_ABI,
+        functionName: "approve",
+        args: [HFT_TOKEN_ADDRESS, BigInt(amount)],
+        chainId,
+      });
+    } catch (error) {
+      console.error("Failed to approve HFT:", error);
+      throw error;
+    }
+  };
+
+  const placeBid = async (proposalId) => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+    if (chainId !== baseSepolia.id) {
+      throw new Error("Please switch to Base Sepolia network");
+    }
+    if (!proposalId && proposalId !== 0) {
+      throw new Error("Invalid proposal ID");
+    }
+
+    try {
+      console.log("Initiating placeBid transaction...", { proposalId });
+      await writePlaceBid({
         address: HFT_TOKEN_ADDRESS,
         abi: HFTtokenABI,
         functionName: "placeBid",
         args: [BigInt(proposalId)],
-        chainId: baseSepolia.id,
+        chainId,
       });
-    } catch (err) {
-      console.error("Place bid error:", err);
-      throw err;
+    } catch (error) {
+      console.error("Failed to place bid:", error);
+      throw error;
     }
   };
 
+  // Refetch allowance after approval confirmation
+  useEffect(() => {
+    if (isApproveConfirmed) {
+      console.log("Approval confirmed, refetching allowance...");
+      refetchAllowance();
+    }
+  }, [isApproveConfirmed, refetchAllowance]);
+
+  // Log transaction states for debugging
+  useEffect(() => {
+    console.log("Transaction states:", {
+      isApprovePending,
+      isApproveConfirming,
+      isApproveConfirmed,
+      approveError: approveError?.message,
+      isBidPending,
+      isBidConfirming,
+      isBidConfirmed,
+      bidError: bidError?.message,
+      allowance: allowanceData?.toString(),
+      hftBalance: hftBalanceData?.toString(),
+    });
+  }, [
+    isApprovePending,
+    isApproveConfirming,
+    isApproveConfirmed,
+    approveError,
+    isBidPending,
+    isBidConfirming,
+    isBidConfirmed,
+    bidError,
+    allowanceData,
+    hftBalanceData,
+  ]);
+
   return {
+    approveHFT,
     placeBid,
-    isPending,
-    isConfirming,
-    isConfirmed,
-    hash,
-    error,
+    isApprovePending,
+    isApproveConfirming,
+    isApproveConfirmed,
+    approveError,
+    approveHash,
+    isBidPending,
+    isBidConfirming,
+    isBidConfirmed,
+    bidError,
+    bidHash,
+    allowance: allowanceData || BigInt(0),
+    hftBalance: hftBalanceData || BigInt(0),
+    allowanceError,
+    hftBalanceError,
   };
 };
