@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 // Create new portfolio
-router.post('/create', createPortfolio);
+router.post('/', createPortfolio);
 
 
 
