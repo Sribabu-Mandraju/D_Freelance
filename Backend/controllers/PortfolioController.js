@@ -1,197 +1,19 @@
 import Portfolio from "../models/PortfolioModel.js"
 import nodemailer from "nodemailer"
+import dotenv from "dotenv"
 
-export const createPortfolio = async (req, res) => {
-  try {
-    const { heroSection, contactInfo, currentStatus, techHighlights } = req.body
+// Load environment variables from .env file
+dotenv.config()
 
-    // Validate required nested fields
-    if (!heroSection?.name) {
-      return res.status(400).json({
-        success: false,
-        message: "Hero section name is required",
-      })
-    }
-
-    if (!contactInfo?.email) {
-      return res.status(400).json({
-        success: false,
-        message: "Contact email is required",
-      })
-    }
-
-    // Create portfolio with nested structure
-    const portfolioData = {
-      heroSection: {
-        name: heroSection.name,
-        domains: heroSection.domains || [],
-        thoughtLine: heroSection.thoughtLine || "",
-        aboutMe: heroSection.aboutMe || "",
-        expertise: heroSection.expertise || [],
-        focusAreas: heroSection.focusAreas || [],
-      },
-      contactInfo: {
-        email: contactInfo.email,
-        phoneNumber: contactInfo.phoneNumber || "",
-        linkedinProfile: contactInfo.linkedinProfile || "",
-      },
-      currentStatus: currentStatus || [],
-      techHighlights: techHighlights || [],
-    }
-
-    const portfolio = new Portfolio(portfolioData)
-    const savedPortfolio = await portfolio.save()
-
-    res.status(201).json({
-      success: true,
-      message: "Portfolio created successfully",
-      data: savedPortfolio,
-    })
-  } catch (error) {
-    console.error("Create portfolio error:", error)
-    res.status(400).json({
-      success: false,
-      message: error.message || "Error creating portfolio",
-    })
-  }
-}
-
-// Get all portfolios
-export const getAllPortfolios = async (req, res) => {
-  try {
-    console.log("hi guys")
-    const portfolios = await Portfolio.find().sort({ createdAt: -1 })
-    res.status(200).json({
-      success: true,
-      count: portfolios.length,
-      data: portfolios,
-    })
-  } catch (error) {
-    console.error("Get portfolios error:", error)
-    res.status(500).json({
-      success: false,
-      message: "Error fetching portfolios",
-    })
-  }
-}
-
-// Get single portfolio by ID
-export const getPortfolioById = async (req, res) => {
-  try {
-    const { id } = req.params
-    const portfolio = await Portfolio.findById(id)
-
-    if (!portfolio) {
-      return res.status(404).json({
-        success: false,
-        message: "Portfolio not found",
-      })
-    }
-
-    res.status(200).json({
-      success: true,
-      data: portfolio,
-    })
-  } catch (error) {
-    console.error("Get portfolio error:", error)
-    res.status(500).json({
-      success: false,
-      message: "Error fetching portfolio",
-    })
-  }
-}
-
-// Update portfolio
-export const updatePortfolio = async (req, res) => {
-  try {
-    const { id } = req.params
-    const { heroSection, contactInfo, currentStatus, techHighlights } = req.body
-
-    const portfolio = await Portfolio.findById(id)
-    if (!portfolio) {
-      return res.status(404).json({
-        success: false,
-        message: "Portfolio not found",
-      })
-    }
-
-    // Update with nested structure validation
-    const updateData = {}
-
-    if (heroSection) {
-      updateData.heroSection = {
-        ...portfolio.heroSection,
-        ...heroSection,
-      }
-    }
-
-    if (contactInfo) {
-      updateData.contactInfo = {
-        ...portfolio.contactInfo,
-        ...contactInfo,
-      }
-    }
-
-    if (currentStatus) {
-      updateData.currentStatus = currentStatus
-    }
-
-    if (techHighlights) {
-      updateData.techHighlights = techHighlights
-    }
-
-    const updatedPortfolio = await Portfolio.findByIdAndUpdate(id, updateData, { new: true, runValidators: true })
-
-    res.status(200).json({
-      success: true,
-      message: "Portfolio updated successfully",
-      data: updatedPortfolio,
-    })
-  } catch (error) {
-    console.error("Update portfolio error:", error)
-    res.status(400).json({
-      success: false,
-      message: error.message || "Error updating portfolio",
-    })
-  }
-}
-
-// Delete portfolio
-export const deletePortfolio = async (req, res) => {
-  try {
-    const { id } = req.params
-    const portfolio = await Portfolio.findByIdAndDelete(id)
-
-    if (!portfolio) {
-      return res.status(404).json({
-        success: false,
-        message: "Portfolio not found",
-      })
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Portfolio deleted successfully",
-    })
-  } catch (error) {
-    console.error("Delete portfolio error:", error)
-    res.status(500).json({
-      success: false,
-      message: "Error deleting portfolio",
-    })
-  }
-}
-
-
-// In-memory OTP store (use Redis or DB in production)
+// In-memory OTP store (use a proper database in production)
 const otpStorage = new Map()
 
 // Email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail
-    pass: process.env.EMAIL_PASS, // App password
+    user: process.env.EMAIL_USER, // Your Gmail address
+    pass: process.env.EMAIL_PASS, // Your Gmail App Password
   },
 })
 
@@ -199,7 +21,11 @@ const transporter = nodemailer.createTransport({
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Regex to validate a general email format, consistent with the Mongoose schema
+const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+
+// Function to send OTP
 export const sendOTP = async (req, res) => {
   try {
     const { contactInfo } = req.body
@@ -256,6 +82,167 @@ export const sendOTP = async (req, res) => {
     })
   }
 }
+
+// All other functions from your original file.
+export const createPortfolio = async (req, res) => {
+  try {
+    const { heroSection, contactInfo, currentStatus, techHighlights } = req.body
+    if (!heroSection?.name) {
+      return res.status(400).json({
+        success: false,
+        message: "Hero section name is required",
+      })
+    }
+    if (!contactInfo?.email) {
+      return res.status(400).json({
+        success: false,
+        message: "Contact email is required",
+      })
+    }
+    const portfolioData = {
+      heroSection: {
+        name: heroSection.name,
+        domains: heroSection.domains || [],
+        thoughtLine: heroSection.thoughtLine || "",
+        aboutMe: heroSection.aboutMe || "",
+        expertise: heroSection.expertise || [],
+        focusAreas: heroSection.focusAreas || [],
+      },
+      contactInfo: {
+        email: contactInfo.email,
+        phoneNumber: contactInfo.phoneNumber || "",
+        linkedinProfile: contactInfo.linkedinProfile || "",
+      },
+      currentStatus: currentStatus || [],
+      techHighlights: techHighlights || [],
+    }
+    const portfolio = new Portfolio(portfolioData)
+    const savedPortfolio = await portfolio.save()
+    res.status(201).json({
+      success: true,
+      message: "Portfolio created successfully",
+      data: savedPortfolio,
+    })
+  } catch (error) {
+    console.error("Create portfolio error:", error)
+    res.status(400).json({
+      success: false,
+      message: error.message || "Error creating portfolio",
+    })
+  }
+}
+
+export const getAllPortfolios = async (req, res) => {
+  try {
+    console.log("hi guys")
+    const portfolios = await Portfolio.find().sort({
+      createdAt: -1
+    })
+    res.status(200).json({
+      success: true,
+      count: portfolios.length,
+      data: portfolios,
+    })
+  } catch (error) {
+    console.error("Get portfolios error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Error fetching portfolios",
+    })
+  }
+}
+
+export const getPortfolioById = async (req, res) => {
+  try {
+    const { id } = req.params
+    const portfolio = await Portfolio.findById(id)
+    if (!portfolio) {
+      return res.status(404).json({
+        success: false,
+        message: "Portfolio not found",
+      })
+    }
+    res.status(200).json({
+      success: true,
+      data: portfolio,
+    })
+  } catch (error) {
+    console.error("Get portfolio error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Error fetching portfolio",
+    })
+  }
+}
+
+export const updatePortfolio = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { heroSection, contactInfo, currentStatus, techHighlights } = req.body
+    const portfolio = await Portfolio.findById(id)
+    if (!portfolio) {
+      return res.status(404).json({
+        success: false,
+        message: "Portfolio not found",
+      })
+    }
+    const updateData = {}
+    if (heroSection) {
+      updateData.heroSection = {
+        ...portfolio.heroSection,
+        ...heroSection,
+      }
+    }
+    if (contactInfo) {
+      updateData.contactInfo = {
+        ...portfolio.contactInfo,
+        ...contactInfo,
+      }
+    }
+    if (currentStatus) {
+      updateData.currentStatus = currentStatus
+    }
+    if (techHighlights) {
+      updateData.techHighlights = techHighlights
+    }
+    const updatedPortfolio = await Portfolio.findByIdAndUpdate(id, updateData, { new: true, runValidators: true })
+    res.status(200).json({
+      success: true,
+      message: "Portfolio updated successfully",
+      data: updatedPortfolio,
+    })
+  } catch (error) {
+    console.error("Update portfolio error:", error)
+    res.status(400).json({
+      success: false,
+      message: error.message || "Error updating portfolio",
+    })
+  }
+}
+
+export const deletePortfolio = async (req, res) => {
+  try {
+    const { id } = req.params
+    const portfolio = await Portfolio.findByIdAndDelete(id)
+    if (!portfolio) {
+      return res.status(404).json({
+        success: false,
+        message: "Portfolio not found",
+      })
+    }
+    res.status(200).json({
+      success: true,
+      message: "Portfolio deleted successfully",
+    })
+  } catch (error) {
+    console.error("Delete portfolio error:", error)
+    res.status(500).json({
+      success: false,
+      message: "Error deleting portfolio",
+    })
+  }
+}
+
 // Modified verifyOTP to accept portfolio data along with OTP verification
 export const verifyOTP = async (req, res) => {
   try {

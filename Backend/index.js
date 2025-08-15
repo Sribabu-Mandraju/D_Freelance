@@ -70,6 +70,7 @@ import TreasuryRoutes from "./routes/TreasuryRoutes.js"
 import EscrowRoutes from "./routes/EscrowRoutes.js"
 import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js"
 import PortfolioRoutes from "./routes/PortfolioRoutes.js"
+import gigRoutes from "./routes/GigRoutes.js";
 
 // Import the WebSocket configuration
 import configureSockets from "./socket.js";
@@ -98,6 +99,7 @@ app.use("/api/treasury", TreasuryRoutes);
 app.use("/api/escrow", EscrowRoutes)
 app.use("/api/proposalManager", ProposalManagerRoutes)
 app.use("/api/portfolio", PortfolioRoutes)
+app.use('/api/gigs', gigRoutes);
 
 // Default route
 app.get("/", (req, res) => {
