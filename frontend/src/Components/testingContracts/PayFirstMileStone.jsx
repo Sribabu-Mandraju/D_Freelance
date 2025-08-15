@@ -1,93 +1,89 @@
 import { useState, useEffect, useRef } from "react";
 import { useAccount, useBalance } from "wagmi";
-import { useStartWork } from "../../interactions/ProposalManager_interactions";
+import { usePayFirstMilestone } from "../../interactions/ProposalManager_interactions";
 import { baseSepolia } from "wagmi/chains";
 import toast from "react-hot-toast";
 
-function StartWork() {
+function PayFirstMilestone() {
   const { address, isConnected, chain } = useAccount();
   const [proposalMetaData, setProposalMetaData] = useState({}); // Reserved for future metadata
   const [proposalId, setProposalId] = useState("");
   const {
-    startWork,
+    payFirstMilestone,
     isPending,
     isConfirming,
     isConfirmed,
     error,
     hash,
-    receipt,
-  } = useStartWork();
+  } = usePayFirstMilestone();
 
   // Check ETH balance for gas (0.001 ETH threshold)
   const { data: balanceData } = useBalance({ address });
   const hasEnoughGas = balanceData && balanceData.value >= 0.001 * 10 ** 18;
 
-  // Validate proposal ID
+  // Validate proposal ID and network
   const isCorrectNetwork = chain && chain.id === baseSepolia.id;
   const isValidProposalId = proposalId !== "" && Number.isInteger(Number(proposalId));
 
-  // Ref to track toast ID
-  const toastIdRef = useRef(null);
+  // Ref to track if toast has been shown
+  const hasShownToast = useRef(false);
 
-  // Handle start work
-  const handleStartWork = async () => {
+  // Handle pay first milestone
+  const handlePayFirstMilestone = async () => {
     if (!isConnected) {
-      toast.error("Please connect your wallet.", { id: "connect-wallet" });
+      toast.error("Please connect your wallet.");
       return;
     }
     if (!isCorrectNetwork) {
-      toast.error("Please switch to Base Sepolia network.", { id: "network-error" });
+      toast.error("Please switch to Base Sepolia network.");
       return;
     }
     if (!hasEnoughGas) {
-      toast.error("Insufficient ETH for gas fees (minimum 0.001 ETH).", { id: "gas-error" });
+      toast.error("Insufficient ETH for gas fees (minimum 0.001 ETH).");
       return;
     }
     if (!isValidProposalId) {
-      toast.error("Please enter a valid proposal ID.", { id: "proposal-id-error" });
+      toast.error("Please enter a valid proposal ID.");
       return;
     }
 
     try {
-      console.log("Calling startWork with proposalId:", proposalId);
-      await startWork(proposalId);
+      console.log("Calling payFirstMilestone with proposalId:", proposalId);
+      hasShownToast.current = false; // Reset toast flag
+      await payFirstMilestone(proposalId);
     } catch (err) {
-      console.error("Start work error:", err);
+      console.error("Pay first milestone error:", err);
       // Toast handled in useEffect
     }
   };
 
   // Toast notifications for transaction states
   useEffect(() => {
-    // Dismiss previous toast if it exists
-    if (toastIdRef.current) {
-      toast.dismiss(toastIdRef.current);
-    }
-
-    if (isPending) {
-      toastIdRef.current = toast.loading("Starting work...");
-    } else if (isConfirming) {
-      toastIdRef.current = toast.loading("Confirming work start...");
-    } else if (isConfirmed) {
-      toastIdRef.current = toast.success("Work started successfully!");
-    } else if (error) {
+    let toastId;
+    if (isPending && !hasShownToast.current) {
+      toastId = toast.loading("Processing first milestone payment...");
+      hasShownToast.current = true;
+    } else if (isConfirming && !hasShownToast.current) {
+      toastId = toast.loading("Confirming first milestone payment...");
+      hasShownToast.current = true;
+    } else if (isConfirmed && !hasShownToast.current) {
+      toastId = toast.success("First milestone payment successful!");
+      hasShownToast.current = true;
+    } else if (error && !hasShownToast.current) {
       const isCancelled = error.code === 4001 || /rejected|denied|cancelled/i.test(error.message);
-      toastIdRef.current = toast.error(
-        isCancelled ? "Transaction cancelled" : `Error: ${error.message.slice(0, 100)}...`
+      toastId = toast.error(
+        isCancelled ? "Transaction cancelled" : `Error: ${error.message}`
       );
+      hasShownToast.current = true;
     }
-
-    // Cleanup on unmount
     return () => {
-      if (toastIdRef.current) {
-        toast.dismiss(toastIdRef.current);
-      }
+      if (toastId) toast.dismiss(toastId);
     };
   }, [isPending, isConfirming, isConfirmed, error]);
 
   return (
     <div className="p-5 max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg">
-      <h3 className="text-xl font-semibold mb-4 text-gray-100">Start Work</h3>
+      <h3 className="text-xl font-semibold mb-4 text-gray-100">Pay First Milestone</h3>
       <div className="mb-4">
         <label className="block text-gray-200 mb-2">Proposal ID</label>
         <input
@@ -99,7 +95,7 @@ function StartWork() {
         />
       </div>
       <button
-        onClick={handleStartWork}
+        onClick={handlePayFirstMilestone}
         disabled={
           isPending ||
           isConfirming ||
@@ -119,10 +115,10 @@ function StartWork() {
             : "bg-cyan-600 hover:bg-cyan-700"
         }`}
       >
-        {isPending || isConfirming ? "Processing..." : "Start Work"}
+        {isPending || isConfirming ? "Processing..." : "Pay First Milestone"}
       </button>
     </div>
   );
 }
 
-export default StartWork;
+export default PayFirstMilestone;

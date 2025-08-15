@@ -1,34 +1,63 @@
 import Gig from '../models/GigModel.js';
 
+// ---- helpers ----
+const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+const hasPayload = (obj) =>
+  obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+
+const countSelectedPackages = (body) => {
+  const names = ['basic', 'standard', 'pro'];
+  const selected = names.filter((n) => hasPayload(body[n]));
+  return { count: selected.length, selected };
+};
+
 // Create a new gig
 export const createGig = async (req, res) => {
   try {
     const {
       title,
       description,
-      images,
+      images,     // [{ url, public_id }]
       category,
-      price,
       deliveryTime,
-      revisions,
-      faqs,
+      faqs,       // [{question, answer}]
       about,
+      tags,       // [string]
+      skills,     // [string]
+      basic,
+      standard,
+      pro,
     } = req.body;
 
-    if (!title || !description || !category || !price || !deliveryTime || !revisions) {
+    // required top-level fields
+    if (!title || !description || !category || !deliveryTime) {
       return res.status(400).json({ message: 'Please enter all required fields' });
+    }
+
+    // package validation: exactly one of basic/standard/pro
+    const { count, selected } = countSelectedPackages({ basic, standard, pro });
+    if (count === 0) {
+      return res.status(400).json({ message: 'Provide one package: basic, standard, or pro' });
+    }
+    if (count > 1) {
+      return res.status(400).json({ message: `Only one package allowed. You sent: ${selected.join(', ')}` });
     }
 
     const newGig = new Gig({
       userId: req.user._id,
       title,
       description,
-      images: Array.isArray(images) ? images : (images ? [images] : []),
+      images: toArray(images),       // expect array of {url, public_id}
+      tags: toArray(tags),
+      skills: toArray(skills),
       category,
-      price,
+      // set the single provided package
+      ...(hasPayload(basic) && { basic }),
+      ...(hasPayload(standard) && { standard }),
+      ...(hasPayload(pro) && { pro }),
+
       deliveryTime,
-      revisions,
-      faqs: Array.isArray(faqs) ? faqs : (faqs ? [faqs] : []),
+      faqs: toArray(faqs),
       about,
     });
 
@@ -75,15 +104,17 @@ export const updateGig = async (req, res) => {
       description,
       images,
       category,
-      price,
       deliveryTime,
-      revisions,
       faqs,
       about,
+      tags,
+      skills,
+      basic,
+      standard,
+      pro,
     } = req.body;
 
     const gig = await Gig.findById(req.params.id);
-
     if (!gig) {
       return res.status(404).json({ message: 'Gig not found' });
     }
@@ -92,15 +123,36 @@ export const updateGig = async (req, res) => {
       return res.status(401).json({ message: 'Not authorized to update this gig' });
     }
 
-    gig.title = title ?? gig.title;
-    gig.description = description ?? gig.description;
-    gig.images = images ? (Array.isArray(images) ? images : [images]) : gig.images;
-    gig.category = category ?? gig.category;
-    gig.price = price ?? gig.price;
-    gig.deliveryTime = deliveryTime ?? gig.deliveryTime;
-    gig.revisions = revisions ?? gig.revisions;
-    gig.faqs = faqs ? (Array.isArray(faqs) ? faqs : [faqs]) : gig.faqs;
-    gig.about = about ?? gig.about;
+    // If user is changing packages, enforce "exactly one"
+    const { count, selected } = countSelectedPackages({ basic, standard, pro });
+    if (count > 1) {
+      return res.status(400).json({ message: `Only one package allowed. You sent: ${selected.join(', ')}` });
+    }
+
+    // Top-level updates
+    if (title !== undefined) gig.title = title;
+    if (description !== undefined) gig.description = description;
+    if (images !== undefined) gig.images = toArray(images);
+    if (category !== undefined) gig.category = category;
+    if (deliveryTime !== undefined) gig.deliveryTime = deliveryTime;
+    if (faqs !== undefined) gig.faqs = toArray(faqs);
+    if (about !== undefined) gig.about = about;
+    if (tags !== undefined) gig.tags = toArray(tags);
+    if (skills !== undefined) gig.skills = toArray(skills);
+
+    // Package updates: replace whichever is provided; clear others if switching
+    if (count === 1) {
+      // clear all first
+      gig.basic = undefined;
+      gig.standard = undefined;
+      gig.pro = undefined;
+      // set the one provided
+      if (hasPayload(basic)) gig.basic = basic;
+      if (hasPayload(standard)) gig.standard = standard;
+      if (hasPayload(pro)) gig.pro = pro;
+    } else if (count === 0) {
+      // no package fields in payload -> leave existing as-is
+    }
 
     const updatedGig = await gig.save();
     return res.json(updatedGig);

@@ -1,5 +1,28 @@
-
 import mongoose from 'mongoose';
+
+const packageSchema = new mongoose.Schema(
+  {
+    hourlyPay: {
+      type: Number,
+      min: 0,
+    },
+    duration: {
+      type: String,
+      trim: true,
+    },
+    custom_ui: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      enum: ['yes', 'no', 'client_choice'],
+    },
+    code_reviews: {
+      type: String,
+      trim: true,
+    },
+  },
+  { _id: false }
+);
 
 const GigSchema = new mongoose.Schema({
   userId: {
@@ -24,26 +47,37 @@ const GigSchema = new mongoose.Schema({
       public_id: { type: String, required: true },
     },
   ],
+  tags: [
+    {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  ],
+  skills: [
+    {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  ],
   category: {
     type: String,
     required: true,
     trim: true,
   },
-  price: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
+
+  // Packages - user will select only one
+  basic: { type: packageSchema, required: false },
+  standard: { type: packageSchema, required: false },
+  pro: { type: packageSchema, required: false },
+
   deliveryTime: {
     type: Number,
     required: true,
     min: 1,
   },
-  revisions: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
+
   faqs: [
     {
       question: { type: String, required: true },
