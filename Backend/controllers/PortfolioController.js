@@ -199,23 +199,24 @@ const transporter = nodemailer.createTransport({
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
-
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const sendOTP = async (req, res) => {
   try {
-    const { email } = req.body
+    const { contactInfo } = req.body
 
-    // Basic validation
-    if (!email) {
+    // Basic validation for existence of email field
+    if (!contactInfo || !contactInfo.email) {
       return res.status(400).json({
         success: false,
         message: "Email is required",
       })
     }
 
-    if (!email.endsWith("@gmail.com")) {
+    // Validate email format using regex, consistent with the schema
+    if (!emailRegex.test(contactInfo.email)) {
       return res.status(400).json({
         success: false,
-        message: "Only Gmail addresses are allowed",
+        message: "Please enter a valid email address",
       })
     }
 
@@ -223,12 +224,13 @@ export const sendOTP = async (req, res) => {
     const otp = generateOTP()
     const expiresAt = Date.now() + 5 * 60 * 1000 // 5 minutes
 
-    otpStorage.set(email, { otp, expiresAt })
+    // Store OTP with the email as key
+    otpStorage.set(contactInfo.email, { otp, expiresAt })
 
     // Send email
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: email,
+      to: contactInfo.email,
       subject: "Your OTP Code",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 400px; padding: 20px; background: #f4f4f4; border-radius: 8px;">
@@ -244,7 +246,7 @@ export const sendOTP = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "OTP sent successfully to your Gmail",
+      message: "OTP sent successfully",
     })
   } catch (error) {
     console.error("Send OTP error:", error)
@@ -254,7 +256,6 @@ export const sendOTP = async (req, res) => {
     })
   }
 }
-
 // Modified verifyOTP to accept portfolio data along with OTP verification
 export const verifyOTP = async (req, res) => {
   try {
@@ -312,7 +313,6 @@ export const verifyOTP = async (req, res) => {
       currentStatus: currentStatus || [],
       techHighlights: techHighlights || [],
     }
-
     const portfolio = new Portfolio(finalPortfolioData)
     const savedPortfolio = await portfolio.save()
 
