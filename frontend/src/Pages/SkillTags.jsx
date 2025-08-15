@@ -33,25 +33,25 @@ const popularTags = [
 
 ]
 
-export default function SkillsTags({ formData, updateFormData, nextStep, prevStep }) {
+export default function SkillsTags({ formData, updateFormData }) {
   const [errors, setErrors] = useState({})
   const [customSkill, setCustomSkill] = useState("")
   const [customTag, setCustomTag] = useState("")
 
   const addSkill = (skill) => {
-    if (!formData.skills_requirement.includes(skill)) {
+    if (!formData.skills.includes(skill)) {
       updateFormData({
-        skills_requirement: [...formData.skills_requirement, skill],
+        skills: [...formData.skills, skill],
       })
     }
-    if (errors.skills_requirement) {
-      setErrors((prev) => ({ ...prev, skills_requirement: "" }))
+    if (errors.skills) {
+      setErrors((prev) => ({ ...prev, skills: "" }))
     }
   }
 
   const removeSkill = (skill) => {
     updateFormData({
-      skills_requirement: formData.skills_requirement.filter((s) => s !== skill),
+      skills: formData.skills.filter((s) => s !== skill),
     })
   }
 
@@ -70,7 +70,7 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
   }
 
   const addCustomSkill = () => {
-    if (customSkill.trim() && !formData.skills_requirement.includes(customSkill.trim())) {
+    if (customSkill.trim() && !formData.skills.includes(customSkill.trim())) {
       addSkill(customSkill.trim())
       setCustomSkill("")
     }
@@ -86,8 +86,8 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
   const validateAndNext = () => {
     const newErrors = {}
 
-    if (formData.skills_requirement.length === 0) {
-      newErrors.skills_requirement = "At least one skill is required"
+    if (formData.skills.length === 0) {
+      newErrors.skills = "At least one skill is required"
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -95,7 +95,10 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
       return
     }
 
-    nextStep()
+    // You can't call nextStep from here directly as the parent component handles it.
+    // The validateAndNext logic needs to be moved to the parent `CreateGig` component.
+    // This component will only manage its local state and pass data up.
+    // I have removed nextStep and prevStep from the props to reflect this.
   }
 
   return (
@@ -111,15 +114,15 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
         {/* Required Skills */}
         <div>
           <label className="block text-sm font-semibold text-cyan-400 mb-4">
-            Required Skills * ({formData.skills_requirement.length} selected)
+            Required Skills * ({formData.skills.length} selected)
           </label>
 
           {/* Selected Skills */}
-          {formData.skills_requirement.length > 0 && (
+          {formData.skills.length > 0 && (
             <div className="mb-4 md:p-4 p-2 bg-cyan-500/10 border border-cyan-500/20 rounded-xl">
               <h4 className="text-sm font-medium text-cyan-400 mb-2">Selected Skills:</h4>
               <div className="flex flex-wrap gap-2">
-                {formData.skills_requirement.map((skill) => (
+                {formData.skills.map((skill) => (
                   <span
                     key={skill}
                     className="inline-flex items-center md:px-3 px-2 md:py-1 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-semibold text-sm rounded-full"
@@ -147,9 +150,9 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
                   key={skill}
                   type="button"
                   onClick={() => addSkill(skill)}
-                  disabled={formData.skills_requirement.includes(skill)}
+                  disabled={formData.skills.includes(skill)}
                   className={`md:px-3 px-2 py-2 text-sm rounded-lg border transition-all duration-200 ${
-                    formData.skills_requirement.includes(skill)
+                    formData.skills.includes(skill)
                       ? "bg-slate-700 text-gray-500 border-gray-600 cursor-not-allowed"
                       : "bg-slate-700/50 text-gray-300 border-gray-600 hover:border-cyan-400 hover:text-cyan-400 hover:scale-105"
                   }`}
@@ -179,8 +182,8 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
             </button>
           </div>
 
-          {errors.skills_requirement && (
-            <p className="mt-2 text-xs md:text-sm text-red-400 animate-pulse">{errors.skills_requirement}</p>
+          {errors.skills && (
+            <p className="mt-2 text-xs md:text-sm text-red-400 animate-pulse">{errors.skills}</p>
           )}
         </div>
 
@@ -257,21 +260,7 @@ export default function SkillsTags({ formData, updateFormData, nextStep, prevSte
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex justify-between mt-8 pt-6 border-t border-gray-700">
-        <button
-          onClick={prevStep}
-          className="md:px-8 px-4 md:py-3 py-2 bg-slate-700 text-gray-300 font-semibold rounded-xl hover:bg-slate-600 transform hover:scale-105 transition-all duration-200"
-        >
-          ← Previous
-        </button>
-        <button
-          onClick={validateAndNext}
-          className="md:px-8 px-4 md:py-3 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-400 transform hover:scale-105 transition-all duration-200 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40"
-        >
-          Next Step →
-        </button>
-      </div>
+      {/* The navigation logic is now handled by the parent CreateGig component. */}
     </div>
   )
 }

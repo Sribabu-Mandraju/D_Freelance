@@ -1,25 +1,35 @@
-import express from 'express';
+import express from "express"
 import {
   createPortfolio,
   updatePortfolio,
   deletePortfolio,
-  getAllPortfolios
+  getAllPortfolios,
+  getPortfolioById,
+  sendOTP,
+  verifyOTP,
+  resendOTP,
 } from "../controllers/PortfolioController.js"
+const router = express.Router()
+// Send OTP for portfolio creation
+router.post("/send-otp", sendOTP)
 
-const router = express.Router();
+// Verify OTP and create portfolio
+router.post("/verify-otp", verifyOTP)
 
-// Create new portfolio
-router.post('/', createPortfolio);
+// Resend OTP
+router.post("/resend-otp", resendOTP)
 
-
+// Create new portfolio (direct creation without OTP - kept for backward compatibility)
+router.post("/", createPortfolio)
 
 // Get all portfolios
-router.get('/getAll', getAllPortfolios);
+router.get("/getAll", getAllPortfolios)
+router.get("/:id", getPortfolioById)
 
 // Update portfolio by ID
-router.put('/:id', updatePortfolio);
+router.put("/:id", updatePortfolio)
 
 // Delete portfolio by ID
-router.delete('/:id', deletePortfolio);
+router.delete("/:id", deletePortfolio)
 
-export default router;
+export default router

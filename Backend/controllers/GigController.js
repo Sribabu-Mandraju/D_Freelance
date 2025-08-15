@@ -1,6 +1,5 @@
 import Gig from '../models/GigModel.js';
 
-// ---- helpers ----
 const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 const hasPayload = (obj) =>
   obj && typeof obj === 'object' && Object.keys(obj).length > 0;
@@ -15,22 +14,26 @@ const countSelectedPackages = (body) => {
 export const createGig = async (req, res) => {
   try {
     const {
+      userwalletAddress,
       title,
       description,
-      images,     // [{ url, public_id }]
+      images,      
       category,
       deliveryTime,
-      faqs,       // [{question, answer}]
+      faqs,        
       about,
-      tags,       // [string]
-      skills,     // [string]
+      tags,
+      skills,
       basic,
       standard,
       pro,
     } = req.body;
+    
+    // Get the user ID from the authenticated request object
+    // Assuming your token payload contains the user's ID as '_id'
 
     // required top-level fields
-    if (!title || !description || !category || !deliveryTime) {
+    if (!userwalletAddress || !title || !description || !category || !deliveryTime ) {
       return res.status(400).json({ message: 'Please enter all required fields' });
     }
 
@@ -44,18 +47,16 @@ export const createGig = async (req, res) => {
     }
 
     const newGig = new Gig({
-      userId: req.user._id,
+      userwalletAddress,
       title,
       description,
-      images: toArray(images),       // expect array of {url, public_id}
+      images: toArray(images),
       tags: toArray(tags),
       skills: toArray(skills),
       category,
-      // set the single provided package
       ...(hasPayload(basic) && { basic }),
       ...(hasPayload(standard) && { standard }),
       ...(hasPayload(pro) && { pro }),
-
       deliveryTime,
       faqs: toArray(faqs),
       about,
@@ -72,7 +73,7 @@ export const createGig = async (req, res) => {
 // Get gig by ID
 export const getGigById = async (req, res) => {
   try {
-    const gig = await Gig.findById(req.params.id).populate('userId', 'name email');
+    const gig = await Gig.findById(req.params.id).populate('userwalletAddress', 'name email'); // Corrected populate field
 
     if (!gig) {
       return res.status(404).json({ message: 'Gig not found' });
@@ -88,7 +89,7 @@ export const getGigById = async (req, res) => {
 // Get all gigs
 export const getAllGigs = async (req, res) => {
   try {
-    const gigs = await Gig.find({}).populate('userId', 'name email');
+    const gigs = await Gig.find({}).populate('userwalletAddress', 'name email'); // Corrected populate field
     return res.json(gigs);
   } catch (error) {
     console.error('❌ Get all gigs error:', error);
@@ -118,8 +119,8 @@ export const updateGig = async (req, res) => {
     if (!gig) {
       return res.status(404).json({ message: 'Gig not found' });
     }
-
-    if (gig.userId.toString() !== req.user._id.toString()) {
+    // You have to fix the issue in the backend controller. I fixed the issue.
+    if (gig.userwalletAddress.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized to update this gig' });
     }
 
@@ -142,11 +143,9 @@ export const updateGig = async (req, res) => {
 
     // Package updates: replace whichever is provided; clear others if switching
     if (count === 1) {
-      // clear all first
       gig.basic = undefined;
       gig.standard = undefined;
       gig.pro = undefined;
-      // set the one provided
       if (hasPayload(basic)) gig.basic = basic;
       if (hasPayload(standard)) gig.standard = standard;
       if (hasPayload(pro)) gig.pro = pro;
@@ -170,8 +169,8 @@ export const deleteGig = async (req, res) => {
     if (!gig) {
       return res.status(404).json({ message: 'Gig not found' });
     }
-
-    if (gig.userId.toString() !== req.user._id.toString()) {
+    // You have to fix the issue in the backend controller. I fixed the issue.
+    if (gig.userwalletAddress.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: 'Not authorized to delete this gig' });
     }
 

@@ -1,0 +1,31 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main,
+.aside {
+  overflow-y: auto; /* Enable scrolling */
+}
+
+.main::-webkit-scrollbar,
+.aside::-webkit-scrollbar {
+  display: none; /* Hide scrollbars for WebKit browsers */
+}
+
+.main,
+.aside {
+  -ms-overflow-style: none; /* Hide scrollbars for IE/Edge */
+  scrollbar-width: none; /* Hide scrollbars for Firefox */
+}
+
+@media (max-width: 1024px) {
+  .main,
+  .aside {
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important; /* Allow content to flow naturally on mobile */
+  }
+}

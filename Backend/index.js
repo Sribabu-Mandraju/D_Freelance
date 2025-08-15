@@ -77,7 +77,6 @@ import configureSockets from "./socket.js";
 
 // Load environment variables
 dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 const server = http.createServer(app);
@@ -120,7 +119,6 @@ mongoose
 
 // Configure and start the WebSocket server
 configureSockets(server);
-
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

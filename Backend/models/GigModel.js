@@ -25,10 +25,10 @@ const packageSchema = new mongoose.Schema(
 );
 
 const GigSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+   userwalletAddress: {
+    type: String,
     required: true,
+    trim: true,
   },
   title: {
     type: String,
@@ -43,34 +43,26 @@ const GigSchema = new mongoose.Schema({
   },
   images: [
     {
-      url: { type: String, required: true },
-      public_id: { type: String, required: true },
+      url: { type: String, required: false },
     },
   ],
-  tags: [
-    {
-      type: String,
-      required: true,
-      trim: true,
-    },
-  ],
-  skills: [
-    {
-      type: String,
-      required: true,
-      trim: true,
-    },
-  ],
+  tags: {
+    type: [String],
+    default: [],
+  },
+  skills: {
+    type: [String],
+    default: [],
+  },
   category: {
     type: String,
     required: true,
     trim: true,
   },
 
-  // Packages - user will select only one
-  basic: { type: packageSchema, required: false },
-  standard: { type: packageSchema, required: false },
-  pro: { type: packageSchema, required: false },
+  basic: packageSchema,
+  standard: packageSchema,
+  pro: packageSchema,
 
   deliveryTime: {
     type: Number,
