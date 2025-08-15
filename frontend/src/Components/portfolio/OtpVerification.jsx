@@ -1,6 +1,7 @@
-"use client"
 import { useState, useRef, useEffect } from "react"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react"
+
 function OtpVerification() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [isVerifying, setIsVerifying] = useState(false)
@@ -8,19 +9,23 @@ function OtpVerification() {
   const [message, setMessage] = useState("")
   const [email, setEmail] = useState("")
   const inputRefs = useRef([])
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
   useEffect(() => {
     // Get email from URL params
-    const urlParams = new URLSearchParams(window.location.search)
-    const emailParam = urlParams.get("email")
+    const emailParam = searchParams.get("email")
     if (emailParam) {
       setEmail(decodeURIComponent(emailParam))
+    } else {
+      setMessage("Error: Email not found in URL")
     }
 
     // Focus first input
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus()
     }
-  }, [])
+  }, [searchParams])
 
   const handleInputChange = (index, value) => {
     if (value.length > 1) return
@@ -54,7 +59,16 @@ function OtpVerification() {
     setMessage("")
 
     try {
-      const response = await fetch("/api/portfolio/verify-otp", {
+      // Retrieve portfolio ID from sessionStorage
+      const portfolioId = sessionStorage.getItem("portfolioId")
+
+      if (!portfolioId) {
+        setMessage("Error: Portfolio ID is missing")
+        setIsVerifying(false)
+        return
+      }
+
+      const response = await fetch("http://localhost:3001/api/portfolio/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,6 +76,7 @@ function OtpVerification() {
         body: JSON.stringify({
           email,
           otp: otpString,
+          portfolioId,
         }),
       })
 
@@ -69,8 +84,12 @@ function OtpVerification() {
 
       if (response.ok && result.success) {
         setMessage("Verification successful! Redirecting to your portfolio...")
+        // Clear sessionStorage
+        sessionStorage.removeItem("portfolioId")
+        sessionStorage.removeItem("portfolioData")
+        // Redirect to success page
         setTimeout(() => {
-          window.location.href = `/portfolio/${result.data._id}`
+          navigate("/portfolio-success")
         }, 2000)
       } else {
         setMessage(`Error: ${result.message}`)
@@ -80,6 +99,8 @@ function OtpVerification() {
       }
     } catch (error) {
       setMessage(`Error: ${error.message}`)
+      setOtp(["", "", "", "", "", ""])
+      inputRefs.current[0]?.focus()
     } finally {
       setIsVerifying(false)
     }
@@ -95,7 +116,7 @@ function OtpVerification() {
     setMessage("")
 
     try {
-      const response = await fetch("/api/portfolio/resend-otp", {
+      const response = await fetch("http://localhost:3001/api/portfolio/resend-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -181,7 +202,7 @@ function OtpVerification() {
             {/* Back Button */}
             <button
               type="button"
-              onClick={() => window.history.back()}
+              onClick={() => navigate(-1)}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 text-gray-400 hover:text-white transition-all duration-300"
             >
               <ArrowLeft className="w-4 h-4" />

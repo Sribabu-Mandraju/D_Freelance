@@ -24,7 +24,7 @@ import Proposal from "./Pages/proposal/Proposal";
 import StartWork from "./Components/testingContracts/StartWork";
 import PortfolioForm from "./Components/portfolio/portfolioForm";
 import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
-
+import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
 
 const App = () => {
@@ -61,7 +61,7 @@ const App = () => {
             <Route path="/placeBid" element={<PlaceBid />} />
             <Route path="/startWork" element={<StartWork />} />
             <Route path="/portfolioForm" element={<PortfolioForm/>}/>
-
+            <Route path="otpverification" element={<OtpVerification/>}/>
 
             
             <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />

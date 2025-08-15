@@ -172,7 +172,7 @@ export default function Navbar() {
         <div className="flex items-center md:gap-4 ">
           {/* Portfolio */}
           <Link
-            to="/portfolio"
+            to="/portfolioform"
             className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group"
           >
             <Portfolio className="w-4 h-4 mr-2  group-hover:text-cyan-400 transition-colors duration-300" />
