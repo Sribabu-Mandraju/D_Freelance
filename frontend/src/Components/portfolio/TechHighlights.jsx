@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Code, Edit, Save, X, Plus, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 
-const portfolioId = "689d21754780b3f30cf4130b" // Replace with actual portfolio ID
 
-function TechHighlights({ techHighlights, setTechHighlights }) {
+
+function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
   const [isEditingTech, setIsEditingTech] = useState(false)
   const [editTech, setEditTech] = useState([])
   const [isSaving, setIsSaving] = useState(false)
