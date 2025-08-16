@@ -71,7 +71,7 @@ const Dashboard = () => {
       {/* Header */}
      <Navbar />
 
-      <div className="p-6 mt-[70px] space-y-6">
+      <div className="p-6 mt-[60px] space-y-6">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
