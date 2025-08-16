@@ -128,11 +128,11 @@ function CreateProposal() {
           isConfirming ||
           !hasEnoughGas ||
           !isConnected ||
-          !isCorrectNetwork ||
-          !deadline ||
-          deadlineTimestamp <= Math.floor(Date.now() / 1000) ||
-          !budget ||
-          budgetValue <= 0
+          !isCorrectNetwork 
+          // !deadline ||
+          // deadlineTimestamp <= Math.floor(Date.now() / 1000) ||
+          // !budget ||
+          // budgetValue <= 0
         }
         className={`w-full py-2 px-4 rounded-md text-white font-medium transition-all duration-300 ${
           isPending ||

@@ -51,25 +51,24 @@
 //   console.log(`🚀 Server running on http://localhost:${PORT}`);
 // });
 
-
-
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import AdminRoutes from "./routes/AdminRoutes.js";
 
 // Import your existing routes
 import ProposalRoutes from "./Routes/ProposalRoutes.js";
 import BidRoutes from "./routes/BidRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import authRoutes from "./routes/AuthRoutes.js";
-import HFTtokenRoutes from "./routes/HFTtokenRoutes.js"
-import TreasuryRoutes from "./routes/TreasuryRoutes.js"
-import EscrowRoutes from "./routes/EscrowRoutes.js"
-import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js"
-import PortfolioRoutes from "./routes/PortfolioRoutes.js"
+import HFTtokenRoutes from "./routes/HFTtokenRoutes.js";
+import TreasuryRoutes from "./routes/TreasuryRoutes.js";
+import EscrowRoutes from "./routes/EscrowRoutes.js";
+import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js";
+import PortfolioRoutes from "./routes/PortfolioRoutes.js";
 import gigRoutes from "./routes/GigRoutes.js";
 
 // Import the WebSocket configuration
@@ -84,10 +83,17 @@ const server = http.createServer(app);
 // Middleware to parse JSON and enable CORS
 app.use(express.json());
 
-app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:3001","http://localhost:3000"],
-  credentials: true // if you want to allow cookies/auth headers
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:3001",
+      "http://localhost:3000",
+    ],
+    credentials: true, // if you want to allow cookies/auth headers
+  })
+);
 
 // All your existing routes
 app.use("/api/proposals", ProposalRoutes);
@@ -96,10 +102,11 @@ app.use("/api/users", UserRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/hftToken", HFTtokenRoutes);
 app.use("/api/treasury", TreasuryRoutes);
-app.use("/api/escrow", EscrowRoutes)
-app.use("/api/proposalManager", ProposalManagerRoutes)
-app.use("/api/portfolio", PortfolioRoutes)
-app.use('/api/gigs', gigRoutes);
+app.use("/api/escrow", EscrowRoutes);
+app.use("/api/proposalManager", ProposalManagerRoutes);
+app.use("/api/portfolio", PortfolioRoutes);
+app.use("/api/gigs", gigRoutes);
+app.use("/api/admin", AdminRoutes);
 
 // Default route
 app.get("/", (req, res) => {

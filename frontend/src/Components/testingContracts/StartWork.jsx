@@ -24,7 +24,8 @@ function StartWork() {
 
   // Validate proposal ID
   const isCorrectNetwork = chain && chain.id === baseSepolia.id;
-  const isValidProposalId = proposalId !== "" && Number.isInteger(Number(proposalId));
+  const isValidProposalId =
+    proposalId !== "" && Number.isInteger(Number(proposalId));
 
   // Ref to track toast ID
   const toastIdRef = useRef(null);
@@ -36,15 +37,21 @@ function StartWork() {
       return;
     }
     if (!isCorrectNetwork) {
-      toast.error("Please switch to Base Sepolia network.", { id: "network-error" });
+      toast.error("Please switch to Base Sepolia network.", {
+        id: "network-error",
+      });
       return;
     }
     if (!hasEnoughGas) {
-      toast.error("Insufficient ETH for gas fees (minimum 0.001 ETH).", { id: "gas-error" });
+      toast.error("Insufficient ETH for gas fees (minimum 0.001 ETH).", {
+        id: "gas-error",
+      });
       return;
     }
     if (!isValidProposalId) {
-      toast.error("Please enter a valid proposal ID.", { id: "proposal-id-error" });
+      toast.error("Please enter a valid proposal ID.", {
+        id: "proposal-id-error",
+      });
       return;
     }
 
@@ -71,9 +78,12 @@ function StartWork() {
     } else if (isConfirmed) {
       toastIdRef.current = toast.success("Work started successfully!");
     } else if (error) {
-      const isCancelled = error.code === 4001 || /rejected|denied|cancelled/i.test(error.message);
+      const isCancelled =
+        error.code === 4001 || /rejected|denied|cancelled/i.test(error.message);
       toastIdRef.current = toast.error(
-        isCancelled ? "Transaction cancelled" : `Error: ${error.message.slice(0, 100)}...`
+        isCancelled
+          ? "Transaction cancelled"
+          : `Error: ${error.message.slice(0, 100)}...`
       );
     }
 
