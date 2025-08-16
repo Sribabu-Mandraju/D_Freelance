@@ -1,48 +1,48 @@
 ### Send OTP Request
-# POST http://localhost:3001/api/portfolio/send-otp
-# Content-Type: application/json
-
-# {
-#   "contactInfo": {
-#     "email": "n210797@rguktn.ac.in"
-#   }
-# }
-
-### Verify OTP and Create Portfolio
-POST http://localhost:3001/api/portfolio/verify-otp
+POST http://localhost:3001/api/portfolio/send-otp
 Content-Type: application/json
 
 {
-  "email": "n210797@rguktn.ac.in",
-  "otp": "964154",
-  "portfolioData": {
-    "heroSection": {
-      "name": "John Doe",
-      "domains": ["Web Development", "Mobile Apps"],
-      "thoughtLine": "Creating innovative solutions",
-      "aboutMe": "A passionate developer.",
-      "expertise": ["JavaScript", "React", "Node.js"],
-      "focusAreas": ["Frontend", "Backend"]
-    },
-    "contactInfo": {
-      "email": "your_email@example.com",
-      "phoneNumber": "+1234567890",
-      "linkedinProfile": "https://www.linkedin.com/in/johndoe"
-    },
-    "currentStatus": [
-      {
-        "status": "Available",
-        "color": "green"
-      }
-    ],
-    "techHighlights": [
-      {
-        "technology": "React",
-        "rating": 5
-      }
-    ]
+  "contactInfo": {
+    "email": "n210797@rguktn.ac.in"
   }
 }
+
+### Verify OTP and Create Portfolio
+# POST http://localhost:3001/api/portfolio/verify-otp
+# Content-Type: application/json
+
+# {
+#   "email": "n210797@rguktn.ac.in",
+#   "otp": "964154",
+#   "portfolioData": {
+#     "heroSection": {
+#       "name": "John Doe",
+#       "domains": ["Web Development", "Mobile Apps"],
+#       "thoughtLine": "Creating innovative solutions",
+#       "aboutMe": "A passionate developer.",
+#       "expertise": ["JavaScript", "React", "Node.js"],
+#       "focusAreas": ["Frontend", "Backend"]
+#     },
+#     "contactInfo": {
+#       "email": "your_email@example.com",
+#       "phoneNumber": "+1234567890",
+#       "linkedinProfile": "https://www.linkedin.com/in/johndoe"
+#     },
+#     "currentStatus": [
+#       {
+#         "status": "Available",
+#         "color": "green"
+#       }
+#     ],
+#     "techHighlights": [
+#       {
+#         "technology": "React",
+#         "rating": 5
+#       }
+#     ]
+#   }
+# }
 
 # POST http://localhost:3001/api/portfolio/resend-otp
 # Content-Type: application/json

@@ -1,29 +1,48 @@
-
-"use client"
-import { useState, useEffect } from "react"
-import { Plus, X, DollarSign, Clock, Tag, BookOpen, Repeat, Info, CheckCircle } from 'lucide-react'
-import Navbar from "../Components/Navbar"
-import Footer from "../Components/Footer"
-import axios from 'axios';
+"use client";
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  X,
+  DollarSign,
+  Clock,
+  Tag,
+  BookOpen,
+  Repeat,
+  Info,
+  CheckCircle,
+} from "lucide-react";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
+import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAccount, useBalance } from "wagmi";
 
 export default function EditGig() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { address, isConnected, chain } = useAccount();
 
   const [formData, setFormData] = useState({
+    userwalletAddress: "",
     title: "",
     description: "",
-    images: [{ url: "", public_id: "" }],
+    images: [{ url: "" }],
     category: "",
-    price: "",
-    deliveryTime: "",
-    revisions: "",
     faqs: [],
     about: "",
-  })
+    tags: [],
+    skills: [],
+    // Package data is handled in a separate state
+  });
 
-  const [currentStep, setCurrentStep] = useState(1)
+  const [packageData, setPackageData] = useState({
+    hourlyPay: "",
+    duration: "",
+    custom_ui: "",
+    code_reviews: "",
+  });
+
+  const [currentStep, setCurrentStep] = useState(1);
   const [newFaqQuestion, setNewFaqQuestion] = useState("");
   const [newFaqAnswer, setNewFaqAnswer] = useState("");
   const [loading, setLoading] = useState(true);
@@ -32,14 +51,32 @@ export default function EditGig() {
   useEffect(() => {
     const fetchGig = async () => {
       try {
-        const { data } = await axios.get(`/api/gigs/${id}`);
-        setFormData({ 
-          ...data, 
-          images: data.images.length > 0 ? data.images : [{ url: "", public_id: "" }], // Ensure images array always has at least one element
-          price: data.price.toString(),
-          deliveryTime: data.deliveryTime.toString(),
-          revisions: data.revisions.toString(),
+        const { data } = await axios.get(`http://localhost:3001/api/gigs/${id}`);
+        
+        // Find the non-null package and extract its data
+        const activePackage = data.basic || data.standard || data.pro;
+        if (activePackage) {
+          setPackageData({
+            hourlyPay: activePackage.hourlyPay.toString(),
+            duration: activePackage.duration,
+            custom_ui: activePackage.custom_ui,
+            code_reviews: activePackage.code_reviews,
+          });
+        }
+
+        // Set the main gig data
+        setFormData({
+          userwalletAddress: data.userwalletAddress || "",
+          title: data.title,
+          description: data.description,
+          images: data.images.length > 0 ? data.images : [{ url: "" }],
+          category: data.category,
+          faqs: data.faqs,
+          about: data.about || "",
+          tags: data.tags || [],
+          skills: data.skills || [],
         });
+        
         setLoading(false);
       } catch (err) {
         console.error("Error fetching gig for editing:", err.response ? err.response.data : err.message);
@@ -51,7 +88,7 @@ export default function EditGig() {
   }, [id]);
 
   const handleImageChange = (e) => {
-    setFormData({ ...formData, images: [{ url: e.target.value, public_id: "dummy_id" }] });
+    setFormData({ ...formData, images: [{ url: e.target.value }] });
   };
 
   const addFaq = () => {
@@ -78,10 +115,31 @@ export default function EditGig() {
       const config = {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         },
       };
-      const { data } = await axios.put(`/api/gigs/${id}`, formData, config);
+
+      // Find the name of the currently active package (basic, standard, or pro)
+      const packageType = 'basic'; // The provided code assumes 'basic' is the only package
+
+      const updatePayload = {
+        title: formData.title,
+        description: formData.description,
+        images: formData.images,
+        category: formData.category,
+        faqs: formData.faqs,
+        about: formData.about,
+        tags: formData.tags,
+        skills: formData.skills,
+        [packageType]: {
+          hourlyPay: Number(packageData.hourlyPay),
+          duration: packageData.duration,
+          custom_ui: packageData.custom_ui,
+          code_reviews: packageData.code_reviews,
+        },
+      };
+
+      const { data } = await axios.put(`http://localhost:3001/api/gigs/${id}`, updatePayload, config);
       console.log("Gig updated successfully:", data);
       navigate(`/gig/${data._id}`);
     } catch (error) {
@@ -90,8 +148,8 @@ export default function EditGig() {
     }
   };
 
-  const stepTitles = ["Basic Info", "Details & FAQs", "Review"]
-  const stepIcons = [Info, BookOpen, CheckCircle]
+  const stepTitles = ["Basic Info", "Details & FAQs", "Review"];
+  const stepIcons = [Info, BookOpen, CheckCircle];
 
   if (loading) {
     return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white text-xl">Loading gig data...</div>;
@@ -120,7 +178,7 @@ export default function EditGig() {
           <div className="flex justify-center mb-3">
             <div className="flex items-center space-x-3">
               {[1, 2, 3].map((step) => {
-                const Icon = stepIcons[step - 1]
+                const Icon = stepIcons[step - 1];
                 return (
                   <div key={step} className="flex items-center">
                     <div className="flex flex-col items-center">
@@ -133,9 +191,11 @@ export default function EditGig() {
                       >
                         {step}
                       </div>
-                      <span className={`text-xs mt-1 ${
-                        currentStep >= step ? "text-blue-400 font-semibold" : "text-gray-500"
-                      }`}>
+                      <span
+                        className={`text-xs mt-1 ${
+                          currentStep >= step ? "text-blue-400 font-semibold" : "text-gray-500"
+                        }`}
+                      >
                         {stepTitles[step - 1]}
                       </span>
                     </div>
@@ -147,7 +207,7 @@ export default function EditGig() {
                       />
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -158,12 +218,30 @@ export default function EditGig() {
               {/* Form Steps - Scrollable content area */}
               <div className="flex-1 flex justify-center min-h-0">
                 <div className="w-full max-w-2xl flex flex-col">
-                  
                   {/* Step 1: Basic Information */}
                   {currentStep === 1 && (
                     <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 flex-1 overflow-y-auto">
-                      <h2 className="text-xl font-bold text-white mb-4 text-center">Basic Information</h2>
+                      <h2 className="text-xl font-bold text-white mb-4 text-center">
+                        Basic Information
+                      </h2>
                       <div className="space-y-4">
+                         <div>
+                          <label className="block text-lg font-medium text-white mb-1">
+                            Wallet Address *
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.userwalletAddress}
+                            onChange={(e) =>
+                              setFormData({ ...formData, userwalletAddress: e.target.value })
+                            }
+                            placeholder="e.g., I will create a stunning web application"
+                            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            required
+                            readOnly
+                          />
+                        </div>
+
                         <div>
                           <label className="block text-lg font-medium text-white mb-1">
                             Gig Title *
@@ -171,7 +249,9 @@ export default function EditGig() {
                           <input
                             type="text"
                             value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({ ...formData, title: e.target.value })
+                            }
                             placeholder="e.g., I will create a stunning web application"
                             className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                             required
@@ -187,7 +267,9 @@ export default function EditGig() {
                             <input
                               type="text"
                               value={formData.category}
-                              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                              onChange={(e) =>
+                                setFormData({ ...formData, category: e.target.value })
+                              }
                               placeholder="e.g., Web Development, Graphic Design"
                               className="w-full pl-10 pr-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               required
@@ -197,14 +279,16 @@ export default function EditGig() {
 
                         <div>
                           <label className="block text-lg font-medium text-white mb-1">
-                            Price (USD) *
+                            Hourly Pay *
                           </label>
                           <div className="relative">
                             <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
                               type="number"
-                              value={formData.price}
-                              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                              value={packageData.hourlyPay}
+                              onChange={(e) =>
+                                setPackageData({ ...packageData, hourlyPay: e.target.value })
+                              }
                               placeholder="50"
                               className="w-full pl-10 pr-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               required
@@ -214,15 +298,17 @@ export default function EditGig() {
 
                         <div>
                           <label className="block text-lg font-medium text-white mb-1">
-                            Delivery Time (Days) *
+                            Delivery Duration *
                           </label>
                           <div className="relative">
                             <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
-                              type="number"
-                              value={formData.deliveryTime}
-                              onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
-                              placeholder="3"
+                              type="text"
+                              value={packageData.duration}
+                              onChange={(e) =>
+                                setPackageData({ ...packageData, duration: e.target.value })
+                              }
+                              placeholder="3 Days"
                               className="w-full pl-10 pr-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               required
                             />
@@ -231,16 +317,35 @@ export default function EditGig() {
 
                         <div>
                           <label className="block text-lg font-medium text-white mb-1">
-                            Number of Revisions *
+                            Custom UI *
                           </label>
                           <div className="relative">
-                            <Repeat className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                             <input
-                              type="number"
-                              value={formData.revisions}
-                              onChange={(e) => setFormData({ ...formData, revisions: e.target.value })}
-                              placeholder="2"
-                              className="w-full pl-10 pr-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              type="text"
+                              value={packageData.custom_ui}
+                              onChange={(e) =>
+                                setPackageData({ ...packageData, custom_ui: e.target.value })
+                              }
+                              placeholder="yes, no, or client_choice"
+                              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-lg font-medium text-white mb-1">
+                            Code Reviews *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={packageData.code_reviews}
+                              onChange={(e) =>
+                                setPackageData({ ...packageData, code_reviews: e.target.value })
+                              }
+                              placeholder="e.g., 2"
+                              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                               required
                             />
                           </div>
@@ -265,7 +370,9 @@ export default function EditGig() {
                           </label>
                           <textarea
                             value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({ ...formData, description: e.target.value })
+                            }
                             placeholder="Describe your gig in detail, what will you offer..."
                             rows={6}
                             className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"
@@ -279,7 +386,9 @@ export default function EditGig() {
                   {/* Step 2: Details & FAQs */}
                   {currentStep === 2 && (
                     <div className="bg-slate-800 border border-slate-700 rounded-lg p-5 flex-1 overflow-y-auto">
-                      <h2 className="text-xl font-bold text-white mb-5 text-center">Additional Details & FAQs</h2>
+                      <h2 className="text-xl font-bold text-white mb-5 text-center">
+                        Additional Details & FAQs
+                      </h2>
                       <div className="space-y-5">
                         <div>
                           <label className="block text-base font-medium text-white mb-2">
@@ -287,7 +396,9 @@ export default function EditGig() {
                           </label>
                           <textarea
                             value={formData.about}
-                            onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+                            onChange={(e) =>
+                              setFormData({ ...formData, about: e.target.value })
+                            }
                             placeholder="Provide more information about yourself or your service..."
                             rows={4}
                             className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base resize-none"
@@ -305,8 +416,11 @@ export default function EditGig() {
                                 className="bg-slate-700 border border-slate-600 rounded-lg p-3 flex justify-between items-center"
                               >
                                 <p className="text-gray-300 text-sm">
-                                  <span className="font-semibold">Q:</span> {faq.question}<br/>
-                                  <span className="font-semibold">A:</span> {faq.answer}
+                                  <span className="font-semibold">Q:</span>{" "}
+                                  {faq.question}
+                                  <br />
+                                  <span className="font-semibold">A:</span>{" "}
+                                  {faq.answer}
                                 </p>
                                 <button
                                   type="button"
@@ -319,7 +433,9 @@ export default function EditGig() {
                             ))}
                           </div>
                           <div className="mt-4 p-4 bg-slate-700 border border-slate-600 rounded-lg">
-                            <h4 className="text-white font-semibold mb-2">Add New FAQ</h4>
+                            <h4 className="text-white font-semibold mb-2">
+                              Add New FAQ
+                            </h4>
                             <input
                               type="text"
                               value={newFaqQuestion}
@@ -352,10 +468,14 @@ export default function EditGig() {
                   {currentStep === 3 && (
                     <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 flex-1 overflow-y-auto">
                       <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-2xl font-bold text-white">Review Your Gig</h2>
+                        <h2 className="text-2xl font-bold text-white">
+                          Review Your Gig
+                        </h2>
                         <div className="flex items-center gap-2 text-green-400">
                           <CheckCircle className="w-4 h-4" />
-                          <span className="text-md font-medium">Ready to submit</span>
+                          <span className="text-md font-medium">
+                            Ready to submit
+                          </span>
                         </div>
                       </div>
 
@@ -365,63 +485,98 @@ export default function EditGig() {
                             <div>
                               <div className="flex items-center gap-1 mb-1">
                                 <Info className="w-3 h-3 text-gray-400" />
-                                <span className="text-lg font-medium text-gray-400">Title</span>
+                                <span className="text-lg font-medium text-gray-400">
+                                  Title
+                                </span>
                               </div>
-                              <p className="text-white font-semibold text-lg">{formData.title}</p>
+                              <p className="text-white font-semibold text-lg">
+                                {formData.title}
+                              </p>
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1">
                                 <Tag className="w-3 h-3 text-gray-400" />
-                                <span className="text-lg font-medium text-gray-400">Category</span>
+                                <span className="text-lg font-medium text-gray-400">
+                                  Category
+                                </span>
                               </div>
-                              <p className="text-white font-semibold text-lg">{formData.category}</p>
+                              <p className="text-white font-semibold text-lg">
+                                {formData.category}
+                              </p>
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1">
                                 <DollarSign className="w-3 h-3 text-gray-400" />
-                                <span className="text-lg font-medium text-gray-400">Price</span>
+                                <span className="text-lg font-medium text-gray-400">
+                                  Hourly Pay
+                                </span>
                               </div>
-                              <p className="text-white font-semibold text-lg">${formData.price}</p>
+                              <p className="text-white font-semibold text-lg">
+                                ${packageData.hourlyPay}
+                              </p>
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1">
                                 <Clock className="w-3 h-3 text-gray-400" />
-                                <span className="text-lg font-medium text-gray-400">Delivery Time</span>
+                                <span className="text-lg font-medium text-gray-400">
+                                  Delivery Duration
+                                </span>
                               </div>
-                              <p className="text-white font-semibold text-lg">{formData.deliveryTime} Days</p>
+                              <p className="text-white font-semibold text-lg">
+                                {packageData.duration}
+                              </p>
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1">
                                 <Repeat className="w-3 h-3 text-gray-400" />
-                                <span className="text-lg font-medium text-gray-400">Revisions</span>
+                                <span className="text-lg font-medium text-gray-400">
+                                  Code Reviews
+                                </span>
                               </div>
-                              <p className="text-white font-semibold text-lg">{formData.revisions}</p>
+                              <p className="text-white font-semibold text-lg">
+                                {packageData.code_reviews}
+                              </p>
                             </div>
                           </div>
 
                           <div className="mb-3">
-                            <span className="text-xs font-medium text-gray-400">Description</span>
-                            <p className="text-gray-300 text-xs leading-relaxed mt-1">{formData.description}</p>
+                            <span className="text-xs font-medium text-gray-400">
+                              Description
+                            </span>
+                            <p className="text-gray-300 text-xs leading-relaxed mt-1">
+                              {formData.description}
+                            </p>
                           </div>
 
                           {formData.about && (
                             <div className="mb-3">
-                              <span className="text-xs font-medium text-gray-400">About Gig</span>
-                              <p className="text-gray-300 text-xs leading-relaxed mt-1">{formData.about}</p>
+                              <span className="text-xs font-medium text-gray-400">
+                                About Gig
+                              </span>
+                              <p className="text-gray-300 text-xs leading-relaxed mt-1">
+                                {formData.about}
+                              </p>
                             </div>
                           )}
 
                           {formData.faqs.length > 0 && (
                             <div>
-                              <span className="text-xs font-medium text-gray-400">FAQs</span>
+                              <span className="text-xs font-medium text-gray-400">
+                                FAQs
+                              </span>
                               <div className="space-y-2 mt-1">
                                 {formData.faqs.map((faq, index) => (
-                                  <div key={index} className="bg-slate-700/50 p-2 rounded-md">
+                                  <div
+                                    key={index}
+                                    className="bg-slate-700/50 p-2 rounded-md"
+                                  >
                                     <p className="text-gray-300 text-xs">
-                                      <span className="font-semibold">Q:</span> {faq.question}
+                                      <span className="font-semibold">Q:</span>{" "}
+                                      {faq.question}
                                     </p>
                                     <p className="text-gray-400 text-xs">
-                                      <span className="font-semibold">A:</span> {faq.answer}
+                                      <span className="font-semibold">A:</span>{" "}
+                                      {faq.answer}
                                     </p>
                                   </div>
                                 ))}
@@ -432,26 +587,39 @@ export default function EditGig() {
 
                         {formData.images[0]?.url && (
                           <div>
-                            <span className="text-xs font-medium text-gray-400">Gig Image</span>
-                            <img 
-                              src={formData.images[0].url || "/placeholder.svg"} 
-                              alt="Gig preview" 
+                            <span className="text-xs font-medium text-gray-400">
+                              Gig Image
+                            </span>
+                            <img
+                              src={formData.images[0].url || "/placeholder.svg"}
+                              alt="Gig preview"
                               className="w-full h-40 object-cover rounded-lg border border-slate-600 mt-1"
                               onError={(e) => {
-                                e.target.src = "/placeholder.svg?height=160&width=400&text=Image+Preview";
+                                e.target.src =
+                                  "/placeholder.svg?height=160&width=400&text=Image+Preview";
                               }}
                             />
                           </div>
                         )}
 
                         <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-lg p-3">
-                          <h3 className="text-lg font-semibold text-white mb-2">Important Note</h3>
+                          <h3 className="text-lg font-semibold text-white mb-2">
+                            Important Note
+                          </h3>
                           <p className="text-sm text-gray-300 mb-3">
-                            By submitting, you agree that your gig details are accurate and you are authorized to offer these services.
+                            By submitting, you agree that your gig details are
+                            accurate and you are authorized to offer these
+                            services.
                           </p>
                           <label className="flex items-center">
-                            <input type="checkbox" className="mr-2 accent-blue-500" required />
-                            <span className="text-md text-gray-300">I agree to the terms and conditions</span>
+                            <input
+                              type="checkbox"
+                              className="mr-2 accent-blue-500"
+                              required
+                            />
+                            <span className="text-md text-gray-300">
+                              I agree to the terms and conditions
+                            </span>
                           </label>
                         </div>
                       </div>
@@ -478,12 +646,22 @@ export default function EditGig() {
                       onClick={() => {
                         // Basic validation for current step
                         if (currentStep === 1) {
-                            if (!formData.title || !formData.category || !formData.price || !formData.deliveryTime || !formData.revisions || !formData.description) {
-                                alert("Please fill in all required fields for Basic Information.");
-                                return;
-                            }
+                          if (
+                            !formData.title ||
+                            !formData.category ||
+                            !packageData.hourlyPay ||
+                            !packageData.duration ||
+                            !packageData.custom_ui ||
+                            !packageData.code_reviews ||
+                            !formData.description
+                          ) {
+                            alert(
+                              "Please fill in all required fields for Basic Information."
+                            );
+                            return;
+                          }
                         }
-                        setCurrentStep(currentStep + 1)
+                        setCurrentStep(currentStep + 1);
                       }}
                       className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg font-semibold transition-all text-sm"
                     >
@@ -505,5 +683,5 @@ export default function EditGig() {
       </div>
       <Footer />
     </div>
-  )
+  );
 }

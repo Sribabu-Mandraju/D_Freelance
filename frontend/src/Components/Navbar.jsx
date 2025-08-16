@@ -40,35 +40,20 @@ export default function Navbar() {
   const navigationItems = [
     {
       name: "Find talent",
+      navlink:"/gigs",
       icon: Coins,
-      items: [
-        "Post a job and hire a pro",
-        "Browse and buy projects",
-        "Get advice from an industry expert",
-        
-      ],
     },
     {
       name: "Find work",
+      navlink:"/browse-jobs",
       icon: Users,
-      items: [
-        "Ways to learn",
-        "Find work for your skills",
-        "Win work with adds",
-        "Join freelancer plus",
-       
-      ],
+  
     },
     {
       name: "Why CryptoLance",
+      navlink:"/help",
       icon: Package,
-      items: [
-        "Success stories",
-        "Reviews",
-        "How to hire",
-        "How to find work",
-        
-      ],
+
     },
   ];
 
@@ -111,12 +96,11 @@ export default function Navbar() {
           <nav className="hidden lg:flex items-center gap-4">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
-              const [leftColumn, rightColumn] = splitItemsIntoColumns(
-                item.items
-              );
+           
 
               return (
-                <div
+                <Link
+                 to={item.navlink}
                   key={item.name}
                   className="relative"
                   onMouseEnter={() => handleMouseEnter(item.name)}
@@ -128,41 +112,8 @@ export default function Navbar() {
                    
                   </button>
 
-                  {/* Dropdown Menu - Two Columns */}
-                  {activeDropdown === item.name && (
-                    <div className="absolute top-[33px] left-0 mt-2 w-72 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
-                      <div className="p-6">
-                        <div className="grid grid-cols-1 gap-4">
-                          {/* Left Column */}
-                          <div className="space-y-2">
-                            {leftColumn.map((subItem, itemIndex) => (
-                              <a
-                                key={itemIndex}
-                                href="#"
-                                className="block text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-md hover:shadow-cyan-500/10 text-sm"
-                              >
-                                {subItem}
-                              </a>
-                            ))}
-                          </div>
-
-                          {/* Right Column */}
-                          <div className="space-y-2">
-                            {rightColumn.map((subItem, itemIndex) => (
-                              <a
-                                key={itemIndex}
-                                href="#"
-                                className="block text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50 px-3 py-2 rounded-lg transition-all duration-200 hover:shadow-md hover:shadow-cyan-500/10 text-sm"
-                              >
-                                {subItem}
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                
+                </Link>
               );
             })}
           </nav>
