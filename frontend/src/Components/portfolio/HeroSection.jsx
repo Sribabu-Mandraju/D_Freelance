@@ -1,108 +1,107 @@
-"use client";
+// HeroSection.jsx
+"use client"
+import { useState } from "react"
+import { User, Shield, Zap, Edit, Save, X } from "lucide-react"
+import { toast } from "react-hot-toast"
 
-import { useState } from "react";
-import { User, Shield, Zap, Edit, Save, X } from "lucide-react";
-import { toast } from "react-hot-toast";
-
-function HeroSection({ personalInfo, setPersonalInfo }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({ ...personalInfo });
-  const portfolioId = "689d21754780b3f30cf4130b";
+function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editData, setEditData] = useState({ ...personalInfo })
 
   const handleChange = (field, value) => {
-    setEditData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-    setEditData({ ...personalInfo });
-  };
+    setEditData((prev) => ({ ...prev, [field]: value }))
+  }
 
   const validateLimits = () => {
-    const expertise = editData.expertise || [];
-    const focusAreas = editData.focusAreas || [];
+    const expertise = editData.expertise || []
+    const focusAreas = editData.focusAreas || []
 
     if ((editData.name || "").length > 100) {
-      toast.error("Name cannot exceed 100 characters");
-      return false;
+      toast.error("Name cannot exceed 100 characters")
+      return false
     }
 
     if (editData.domains && editData.domains.some((domain) => domain.length > 50)) {
-      toast.error("Each domain cannot exceed 50 characters");
-      return false;
+      toast.error("Each domain cannot exceed 50 characters")
+      return false
     }
 
     if ((editData.thoughtLine || "").length > 200) {
-      toast.error("Thought line cannot exceed 200 characters");
-      return false;
+      toast.error("Thought line cannot exceed 200 characters")
+      return false
     }
 
     if ((editData.aboutMe || "").length > 300) {
-      toast.error("About me cannot exceed 300 characters");
-      return false;
+      toast.error("About me cannot exceed 300 characters")
+      return false
     }
 
     if (expertise.length > 4) {
-      toast.error("Expertise can have a maximum of 4 items");
-      return false;
+      toast.error("Expertise can have a maximum of 4 items")
+      return false
     }
 
     if (expertise.some((item) => item.length > 40)) {
-      toast.error("Each expertise item cannot exceed 40 characters");
-      return false;
+      toast.error("Each expertise item cannot exceed 40 characters")
+      return false
     }
 
     if (focusAreas.length > 4) {
-      toast.error("Focus areas can have a maximum of 4 items");
-      return false;
+      toast.error("Focus areas can have a maximum of 4 items")
+      return false
     }
 
     if (focusAreas.some((item) => item.length > 40)) {
-      toast.error("Each focus area item cannot exceed 40 characters");
-      return false;
+      toast.error("Each focus area item cannot exceed 40 characters")
+      return false
     }
 
-    return true;
-  };
+    return true
+  }
 
   const handleSave = async () => {
     if (!validateLimits()) {
-      return;
+      return
     }
 
-    const toastId = toast.loading("Saving hero section..."); // Show loading toast
+    const toastId = toast.loading("Saving hero section...")
     try {
       // Update frontend state
       setPersonalInfo((prev) => ({
         ...prev,
-        heroSection: { ...prev.heroSection, ...editData },
-      }));
+        heroSection: { ...editData },
+      }))
 
       // Update backend
       const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ heroSection: editData }),
-      });
-      const result = await response.json();
+      })
+      const result = await response.json()
 
       if (!response.ok || !result.success) {
-        throw new Error(result.message || "Failed to update");
+        throw new Error(result.message || "Failed to update")
       }
 
-      setIsEditing(false);
-      toast.success("Hero section updated successfully!", { id: toastId }); // Update to success
-      console.log("Updated hero section:", result.data.heroSection);
+      setIsEditing(false)
+      toast.success("Hero section updated successfully!", { id: toastId })
+      console.log("Updated hero section:", result.data.heroSection)
     } catch (err) {
-      console.error("Error updating hero section:", err.message);
-      toast.error(`Failed to save changes: ${err.message}`, { id: toastId }); // Update to error
+      console.error("Error updating hero section:", err.message)
+      toast.error(`Failed to save changes: ${err.message}`, { id: toastId })
     }
-  };
+  }
+
+  const handleEdit = () => {
+    setIsEditing(true)
+    setEditData({ ...personalInfo })
+  }
 
   const handleCancel = () => {
-    setEditData({ ...personalInfo });
-    setIsEditing(false);
-  };
+    setEditData({ ...personalInfo })
+    setIsEditing(false)
+  }
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden mb-6">
@@ -283,8 +282,8 @@ function HeroSection({ personalInfo, setPersonalInfo }) {
                 <textarea
                   value={editData.expertise?.join("\n") || ""}
                   onChange={(e) => {
-                    const items = e.target.value.split("\n").filter((item) => item.trim());
-                    handleChange("expertise", items);
+                    const items = e.target.value.split("\n").filter((item) => item.trim())
+                    handleChange("expertise", items)
                   }}
                   className={`w-full bg-gray-900/50 border rounded-lg px-3 py-2 text-gray-300 text-[13px] focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] resize-none ${
                     (editData.expertise?.length || 0) > 4 || (editData.expertise || []).some((item) => item.length > 40)
@@ -332,8 +331,8 @@ function HeroSection({ personalInfo, setPersonalInfo }) {
                 <textarea
                   value={editData.focusAreas?.join("\n") || ""}
                   onChange={(e) => {
-                    const items = e.target.value.split("\n").filter((item) => item.trim());
-                    handleChange("focusAreas", items);
+                    const items = e.target.value.split("\n").filter((item) => item.trim())
+                    handleChange("focusAreas", items)
                   }}
                   className={`w-full bg-gray-900/50 border rounded-lg px-3 py-2 text-gray-300 text-[13px] focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] resize-none ${
                     (editData.focusAreas?.length || 0) > 4 ||
@@ -361,7 +360,7 @@ function HeroSection({ personalInfo, setPersonalInfo }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default HeroSection;
+export default HeroSection

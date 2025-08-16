@@ -11,6 +11,7 @@ import { parseAbiItem } from "viem";
 import { createPublicClient, http } from "viem";
 import { useRef } from "react";
 import { parseEventLogs } from "viem"; // Add this import
+import toast from "react-hot-toast";
 
 const PROPOSAL_MANAGER_ADDRESS = "0x9e002323F46D6908EC4ef5444f1Bd0F67AF9Cf10"; // ProposalManager contract address
 const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // USDC contract address
@@ -271,40 +272,41 @@ export const useAcceptBid = () => {
 };
 
 export const useDepositBidAmount = (proposalId) => {
+  const { address, chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  // Separate writeContract instances for approve and deposit
   const {
     writeContract: writeApprove,
     data: approveHash,
     error: approveError,
     isPending: isApprovePending,
+    reset: resetApprove,
   } = useWriteContract();
   const {
     writeContract: writeDeposit,
     data: depositHash,
     error: depositError,
     isPending: isDepositPending,
+    reset: resetDeposit,
   } = useWriteContract();
-  const {
-    isLoading: isApproveConfirming,
-    isSuccess: isApproveConfirmed,
-  } = useWaitForTransactionReceipt({ hash: approveHash });
-  const {
-    isLoading: isDepositConfirming,
-    isSuccess: isDepositConfirmed,
-  } = useWaitForTransactionReceipt({ hash: depositHash });
-  const { address, chain } = useAccount();
-  const chainId = chain?.id || baseSepolia.id;
 
-  // Check USDC allowance for ProposalManager
-  const {
-    data: allowanceData,
-    error: allowanceError,
-    refetch: refetchAllowance,
-  } = useReadContract({
+  // Track approval and deposit confirmations
+  const { isLoading: isApproveConfirming, isSuccess: isApproveConfirmed } = useWaitForTransactionReceipt({
+    hash: approveHash,
+  });
+  const { isLoading: isDepositConfirming, isSuccess: isDepositConfirmed } = useWaitForTransactionReceipt({
+    hash: depositHash,
+  });
+
+  // Check USDC allowance
+  const { data: allowance, error: allowanceError } = useReadContract({
     address: USDC_ADDRESS,
     abi: USDC_ABI,
     functionName: "allowance",
     args: [address, PROPOSAL_MANAGER_ADDRESS],
-    query: { enabled: !!address },
+    chainId,
+    query: { enabled: !!address && !!proposalId },
   });
 
   // Check USDC balance
@@ -313,77 +315,48 @@ export const useDepositBidAmount = (proposalId) => {
     abi: USDC_ABI,
     functionName: "balanceOf",
     args: [address],
-    query: { enabled: !!address },
+    chainId,
+    query: { enabled: !!address && !!proposalId },
   });
+  const usdcBalance = usdcBalanceData ? BigInt(usdcBalanceData) : BigInt(0);
 
-  // Fetch proposal details to get bidAmount and state
-  const { data: rawProposalData, error: proposalError } = useReadContract({
+  // Fetch proposal data
+  const { data: proposalData, error: proposalError } = useReadContract({
     address: PROPOSAL_MANAGER_ADDRESS,
     abi: ProposalManager_ABI,
-    functionName: "proposals", // Use "proposals" instead of "getProposal"
+    functionName: "getProposal",
     args: [BigInt(proposalId || 0)],
-    query: {
-      enabled:
-        !!proposalId &&
-        proposalId !== "" &&
-        Number.isInteger(Number(proposalId)),
-    },
+    chainId,
+    query: { enabled: !!proposalId && Number.isInteger(Number(proposalId)) && Number(proposalId) >= 0 },
   });
 
-  // Transform proposal data
-  const proposalData = rawProposalData
-    ? {
-        id: Number(rawProposalData[0]),
-        client: rawProposalData[1],
-        bidder: rawProposalData[2],
-        startTime: Number(rawProposalData[3]),
-        endTime: Number(rawProposalData[4]),
-        budget: Number(rawProposalData[5]),
-        bidAmount: Number(rawProposalData[6]),
-        state: Number(rawProposalData[7]),
-      }
-    : null;
+  // Ref to store deposit parameters and toast ID
+  const depositParamsRef = useRef(null);
+  const toastIdRef = useRef(null);
 
-  const approveUSDC = async (bidAmount) => {
-    if (!address) {
-      throw new Error("Wallet not connected");
-    }
-    if (chainId !== baseSepolia.id) {
-      throw new Error("Please switch to Base Sepolia network");
-    }
-    if (!bidAmount || bidAmount <= 0) {
-      throw new Error("Invalid bid amount");
-    }
+  const approveUSDC = async (amount) => {
     try {
-      console.log("Initiating USDC approval for ProposalManager...", {
-        bidAmount,
-      });
+      toastIdRef.current = toast.loading("Approving USDC...", { id: "approve-pending" });
       await writeApprove({
         address: USDC_ADDRESS,
         abi: USDC_ABI,
         functionName: "approve",
-        args: [PROPOSAL_MANAGER_ADDRESS, BigInt(bidAmount)],
+        args: [PROPOSAL_MANAGER_ADDRESS, amount],
         chainId,
       });
-    } catch (error) {
-      console.error("Failed to approve USDC:", error);
-      throw error;
+    } catch (err) {
+      console.error("Approval error:", err);
+      const errorMessage = err.code === 4001 || err.message.includes("User rejected")
+        ? "Approval transaction cancelled"
+        : "Failed to approve USDC";
+      toast.error(errorMessage, { id: "approve-error" });
+      throw new Error(errorMessage);
     }
   };
 
   const depositBidAmount = async (proposalId) => {
-    if (!address) {
-      throw new Error("Wallet not connected");
-    }
-    if (chainId !== baseSepolia.id) {
-      throw new Error("Please switch to Base Sepolia network");
-    }
-    if (!proposalId && proposalId !== "0") {
-      throw new Error("Invalid proposal ID");
-    }
-
     try {
-      console.log("Initiating depositBidAmount transaction...", { proposalId });
+      toastIdRef.current = toast.loading("Depositing bid amount...", { id: "deposit-pending" });
       await writeDeposit({
         address: PROPOSAL_MANAGER_ADDRESS,
         abi: ProposalManager_ABI,
@@ -391,90 +364,131 @@ export const useDepositBidAmount = (proposalId) => {
         args: [BigInt(proposalId)],
         chainId,
       });
-    } catch (error) {
-      console.error("Failed to deposit bid amount:", error);
-      throw error;
+    } catch (err) {
+      console.error("Deposit error:", err);
+      let errorMessage;
+      if (err.code === 4001 || err.message.includes("User rejected")) {
+        errorMessage = "Deposit transaction cancelled";
+      } else if (err.message.includes("OnlyClientCanCall")) {
+        errorMessage = "Only the proposal client can deposit";
+      } else if (err.message.includes("Invalid state")) {
+        errorMessage = "Proposal must be in Awarded state";
+      } else if (err.message.includes("InvalidProposalId")) {
+        errorMessage = "Invalid proposal ID";
+      } else if (err.message.includes("insufficient allowance")) {
+        errorMessage = "Insufficient USDC allowance";
+      } else if (err.message.includes("transfer amount exceeds balance")) {
+        errorMessage = "Insufficient USDC balance";
+      } else {
+        errorMessage = "Failed to deposit bid amount";
+      }
+      toast.error(errorMessage, { id: "deposit-error" });
+      throw new Error(errorMessage);
     }
   };
 
-  // Refetch allowance after approval confirmation
+  // Auto-trigger deposit after approval
   useEffect(() => {
-    if (isApproveConfirmed) {
-      console.log("Approval confirmed, refetching allowance...");
-      refetchAllowance();
-    }
-  }, [isApproveConfirmed, refetchAllowance]);
-
-  // Ref to prevent infinite logging
-  const hasLogged = useRef(false);
-
-  // Log transaction states for debugging
-  useEffect(() => {
-    if (
-      !hasLogged.current &&
-      (isApprovePending ||
-        isApproveConfirming ||
-        isApproveConfirmed ||
-        approveError ||
-        isDepositPending ||
-        isDepositConfirming ||
-        isDepositConfirmed ||
-        depositError ||
-        allowanceData ||
-        usdcBalanceData ||
-        proposalData ||
-        proposalError)
-    ) {
-      console.log("Transaction states:", {
-        isApprovePending,
-        isApproveConfirming,
-        isApproveConfirmed,
-        approveError: approveError?.message,
-        isDepositPending,
-        isDepositConfirming,
-        isDepositConfirmed,
-        depositError: depositError?.message,
-        allowance: allowanceData?.toString(),
-        usdcBalance: usdcBalanceData?.toString(),
-        proposalData,
-        proposalError: proposalError?.message,
+    if (isApproveConfirmed && depositParamsRef.current) {
+      console.log("Approval confirmed, auto-triggering deposit...");
+      const { proposalId } = depositParamsRef.current;
+      depositBidAmount(proposalId).catch((err) => {
+        console.error("Auto-deposit error:", err);
       });
-      hasLogged.current = true;
+      depositParamsRef.current = null;
     }
-    // Reset hasLogged when a new transaction starts
-    if (isApprovePending || isDepositPending) {
-      hasLogged.current = false;
+  }, [isApproveConfirmed]);
+
+  // Handle transaction states and toasts
+  useEffect(() => {
+    if (toastIdRef.current) {
+      toast.dismiss(toastIdRef.current);
     }
+
+    if (isApprovePending) {
+      toastIdRef.current = toast.loading("Approving USDC...", { id: "approve-pending" });
+    } else if (isApproveConfirming) {
+      toastIdRef.current = toast.loading("Confirming USDC approval...", { id: "approve-confirming" });
+    } else if (isApproveConfirmed && !depositParamsRef.current) {
+      toastIdRef.current = toast.success("USDC approved successfully!", { id: "approve-success" });
+      resetApprove();
+    } else if (isDepositPending) {
+      toastIdRef.current = toast.loading("Depositing bid amount...", { id: "deposit-pending" });
+    } else if (isDepositConfirming) {
+      toastIdRef.current = toast.loading("Confirming deposit...", { id: "deposit-confirming" });
+    } else if (isDepositConfirmed) {
+      toastIdRef.current = toast.success("Bid amount deposited successfully!", { id: "deposit-success" });
+      resetApprove();
+      resetDeposit();
+    } else if (approveError) {
+      const errorMessage = approveError.code === 4001 || approveError.message.includes("User rejected")
+        ? "Approval transaction cancelled"
+        : "Failed to approve USDC";
+      toastIdRef.current = toast.error(errorMessage, { id: "approve-error" });
+      resetApprove();
+      depositParamsRef.current = null;
+    } else if (depositError) {
+      let errorMessage;
+      if (depositError.code === 4001 || depositError.message.includes("User rejected")) {
+        errorMessage = "Deposit transaction cancelled";
+      } else if (depositError.message.includes("OnlyClientCanCall")) {
+        errorMessage = "Only the proposal client can deposit";
+      } else if (depositError.message.includes("Invalid state")) {
+        errorMessage = "Proposal must be in Awarded state";
+      } else if (depositError.message.includes("InvalidProposalId")) {
+        errorMessage = "Invalid proposal ID";
+      } else if (depositError.message.includes("insufficient allowance")) {
+        errorMessage = "Insufficient USDC allowance";
+      } else if (depositError.message.includes("transfer amount exceeds balance")) {
+        errorMessage = "Insufficient USDC balance";
+      } else {
+        errorMessage = "Failed to deposit bid amount";
+      }
+      toastIdRef.current = toast.error(errorMessage, { id: "deposit-error" });
+      resetDeposit();
+    }
+
+    return () => {
+      if (toastIdRef.current) {
+        toast.dismiss(toastIdRef.current);
+      }
+    };
   }, [
     isApprovePending,
     isApproveConfirming,
     isApproveConfirmed,
-    approveError,
     isDepositPending,
     isDepositConfirming,
     isDepositConfirmed,
+    approveError,
     depositError,
-    allowanceData,
-    usdcBalanceData,
-    proposalData,
-    proposalError,
   ]);
 
+  // Initiate deposit with approval if needed
+  const initiateDeposit = async (proposalId, bidAmount) => {
+    const hasEnoughAllowance = allowance >= bidAmount;
+    if (!hasEnoughAllowance) {
+      depositParamsRef.current = { proposalId };
+      await approveUSDC(bidAmount);
+    } else {
+      await depositBidAmount(proposalId);
+    }
+  };
+
   return {
+    initiateDeposit,
     approveUSDC,
     depositBidAmount,
     isApprovePending,
     isApproveConfirming,
     isApproveConfirmed,
     approveError,
-    approveHash,
     isDepositPending,
     isDepositConfirming,
     isDepositConfirmed,
     depositError,
-    depositHash,
-    allowance: allowanceData || BigInt(0),
-    usdcBalance: usdcBalanceData || BigInt(0),
+    allowance: allowance ? BigInt(allowance) : BigInt(0),
+    usdcBalance,
     allowanceError,
     usdcBalanceError,
     proposalData,
@@ -624,3 +638,5 @@ export const usePayFirstMilestone = () => {
     hash,
   };
 };
+
+

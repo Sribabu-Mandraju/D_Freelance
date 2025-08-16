@@ -27,6 +27,7 @@ import StartWork from "./Components/testingContracts/StartWork";
 import PortfolioForm from "./Components/portfolio/portfolioForm";
 import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
 import Gigs from "./Pages/gig/Gigs";
+import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
 import ActiveFreelancers from "./Components/main/ActiveFreelancers";
 
@@ -41,7 +42,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/portfolio/:portfolioId" element={<Portfolio />} />
             <Route path="/browse-jobs" element={<BrowseJobs />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/proposal" element={<Proposal />} />
@@ -69,7 +70,7 @@ const App = () => {
             <Route path="/placeBid" element={<PlaceBid />} />
             <Route path="/startWork" element={<StartWork />} />
             <Route path="/portfolioForm" element={<PortfolioForm/>}/>
-
+            <Route path="otpverification" element={<OtpVerification/>}/>
 
             
             <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />

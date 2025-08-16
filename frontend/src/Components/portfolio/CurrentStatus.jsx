@@ -5,13 +5,13 @@ import { useState } from "react";
 import { Database, Edit, Save, X, Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-function CurrentStatus({ currentStatus = [], setCurrentStatus }) {
+function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
   const [isEditingStatus, setIsEditingStatus] = useState(false);
   const [editStatus, setEditStatus] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
 
   // Static portfolio ID
-  const portfolioId = "689d21754780b3f30cf4130b";
+  
 
   const handleEditStatus = () => {
     setIsEditingStatus(true);
