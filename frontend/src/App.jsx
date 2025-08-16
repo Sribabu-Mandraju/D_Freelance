@@ -34,7 +34,9 @@ import PayThirdMilestone from "./Components/testingContracts/PayThirdMileStone";
 import CompleteProposal from "./Components/testingContracts/CompleteProposal";
 import CancelProposal from "./Components/testingContracts/CancelProposal";
 
-import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
+import AdminDashboard from "./Pages/admin/AdminDashboard"
+
+// import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -55,6 +57,7 @@ const App = () => {
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/help" element={<HelpDocs />} />
             <Route path="/gigs" element={<Gigs />} />
+            <Route path="/adminDashboard" element={<AdminDashboard />} />
 
             <Route path="/jobDetails/:id" element={<ProposalDetails />} />
             <Route

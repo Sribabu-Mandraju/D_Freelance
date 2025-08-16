@@ -1,9 +1,14 @@
 import express from 'express';
-import { getAdminPanelData } from '../contracts/admin.js';
+import { getEscrowData ,getHftTokenData,getProposalManagerData,getTreasuryData} from '../contracts/admin.js';
+
 
 const router = express.Router();
 
 // Route for fetching all admin panel data
-router.get('/admin-panel-data', getAdminPanelData);
+router.get("/escrow-data", getEscrowData);
+router.get("/hft-token-data", getHftTokenData);
+router.get("/proposal-manager-data", getProposalManagerData);
+router.get("/treasury-data", getTreasuryData);
+
 
 export default router;
