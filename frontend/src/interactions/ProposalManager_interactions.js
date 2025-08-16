@@ -640,3 +640,348 @@ export const usePayFirstMilestone = () => {
 };
 
 
+export const usePaySecondMilestone = () => {
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+  } = useWaitForTransactionReceipt({ hash });
+  const { address, chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  const paySecondMilestone = async (proposalId) => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+    if (chainId !== baseSepolia.id) {
+      throw new Error("Please switch to Base Sepolia network");
+    }
+    if (!proposalId && proposalId !== "0") {
+      throw new Error("Invalid proposal ID");
+    }
+
+    try {
+      console.log("Initiating paySecondMilestone transaction...", {
+        proposalId,
+      });
+      await writeContract({
+        address: PROPOSAL_MANAGER_ADDRESS,
+        abi: ProposalManager_ABI,
+        functionName: "paySecondMilestone",
+        args: [BigInt(proposalId)],
+        chainId,
+      });
+    } catch (error) {
+      console.error("Failed to pay second milestone:", error);
+      throw error;
+    }
+  };
+
+  // Ref to prevent infinite logging
+  const hasLogged = useRef(false);
+
+  // Log transaction states only once per transaction
+  useEffect(() => {
+    if (
+      !hasLogged.current &&
+      (isPending || isConfirming || isConfirmed || error || hash)
+    ) {
+      console.log("Transaction states:", {
+        isPending,
+        isConfirming,
+        isConfirmed,
+        error: error?.message,
+        hash,
+      });
+      hasLogged.current = true;
+    }
+    // Reset hasLogged when a new transaction starts
+    if (isPending) {
+      hasLogged.current = false;
+    }
+  }, [isPending, isConfirming, isConfirmed, error, hash]);
+
+  // Handle toast notifications
+  useEffect(() => {
+    if (isPending) {
+      // toast.loading("Transaction pending...");
+    } else if (isConfirming) {
+      toast.loading("Confirming transaction...");
+    } else if (isConfirmed) {
+      toast.success("Second milestone paid successfully!");
+    } else if (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+    return () => toast.dismiss();
+  }, [isPending, isConfirming, isConfirmed, error]);
+
+  return {
+    paySecondMilestone,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash,
+  };
+};
+
+
+export const usePayThirdMilestone = () => {
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+  } = useWaitForTransactionReceipt({ hash });
+  const { address, chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  const payThirdMilestone = async (proposalId) => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+    if (chainId !== baseSepolia.id) {
+      throw new Error("Please switch to Base Sepolia network");
+    }
+    if (!proposalId && proposalId !== "0") {
+      throw new Error("Invalid proposal ID");
+    }
+
+    try {
+      console.log("Initiating payThirdMilestone transaction...", {
+        proposalId,
+      });
+      await writeContract({
+        address: PROPOSAL_MANAGER_ADDRESS,
+        abi: ProposalManager_ABI,
+        functionName: "payThirdMilestone",
+        args: [BigInt(proposalId)],
+        chainId,
+      });
+    } catch (error) {
+      console.error("Failed to pay third milestone:", error);
+      throw error;
+    }
+  };
+
+  // Ref to prevent infinite logging
+  const hasLogged = useRef(false);
+
+  // Log transaction states only once per transaction
+  useEffect(() => {
+    if (
+      !hasLogged.current &&
+      (isPending || isConfirming || isConfirmed || error || hash)
+    ) {
+      console.log("Transaction states:", {
+        isPending,
+        isConfirming,
+        isConfirmed,
+        error: error?.message,
+        hash,
+      });
+      hasLogged.current = true;
+    }
+    // Reset hasLogged when a new transaction starts
+    if (isPending) {
+      hasLogged.current = false;
+    }
+  }, [isPending, isConfirming, isConfirmed, error, hash]);
+
+  // Handle toast notifications
+  useEffect(() => {
+    if (isPending) {
+      toast.loading("Transaction pending...");
+    } else if (isConfirming) {
+      toast.loading("Confirming transaction...");
+    } else if (isConfirmed) {
+      toast.success("Third milestone paid successfully!");
+    } else if (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+    return () => toast.dismiss();
+  }, [isPending, isConfirming, isConfirmed, error]);
+
+  return {
+    payThirdMilestone,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash,
+  };
+};
+
+
+
+
+export const useCompleteProposal = () => {
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+  } = useWaitForTransactionReceipt({ hash });
+  const { address, chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  const completeProposal = async (proposalId) => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+    if (chainId !== baseSepolia.id) {
+      throw new Error("Please switch to Base Sepolia network");
+    }
+    if (!proposalId && proposalId !== "0") {
+      throw new Error("Invalid proposal ID");
+    }
+
+    try {
+      console.log("Initiating completeProposal transaction...", {
+        proposalId,
+      });
+      await writeContract({
+        address: PROPOSAL_MANAGER_ADDRESS,
+        abi: ProposalManager_ABI,
+        functionName: "completeProposal",
+        args: [BigInt(proposalId)],
+        chainId,
+      });
+    } catch (error) {
+      console.error("Failed to complete proposal:", error);
+      throw error;
+    }
+  };
+
+  // Ref to prevent infinite logging
+  const hasLogged = useRef(false);
+
+  // Log transaction states only once per transaction
+  useEffect(() => {
+    if (
+      !hasLogged.current &&
+      (isPending || isConfirming || isConfirmed || error || hash)
+    ) {
+      console.log("Transaction states:", {
+        isPending,
+        isConfirming,
+        isConfirmed,
+        error: error?.message,
+        hash,
+      });
+      hasLogged.current = true;
+    }
+    // Reset hasLogged when a new transaction starts
+    if (isPending) {
+      hasLogged.current = false;
+    }
+  }, [isPending, isConfirming, isConfirmed, error, hash]);
+
+  // Handle toast notifications
+  useEffect(() => {
+    if (isPending) {
+      toast.loading("Transaction pending...");
+    } else if (isConfirming) {
+      toast.loading("Confirming transaction...");
+    } else if (isConfirmed) {
+      toast.success("Proposal completed successfully!");
+    } else if (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+    return () => toast.dismiss();
+  }, [isPending, isConfirming, isConfirmed, error]);
+
+  return {
+    completeProposal,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash,
+  };
+};
+
+
+
+export const useCancelProposal = () => {
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+  } = useWaitForTransactionReceipt({ hash });
+  const { address, chain } = useAccount();
+  const chainId = chain?.id || baseSepolia.id;
+
+  const cancelProposal = async (proposalId) => {
+    if (!address) {
+      throw new Error("Wallet not connected");
+    }
+    if (chainId !== baseSepolia.id) {
+      throw new Error("Please switch to Base Sepolia network");
+    }
+    if (!proposalId && proposalId !== "0") {
+      throw new Error("Invalid proposal ID");
+    }
+
+    try {
+      console.log("Initiating cancelProposal transaction...", {
+        proposalId,
+      });
+      await writeContract({
+        address: PROPOSAL_MANAGER_ADDRESS,
+        abi: ProposalManager_ABI,
+        functionName: "cancelProposal",
+        args: [BigInt(proposalId)],
+        chainId,
+      });
+    } catch (error) {
+      console.error("Failed to cancel proposal:", error);
+      throw error;
+    }
+  };
+
+  // Ref to prevent infinite logging
+  const hasLogged = useRef(false);
+
+  // Log transaction states only once per transaction
+  useEffect(() => {
+    if (
+      !hasLogged.current &&
+      (isPending || isConfirming || isConfirmed || error || hash)
+    ) {
+      console.log("Transaction states:", {
+        isPending,
+        isConfirming,
+        isConfirmed,
+        error: error?.message,
+        hash,
+      });
+      hasLogged.current = true;
+    }
+    // Reset hasLogged when a new transaction starts
+    if (isPending) {
+      hasLogged.current = false;
+    }
+  }, [isPending, isConfirming, isConfirmed, error, hash]);
+
+  // Handle toast notifications
+  useEffect(() => {
+    if (isPending) {
+      toast.loading("Transaction pending...");
+    } else if (isConfirming) {
+      toast.loading("Confirming transaction...");
+    } else if (isConfirmed) {
+      toast.success("Proposal cancelled successfully!");
+    } else if (error) {
+      toast.error(`Error: ${error.message}`);
+    }
+    return () => toast.dismiss();
+  }, [isPending, isConfirming, isConfirmed, error]);
+
+  return {
+    cancelProposal,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash,
+  };
+};

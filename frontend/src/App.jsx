@@ -28,6 +28,11 @@ import PortfolioForm from "./Components/portfolio/portfolioForm";
 import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
+import PaySecondMilestone from "./Components/testingContracts/PaySecondMileStone";
+import PayThirdMilestone from "./Components/testingContracts/PayThirdMileStone";
+import CompleteProposal from "./Components/testingContracts/CompleteProposal";
+import CancelProposal from "./Components/testingContracts/CancelProposal";
+
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -65,11 +70,20 @@ const App = () => {
             <Route path="/depositBidAmount" element={<DepositBidAmount />} />
             <Route path="/placeBid" element={<PlaceBid />} />
             <Route path="/startWork" element={<StartWork />} />
+            <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />
+            <Route path="/paySecondMileStone" element={<PaySecondMilestone />} />
+            <Route path="/payThirdMileStone" element={<PayThirdMilestone />} />
+            <Route path="/completeProposal" element={<CompleteProposal />} />
+            <Route path="/cancelProposal" element={<CancelProposal />} />
+            
+
+
+
             <Route path="/portfolioForm" element={<PortfolioForm/>}/>
             <Route path="otpverification" element={<OtpVerification/>}/>
 
             
-            <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />
+            
           </Routes>
         </Router>
         {/* Add Toaster for toast notifications */}
