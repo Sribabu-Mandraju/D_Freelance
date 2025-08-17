@@ -8,6 +8,26 @@ dotenv.config();
 // In-memory OTP store (use a proper database in production)
 const otpStorage = new Map();
 
+// Cleanup function to remove unverified portfolios after 1 hour
+const cleanupUnverifiedPortfolios = async () => {
+  try {
+    const oneHourAgo = Date.now() - 60 * 60 * 1000; // 1 hour ago
+    const result = await Portfolio.deleteMany({
+      isVerified: false,
+      createdAt: { $lt: oneHourAgo },
+    });
+
+    if (result.deletedCount > 0) {
+      console.log(`Cleaned up ${result.deletedCount} unverified portfolios`);
+    }
+  } catch (error) {
+    console.error("Error cleaning up unverified portfolios:", error);
+  }
+};
+
+// Run cleanup every hour
+setInterval(cleanupUnverifiedPortfolios, 60 * 60 * 1000);
+
 // Email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -28,7 +48,12 @@ const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 // Send OTP
 export const sendOTP = async (req, res) => {
   try {
-    const { contactInfo } = req.body;
+    const {
+      contactInfo,
+      heroSection,
+      currentStatus,
+      techHighlights,
+    } = req.body;
     const walletAddress = req.user.address; // Get wallet address from authMiddleware
 
     if (!contactInfo || !contactInfo.email) {
@@ -45,19 +70,81 @@ export const sendOTP = async (req, res) => {
       });
     }
 
+    if (!heroSection?.name) {
+      return res.status(400).json({
+        success: false,
+        message: "Hero section name is required",
+      });
+    }
+
+    // Check if portfolio already exists for this wallet address
+    const existingPortfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
+    if (existingPortfolio) {
+      return res.status(400).json({
+        success: false,
+        message: "Portfolio already exists for this wallet address",
+      });
+    }
+
+    // Create portfolio with isVerified = false
+    const portfolioData = {
+      heroSection: {
+        walletAddress,
+        name: heroSection.name,
+        domains: heroSection.domains || [],
+        thoughtLine: heroSection.thoughtLine || "",
+        aboutMe: heroSection.aboutMe || "",
+        expertise: heroSection.expertise || [],
+        focusAreas: heroSection.focusAreas || [],
+      },
+      contactInfo: {
+        email: contactInfo.email,
+        phoneNumber: contactInfo.phoneNumber || "",
+        linkedinProfile: contactInfo.linkedinProfile || "",
+      },
+      currentStatus: currentStatus || [],
+      techHighlights: techHighlights || [],
+      biddedProposals: [],
+      acceptedProposals: [],
+      createdProposals: [],
+      savedProposals: [],
+      savedGigs: [],
+      userGigs: [],
+      isVerified: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    console.log(
+      "Creating portfolio with data:",
+      JSON.stringify(portfolioData, null, 2)
+    );
+
+    const portfolio = new Portfolio(portfolioData);
+    const savedPortfolio = await portfolio.save();
+
+    // Generate OTP
     const otp = generateOTP();
     const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
 
-    otpStorage.set(contactInfo.email, { otp, expiresAt, walletAddress });
+    // Store OTP with portfolio ID
+    otpStorage.set(contactInfo.email, {
+      otp,
+      expiresAt,
+      walletAddress,
+      portfolioId: savedPortfolio._id,
+    });
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: contactInfo.email,
-      subject: "Your OTP Code",
+      subject: "Your Portfolio Verification Code",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 400px; padding: 20px; background: #f4f4f4; border-radius: 8px;">
-          <h2 style="color: #333; text-align: center;">Email Verification</h2>
-          <p style="text-align: center;">Your OTP code is:</p>
+          <h2 style="color: #333; text-align: center;">Portfolio Verification</h2>
+          <p style="text-align: center;">Your verification code is:</p>
           <h1 style="text-align: center; letter-spacing: 4px; color: #4f46e5;">${otp}</h1>
           <p style="text-align: center; font-size: 12px; color: #555;">This code will expire in 5 minutes.</p>
         </div>
@@ -69,6 +156,7 @@ export const sendOTP = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "OTP sent successfully",
+      portfolioId: savedPortfolio._id,
     });
   } catch (error) {
     console.error("Send OTP error:", error);
@@ -117,7 +205,7 @@ export const resendOTP = async (req, res) => {
 
     // Generate new OTP
     const otp = generateOTP();
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
 
     // Store or update OTP
     otpStorage.set(email, { otp, expiresAt, portfolioId, walletAddress });
@@ -126,7 +214,7 @@ export const resendOTP = async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Portfolio Creation - New Verification Code",
+      subject: "Portfolio Verification - New Code",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; border-radius: 10px;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -137,7 +225,7 @@ export const resendOTP = async (req, res) => {
           <div style="background: rgba(168, 85, 247, 0.1); padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
             <p style="color: #e5e7eb; margin-bottom: 15px;">Your new verification code is:</p>
             <div style="font-size: 32px; font-weight: bold; color: #a855f7; letter-spacing: 8px; margin: 20px 0;">${otp}</div>
-            <p style="color: #9ca3af; font-size: 14px;">This code will expire in 10 minutes</p>
+            <p style="color: #9ca3af; font-size: 14px;">This code will expire in 5 minutes</p>
           </div>
         </div>
       `,
@@ -182,6 +270,12 @@ export const verifyOTP = async (req, res) => {
 
     if (Date.now() > storedData.expiresAt) {
       otpStorage.delete(email);
+      // Clean up expired OTP portfolio
+      try {
+        await Portfolio.findByIdAndDelete(portfolioId);
+      } catch (error) {
+        console.error("Error cleaning up expired portfolio:", error);
+      }
       return res.status(400).json({
         success: false,
         message: "OTP has expired",
@@ -211,9 +305,11 @@ export const verifyOTP = async (req, res) => {
       });
     }
 
+    // Mark portfolio as verified
     portfolio.isVerified = true;
     const updatedPortfolio = await portfolio.save();
 
+    // Clean up OTP storage
     otpStorage.delete(email);
 
     res.status(200).json({
@@ -231,86 +327,99 @@ export const verifyOTP = async (req, res) => {
 };
 
 // Create Portfolio
-  export const createPortfolio = async (req, res) => {
-    try {
-      const walletAddress = req.user.address;
-      console.log("Wallet Address:", walletAddress);
-      if (!walletAddress) {
-        return res.status(401).json({
-          success: false,
-          message: "Wallet address not found in authentication token",
-        });
-      }
-
-      const { heroSection, contactInfo, currentStatus, techHighlights, biddedProposals, acceptedProposals, createdProposals, savedProposals, savedGigs, userGigs } = req.body;
-
-      if (!heroSection?.name) {
-        return res.status(400).json({
-          success: false,
-          message: "Hero section name is required",
-        });
-      }
-      if (!contactInfo?.email) {
-        return res.status(400).json({
-          success: false,
-          message: "Contact email is required",
-        });
-      }
-
-      // Check if portfolio already exists for this wallet address
-      const existingPortfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
-      if (existingPortfolio) {
-        return res.status(400).json({
-          success: false,
-          message: "Portfolio already exists for this wallet address",
-        });
-      }
-
-      // Explicitly construct portfolio data with walletAddress
-      const portfolioData = {
-        heroSection: {
-          walletAddress, // Explicitly set from authMiddleware
-          name: heroSection.name,
-          domains: heroSection.domains || [],
-          thoughtLine: heroSection.thoughtLine || "",
-          aboutMe: heroSection.aboutMe || "",
-          expertise: heroSection.expertise || [],
-          focusAreas: heroSection.focusAreas || [],
-        },
-        contactInfo: {
-          email: contactInfo.email,
-          phoneNumber: contactInfo.phoneNumber || "",
-          linkedinProfile: contactInfo.linkedinProfile || "",
-        },
-        currentStatus: currentStatus || [],
-        techHighlights: techHighlights || [],
-        biddedProposals: biddedProposals || [],
-        acceptedProposals: acceptedProposals || [],
-        createdProposals: createdProposals || [],
-        savedProposals: savedProposals || [],
-        savedGigs: savedGigs || [],
-        userGigs: userGigs || [],
-        isVerified: false,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      };
-
-      const portfolio = new Portfolio(portfolioData);
-      const savedPortfolio = await portfolio.save();
-
-      res.status(201).json({
-        success: true,
-        message: "Portfolio created successfully",
-        data: savedPortfolio,
-      });
-    } catch (error) {
-      console.error("Create portfolio error:", error);
-      res.status(400).json({
+export const createPortfolio = async (req, res) => {
+  try {
+    const walletAddress = req.user.address;
+    console.log("Wallet Address:", walletAddress);
+    if (!walletAddress) {
+      return res.status(401).json({
         success: false,
-        message: error.message || "Error creating portfolio",
+        message: "Wallet address not found in authentication token",
       });
     }
-  };
+
+    const {
+      heroSection,
+      contactInfo,
+      currentStatus,
+      techHighlights,
+      biddedProposals,
+      acceptedProposals,
+      createdProposals,
+      savedProposals,
+      savedGigs,
+      userGigs,
+    } = req.body;
+
+    if (!heroSection?.name) {
+      return res.status(400).json({
+        success: false,
+        message: "Hero section name is required",
+      });
+    }
+    if (!contactInfo?.email) {
+      return res.status(400).json({
+        success: false,
+        message: "Contact email is required",
+      });
+    }
+
+    // Check if portfolio already exists for this wallet address
+    const existingPortfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
+    if (existingPortfolio) {
+      return res.status(400).json({
+        success: false,
+        message: "Portfolio already exists for this wallet address",
+      });
+    }
+
+    // Explicitly construct portfolio data with walletAddress
+    const portfolioData = {
+      heroSection: {
+        walletAddress, // Explicitly set from authMiddleware
+        name: heroSection.name,
+        domains: heroSection.domains || [],
+        thoughtLine: heroSection.thoughtLine || "",
+        aboutMe: heroSection.aboutMe || "",
+        expertise: heroSection.expertise || [],
+        focusAreas: heroSection.focusAreas || [],
+      },
+      contactInfo: {
+        email: contactInfo.email,
+        phoneNumber: contactInfo.phoneNumber || "",
+        linkedinProfile: contactInfo.linkedinProfile || "",
+      },
+      currentStatus: currentStatus || [],
+      techHighlights: techHighlights || [],
+      biddedProposals: biddedProposals || [],
+      acceptedProposals: acceptedProposals || [],
+      createdProposals: createdProposals || [],
+      savedProposals: savedProposals || [],
+      savedGigs: savedGigs || [],
+      userGigs: userGigs || [],
+      isVerified: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const portfolio = new Portfolio(portfolioData);
+    const savedPortfolio = await portfolio.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Portfolio created successfully",
+      data: savedPortfolio,
+    });
+  } catch (error) {
+    console.error("Create portfolio error:", error);
+    res.status(400).json({
+      success: false,
+      message: error.message || "Error creating portfolio",
+    });
+  }
+};
 
 // Get All Portfolios
 export const getAllPortfolios = async (req, res) => {
@@ -334,7 +443,9 @@ export const getAllPortfolios = async (req, res) => {
 export const getPortfolioByWallet = async (req, res) => {
   try {
     const walletAddress = req.user.address;
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
 
     if (!portfolio) {
       return res.status(404).json({
@@ -360,9 +471,22 @@ export const getPortfolioByWallet = async (req, res) => {
 export const updatePortfolio = async (req, res) => {
   try {
     const walletAddress = req.user.address;
-    const { heroSection, contactInfo, currentStatus, techHighlights, biddedProposals, acceptedProposals, createdProposals, savedProposals, savedGigs, userGigs } = req.body;
+    const {
+      heroSection,
+      contactInfo,
+      currentStatus,
+      techHighlights,
+      biddedProposals,
+      acceptedProposals,
+      createdProposals,
+      savedProposals,
+      savedGigs,
+      userGigs,
+    } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,
@@ -371,7 +495,10 @@ export const updatePortfolio = async (req, res) => {
     }
 
     // Prevent wallet address modification
-    if (heroSection?.walletAddress && heroSection.walletAddress !== walletAddress) {
+    if (
+      heroSection?.walletAddress &&
+      heroSection.walletAddress !== walletAddress
+    ) {
       return res.status(403).json({
         success: false,
         message: "Cannot change wallet address",
@@ -418,7 +545,7 @@ export const updatePortfolio = async (req, res) => {
     }
 
     const updatedPortfolio = await Portfolio.findOneAndUpdate(
-      { 'heroSection.walletAddress': walletAddress },
+      { "heroSection.walletAddress": walletAddress },
       updateData,
       { new: true, runValidators: true }
     );
@@ -441,7 +568,9 @@ export const updatePortfolio = async (req, res) => {
 export const deletePortfolio = async (req, res) => {
   try {
     const walletAddress = req.user.address;
-    const portfolio = await Portfolio.findOneAndDelete({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOneAndDelete({
+      "heroSection.walletAddress": walletAddress,
+    });
 
     if (!portfolio) {
       return res.status(404).json({
@@ -469,7 +598,9 @@ export const addBiddedProposal = async (req, res) => {
     const walletAddress = req.user.address;
     const { proposalId } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,
@@ -502,7 +633,9 @@ export const addAcceptedProposal = async (req, res) => {
     const walletAddress = req.user.address;
     const { proposalId } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,
@@ -535,7 +668,9 @@ export const addCreatedProposal = async (req, res) => {
     const walletAddress = req.user.address;
     const { proposalId } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,
@@ -568,7 +703,9 @@ export const addSavedProposal = async (req, res) => {
     const walletAddress = req.user.address;
     const { proposalId } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,
@@ -601,7 +738,9 @@ export const addSavedGig = async (req, res) => {
     const walletAddress = req.user.address;
     const { gigId } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,
@@ -634,7 +773,9 @@ export const addUserGig = async (req, res) => {
     const walletAddress = req.user.address;
     const { gigId } = req.body;
 
-    const portfolio = await Portfolio.findOne({ 'heroSection.walletAddress': walletAddress });
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       return res.status(404).json({
         success: false,

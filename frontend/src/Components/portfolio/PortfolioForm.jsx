@@ -1,20 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Code, Star, Plus, Trash2, Send } from "lucide-react";
-import { useSelector } from "react-redux";
 
 function PortfolioForm() {
   const [authToken, setAuthToken] = useState("");
-
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    setAuthToken(token);
-    console.log(token);
-  }, []);
-
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     heroSection: {
       name: "",
@@ -49,6 +42,16 @@ function PortfolioForm() {
   const [submitMessage, setSubmitMessage] = useState("");
 
   const colorOptions = ["purple", "blue", "cyan", "indigo", "violet", "pink"];
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setAuthToken(token);
+      console.log("Auth token loaded:", token);
+    } else {
+      console.log("No auth token found");
+    }
+  }, []);
 
   // Add item to array
   const addArrayItem = (section, field, defaultValue) => {
@@ -121,50 +124,63 @@ function PortfolioForm() {
     setIsSubmitting(true);
     setSubmitMessage("");
 
-    try {
-      // Store portfolio data in sessionStorage for OTP verification
-      sessionStorage.setItem("portfolioData", JSON.stringify(formData));
+    // Check if auth token exists
+    if (!authToken) {
+      setSubmitMessage(
+        "Error: Authentication token not found. Please login again."
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
-      // Send portfolio data to create portfolio
-      const createPortfolioResponse = await fetch(
-        "http://localhost:3001/api/portfolio",
+    // Validate required fields
+    if (!formData.heroSection.name.trim()) {
+      setSubmitMessage("Error: Name is required");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!formData.contactInfo.email.trim()) {
+      setSubmitMessage("Error: Email is required");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.contactInfo.email)) {
+      setSubmitMessage("Error: Please enter a valid email address");
+      setIsSubmitting(false);
+      return;
+    }
+
+    console.log("[v0] Auth token being sent:", authToken);
+    console.log(
+      "[v0] Form data being sent:",
+      JSON.stringify(formData, null, 2)
+    );
+
+    try {
+      // Send complete form data to create portfolio and get OTP
+      const otpResponse = await fetch(
+        "http://localhost:3001/api/portfolio/otp/send",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization:`Bearer ${authToken}`
+            Authorization: `Bearer ${authToken}`,
           },
           body: JSON.stringify(formData),
         }
       );
 
-      const createResult = await createPortfolioResponse.json();
-
-      if (!createPortfolioResponse.ok || !createResult.success) {
-        setSubmitMessage(`Error creating portfolio: ${createResult.message}`);
-        sessionStorage.removeItem("portfolioData"); // Clean up on failure
-        return;
-      }
-
-      // Request OTP
-      const otpResponse = await fetch(
-        "http://localhost:3001/api/portfolio/send-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contactInfo: { email: formData.contactInfo.email },
-          }),
-        }
-      );
-
+      console.log("[v0] OTP Response status:", otpResponse.status);
       const otpResult = await otpResponse.json();
+      console.log("[v0] OTP Response data:", otpResult);
 
       if (otpResponse.ok && otpResult.success) {
-        // Store portfolio ID in sessionStorage
-        sessionStorage.setItem("portfolioId", createResult.data._id);
+        // Store portfolio ID for OTP verification
+        sessionStorage.setItem("portfolioId", otpResult.portfolioId);
         // Redirect to OTP verification page with email parameter
         navigate(
           `/otpverification?email=${encodeURIComponent(
@@ -173,13 +189,12 @@ function PortfolioForm() {
         );
       } else {
         setSubmitMessage(
-          `Portfolio created but error sending OTP: ${otpResult.message}`
+          `Error sending OTP: ${otpResult.message || "Unknown error"}`
         );
-        sessionStorage.removeItem("portfolioData"); // Clean up on failure
       }
     } catch (error) {
+      console.error("Submit error:", error);
       setSubmitMessage(`Error: ${error.message}`);
-      sessionStorage.removeItem("portfolioData"); // Clean up on failure
     } finally {
       setIsSubmitting(false);
     }

@@ -1,156 +1,181 @@
-"use client"
-import { useState, useRef, useEffect } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom"
-import { Mail, ArrowLeft, RefreshCw } from "lucide-react"
-import { toast } from "react-hot-toast"
+"use client";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 function OtpVerification() {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""])
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [isResending, setIsResending] = useState(false)
-  const [message, setMessage] = useState("")
-  const [email, setEmail] = useState("")
-  const inputRefs = useRef([])
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const inputRefs = useRef([]);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const emailParam = searchParams.get("email")
+    const emailParam = searchParams.get("email");
     if (emailParam) {
-      setEmail(decodeURIComponent(emailParam))
+      setEmail(decodeURIComponent(emailParam));
     } else {
-      setMessage("Error: Email not found in URL")
-      toast.error("Email not found in URL")
+      setMessage("Error: Email not found in URL");
+      toast.error("Email not found in URL");
     }
 
     if (inputRefs.current[0]) {
-      inputRefs.current[0].focus()
+      inputRefs.current[0].focus();
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const handleInputChange = (index, value) => {
-    if (value.length > 1) return
-    const newOtp = [...otp]
-    newOtp[index] = value
-    setOtp(newOtp)
+    if (value.length > 1) return;
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
     if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus()
+      inputRefs.current[index + 1]?.focus();
     }
-  }
+  };
 
   const handleKeyDown = (index, e) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus()
+      inputRefs.current[index - 1]?.focus();
     }
-  }
+  };
 
   const handleVerify = async (e) => {
-    e.preventDefault()
-    const otpString = otp.join("")
+    e.preventDefault();
+    const otpString = otp.join("");
 
     if (otpString.length !== 6) {
-      setMessage("Please enter all 6 digits")
-      toast.error("Please enter all 6 digits")
-      return
+      setMessage("Please enter all 6 digits");
+      toast.error("Please enter all 6 digits");
+      return;
     }
 
-    setIsVerifying(true)
-    setMessage("")
-    const toastId = toast.loading("Verifying OTP...")
+    setIsVerifying(true);
+    setMessage("");
+    const toastId = toast.loading("Verifying OTP...");
 
     try {
-      const portfolioId = sessionStorage.getItem("portfolioId")
+      const portfolioId = sessionStorage.getItem("portfolioId");
+      const authToken = localStorage.getItem("authToken");
 
       if (!portfolioId) {
-        setMessage("Error: Portfolio ID is missing")
-        toast.error("Portfolio ID is missing", { id: toastId })
-        setIsVerifying(false)
-        return
+        setMessage("Error: Portfolio ID is missing");
+        toast.error("Portfolio ID is missing", { id: toastId });
+        setIsVerifying(false);
+        return;
       }
 
-      const response = await fetch("http://localhost:3001/api/portfolio/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          otp: otpString,
-          portfolioId,
-        }),
-      })
+      if (!authToken) {
+        setMessage("Error: Authentication token is missing");
+        toast.error("Authentication token is missing", { id: toastId });
+        setIsVerifying(false);
+        return;
+      }
 
-      const result = await response.json()
+      const response = await fetch(
+        "http://localhost:3001/api/portfolio/otp/verify",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            email,
+            otp: otpString,
+            portfolioId,
+          }),
+        }
+      );
+
+      const result = await response.json();
 
       if (response.ok && result.success) {
-        setMessage("Verification successful! Redirecting to your portfolio...")
-        toast.success("Verification successful! Redirecting...", { id: toastId })
-        sessionStorage.removeItem("portfolioId")
-        sessionStorage.removeItem("portfolioData")
+        setMessage("Verification successful! Redirecting to your portfolio...");
+        toast.success("Verification successful! Redirecting...", {
+          id: toastId,
+        });
+        sessionStorage.removeItem("portfolioId");
         setTimeout(() => {
-          navigate(`/portfolio/${portfolioId}`)
-        }, 2000)
+          navigate(`/portfolio/${portfolioId}`);
+        }, 2000);
       } else {
-        setMessage(`Error: ${result.message}`)
-        toast.error(`Error: ${result.message}`, { id: toastId })
-        setOtp(["", "", "", "", "", ""])
-        inputRefs.current[0]?.focus()
+        setMessage(`Error: ${result.message}`);
+        toast.error(`Error: ${result.message}`, { id: toastId });
+        setOtp(["", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
       }
     } catch (error) {
-      setMessage(`Error: ${error.message}`)
-      toast.error(`Error: ${error.message}`, { id: toastId })
-      setOtp(["", "", "", "", "", ""])
-      inputRefs.current[0]?.focus()
+      setMessage(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`, { id: toastId });
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
     } finally {
-      setIsVerifying(false)
+      setIsVerifying(false);
     }
-  }
+  };
 
   const handleResend = async () => {
     if (!email) {
-      setMessage("Email not found. Please go back and try again.")
-      toast.error("Email not found. Please go back and try again.")
-      return
+      setMessage("Email not found. Please go back and try again.");
+      toast.error("Email not found. Please go back and try again.");
+      return;
     }
 
-    const portfolioId = sessionStorage.getItem("portfolioId")
+    const portfolioId = sessionStorage.getItem("portfolioId");
+    const authToken = localStorage.getItem("authToken");
+
     if (!portfolioId) {
-      setMessage("Error: Portfolio ID is missing")
-      toast.error("Portfolio ID is missing")
-      return
+      setMessage("Error: Portfolio ID is missing");
+      toast.error("Portfolio ID is missing");
+      return;
     }
 
-    setIsResending(true)
-    setMessage("")
-    const toastId = toast.loading("Resending OTP...")
+    if (!authToken) {
+      setMessage("Error: Authentication token is missing");
+      toast.error("Authentication token is missing");
+      return;
+    }
+
+    setIsResending(true);
+    setMessage("");
+    const toastId = toast.loading("Resending OTP...");
 
     try {
-      const response = await fetch("http://localhost:3001/api/portfolio/resend-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, portfolioId }),
-      })
+      const response = await fetch(
+        "http://localhost:3001/api/portfolio/otp/resend",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ email, portfolioId }),
+        }
+      );
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (response.ok && result.success) {
-        setMessage("New OTP sent to your email!")
-        toast.success("New OTP sent to your email!", { id: toastId })
-        setOtp(["", "", "", "", "", ""])
-        inputRefs.current[0]?.focus()
+        setMessage("New OTP sent to your email!");
+        toast.success("New OTP sent to your email!", { id: toastId });
+        setOtp(["", "", "", "", "", ""]);
+        inputRefs.current[0]?.focus();
       } else {
-        setMessage(`Error: ${result.message}`)
-        toast.error(`Error: ${result.message}`, { id: toastId })
+        setMessage(`Error: ${result.message}`);
+        toast.error(`Error: ${result.message}`, { id: toastId });
       }
     } catch (error) {
-      setMessage(`Error: ${error.message}`)
-      toast.error(`Error: ${error.message}`, { id: toastId })
+      setMessage(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`, { id: toastId });
     } finally {
-      setIsResending(false)
+      setIsResending(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-indigo-900 p-4 sm:p-6 lg:p-8 flex items-center justify-center">
@@ -166,8 +191,12 @@ function OtpVerification() {
                 Verify Your Email
               </span>
             </h1>
-            <p className="text-gray-300 text-sm sm:text-base">We've sent a 6-digit code to</p>
-            <p className="text-purple-400 font-medium text-sm sm:text-base break-all">{email}</p>
+            <p className="text-gray-300 text-sm sm:text-base">
+              We've sent a 6-digit code to
+            </p>
+            <p className="text-purple-400 font-medium text-sm sm:text-base break-all">
+              {email}
+            </p>
           </div>
           <form onSubmit={handleVerify} className="space-y-6">
             <div className="flex gap-2 sm:gap-3 justify-center">
@@ -199,7 +228,9 @@ function OtpVerification() {
               disabled={isResending}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-800/50 border border-gray-600/50 hover:border-gray-500 rounded-lg text-gray-300 hover:text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RefreshCw className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isResending ? "animate-spin" : ""}`}
+              />
               {isResending ? "Sending..." : "Resend Code"}
             </button>
             <button
@@ -230,7 +261,7 @@ function OtpVerification() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default OtpVerification
+export default OtpVerification;
