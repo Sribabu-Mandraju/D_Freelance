@@ -3,6 +3,12 @@ import mongoose from 'mongoose';
 const portfolioSchema = new mongoose.Schema({
   // Hero Section Data
   heroSection: {
+    walletAddress: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 100
+    },
     name: {
       type: String,
       required: true,
@@ -113,7 +119,7 @@ const portfolioSchema = new mongoose.Schema({
   }],
   
   createdProposals: [{
-    type: mongoose.Schema.Types.ObjectId, // MongoDB ObjectId for created proposals
+    type: String, // MongoDB ObjectId for created proposals
     ref: 'Proposal' // Assuming there's a Proposal model
   }],
   
@@ -133,6 +139,10 @@ const portfolioSchema = new mongoose.Schema({
   }],
   
   // Metadata
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -170,6 +180,6 @@ portfolioSchema.pre('save', function(next) {
   next();
 });
 
-const Portfolio = mongoose.model('Portfolio', portfolioSchema);
+const PortfolioScheema = mongoose.model('Portfolio', portfolioSchema);
 
-export default Portfolio;
+export default PortfolioScheema;
