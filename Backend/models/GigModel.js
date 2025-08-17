@@ -27,8 +27,7 @@ const packageSchema = new mongoose.Schema(
 const GigSchema = new mongoose.Schema({
   walletAddress: {
     type: String,
-    required: true,
-    unique: true,
+    // unique: true,
   },
   username: {
     type: String,
@@ -45,6 +44,11 @@ const GigSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true,
+    trim: true,
+  },
+  gigimage:{
+    type: String,
+    required: false,
     trim: true,
   },
   images: [
@@ -75,7 +79,11 @@ const GigSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
-
+  price:{
+      type: String,
+      required: true,
+      min: 0,
+    },
   faqs: [
     {
       question: { type: String, required: true },

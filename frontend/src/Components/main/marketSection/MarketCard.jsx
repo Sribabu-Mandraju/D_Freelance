@@ -77,9 +77,11 @@ import { useNavigate } from "react-router-dom";
 export default function MarketCard({
   username,
   gigId,
+  price,
   title,
   description,
-  price,
+  gigimage,
+  images,
   avatar,
   rating,
   projects,
@@ -91,6 +93,10 @@ export default function MarketCard({
   deliveryTime,
   faqs,
   about,
+  createdAt,
+  basic,
+  standard,
+  pro,
 }) {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -116,6 +122,8 @@ export default function MarketCard({
             title,
             description,
             price,
+            gigimage,
+            images,
             avatar,
             rating,
             projects,
@@ -127,6 +135,10 @@ export default function MarketCard({
             deliveryTime,
             faqs,
             about,
+            createdAt,
+            basic,
+            standard,
+            pro,
           },
         })
        
@@ -142,9 +154,9 @@ export default function MarketCard({
         scale: 1,
         boxShadow: "0 0 40px rgba(34, 211, 238, 0.1)",
       }}
-      className="bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-xl p-6 
+      className="bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3 
                  hover:border-cyan-400/50 transition-all duration-300 cursor-pointer
-                 shadow-lg hover:shadow-cyan-500/20 relative overflow-hidden group"
+                 shadow-lg hover:shadow-cyan-500/20 relative overflow-hidden group scale-[0.8]"
     >
       {/* Neon glow effect */}
       <div
@@ -153,6 +165,7 @@ export default function MarketCard({
       />
 
       {/* Header with title and bookmark */}
+      <img src={gigimage} alt="" className="mb-3"/>
       <div className="flex items-start justify-between mb-4 relative z-10">
         <h3
           className="text-lg font-semibold text-white group-hover:text-cyan-300 
@@ -177,9 +190,8 @@ export default function MarketCard({
       <p className="text-gray-300 text-sm mb-4 leading-relaxed line-clamp-2">
         {description}
       </p>
-
-      {/* Tech Tags */}
-      {/* <div className="flex flex-wrap gap-2 mb-4">
+<div className="flex gap-2">
+   <div className="flex flex-wrap gap-2 mb-4">
         {tags.map((tech, idx) => (
           <span
             key={idx}
@@ -190,20 +202,43 @@ export default function MarketCard({
             {tech}
           </span>
         ))}
-      </div> */}
-
-      {/* Budget */}
-      <div className="mb-4">
-        <span className="text-2xl font-bold text-green-400 drop-shadow-[0_0_2px_rgba(34,197,94,0.4)]">
-          {price}
-        </span>
+      </div>
+       <div className="flex flex-wrap gap-2 mb-4">
+        {skills.map((tech, idx) => (
+          <span
+            key={idx}
+            className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs rounded-full
+                       border border-cyan-500/30 hover:bg-cyan-500/30 transition-colors duration-300
+                       hover:shadow-[0_0_8px_rgba(34,211,238,0.6)]"
+          >
+            {tech}
+          </span>
+        ))}
       </div>
 
+</div>
+      {/* Tech Tags */}
+     
+      {/* Budget */}
+      <div className="flex gap-6 items-center">
+        <div className="mb-2">
+        <span className="text-2xl font-bold text-green-400 drop-shadow-[0_0_2px_rgba(34,197,94,0.4)]">
+         ₹ {price}
+        </span>
+      </div>
+    
+      <div className="mb-2">
+        <span className="text-sm text-gray-400">
+      Created on : {createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}
+        </span>
+      </div>
+        </div>
+
       {/* Job Details */}
-      <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
+      <div className="flex items-center gap-4 mb-2 text-sm text-gray-400">
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
-          <span>{deliveryTime}</span>
+          <span>{deliveryTime} weeks</span>
         </div>
         <div className="flex items-center gap-1">
           <MapPin className="w-4 h-4" />
@@ -211,12 +246,12 @@ export default function MarketCard({
         </div>
         <div className="flex items-center gap-1">
           <Users className="w-4 h-4" />
-          <span>{projects} proposals</span>
+          <span>{projects} Projects</span>
         </div>
       </div>
 
       {/* Client Info */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
           <img
             src={avatar || "/placeholder.svg"}
@@ -225,7 +260,7 @@ export default function MarketCard({
                        shadow-[0_0_8px_rgba(168,85,247,0.6)]"
           />
           <div>
-            <p className="text-sm font-medium text-white">Unknown Client</p>
+            <p className="text-sm font-medium text-white">{username}</p>
             <div className="flex items-center gap-1">
               <span className="text-yellow-400 text-sm drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]">
                 ★
@@ -240,15 +275,7 @@ export default function MarketCard({
       {/* Footer with date and button */}
       <div className="flex items-center justify-between">
         {/* <span className="text-xs text-gray-500">{jobData.postedDate}</span> */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-white text-sm font-medium 
-                     rounded-lg transition-all duration-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.8)]
-                     border border-cyan-400/50"
-        >
-          Place Bid
-        </motion.button>
+        
       </div>
     </motion.div>
   );

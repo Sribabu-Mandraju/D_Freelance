@@ -14,6 +14,7 @@ export default function ReviewSubmit({ formData, packageData }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
           <ReviewItem icon={Info} title="Username" content={formData.username} />
           <ReviewItem icon={Info} title="Title" content={formData.title} />
+          <ReviewItem icon={Info} title="price" content={formData.price} />
           <ReviewItem icon={Tag} title="Category" content={formData.category} />
           <ReviewItem icon={Clock} title="Delivery Time" content={`${formData.deliveryTime} Days`} />
         </div>

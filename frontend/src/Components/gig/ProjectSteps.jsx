@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 
-const ProjectSteps = () => {
+const ProjectSteps = ({username}) => {
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-6 mb-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
@@ -13,10 +13,10 @@ const ProjectSteps = () => {
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-white mb-3 text-lg">
-              After purchasing the project, send requirements so Sribabu can start the project.
+              After purchasing the project, send requirements so {username} can start the project.
             </h3>
             <p className="text-gray-400 mb-4">
-              Delivery time starts when Sribabu receives requirements from you.
+              Delivery time starts when {username} receives requirements from you.
             </p>
             <button className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 transition-colors">
               <span>View requirements</span>
@@ -30,7 +30,7 @@ const ProjectSteps = () => {
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-white mb-3 text-lg">
-              Sribabu works on your project following the steps below.
+              {username} works on your project following the steps below.
             </h3>
             <p className="text-gray-400 mb-6">
               Revisions may occur after the delivery date.
@@ -69,7 +69,7 @@ const ProjectSteps = () => {
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-white mb-3 text-lg">
-              Review the work, release payment, and leave feedback to Sribabu.
+              Review the work, release payment, and leave feedback to {username}.
             </h3>
             <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">
               What if I'm not happy with the work?
