@@ -28,6 +28,7 @@ import PortfolioForm from "./Components/portfolio/portfolioForm";
 import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
+import AdminDashboard from "./Pages/admin/AdminDashboard";
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -56,6 +57,8 @@ const App = () => {
             <Route path="/create-gig" element={<CreateGig />} />
             <Route path="/edit-gig/:id" element={<EditGig />} />
             <Route path="/gig/:id" element={<GigPage />} />
+
+            <Route path="/adminDashboard" element={<AdminDashboard />} />
 
             <Route path="/claimTokens" element={<ClaimTokens />} />
             <Route path="/purchaseTokens" element={<PurchaseTokens />} />
