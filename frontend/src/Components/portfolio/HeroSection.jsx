@@ -71,13 +71,20 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
         ...prev,
         heroSection: { ...editData },
       }))
-
+      
+      // get token from localStorage (or Context/Redux if you store it there)
+      const token = localStorage.getItem("authToken")
       // Update backend
-      const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`, {
+      const response = await fetch(`http://localhost:3001/api/portfolio/`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, 
+         },
         body: JSON.stringify({ heroSection: editData }),
-      })
+      },
+      
+    )
       const result = await response.json()
 
       if (!response.ok || !result.success) {
