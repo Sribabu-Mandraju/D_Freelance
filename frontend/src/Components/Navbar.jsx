@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import WalletConnect from "./walletConnection/WalletConnect";
-import { useAccount } from "wagmi";
-import { useNavigate } from "react-router-dom";
 import {
   Search,
   Briefcase,
@@ -29,7 +27,6 @@ import {
   Award,
   Target,
 } from "lucide-react";
-import toast from "react-hot-toast";
 
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
@@ -37,43 +34,7 @@ export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedTheme, setTheme] = useState("Dark");
-  const { address, isConnected, chain } = useAccount();
-  const navigate = useNavigate();
-  const handlePortfolioClick = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        toast.error("Please Connect your wallet to view your portfolio");
-        return;
-      }
 
-      const res = await fetch("http://localhost:3001/api/portfolio/me", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      let result = null;
-      try {
-        result = await res.json();
-      } catch (err) {
-        toast.error("Failed to parse response. Please try again.");
-      }
-
-      if (res.ok && result?.success && result?.data) {
-        navigate("/portfolio/me");
-        return;
-      }
-      navigate("/portfolioForm");
-    } catch (err) {
-      console.error("Error checking portfolio:", err);
-      toast.error("Unable to check portfolio. Please try again.");
-      navigate("/portfolioForm");
-    }
-  };
   const navigationItems = [
     {
       name: "Find talent",
@@ -89,6 +50,10 @@ export default function Navbar() {
       name: "Why CryptoLance",
       navlink: "/help",
       icon: Package,
+      subItems: [
+        { name: "How to Use", link: "/help" },
+        { name: "About", link: "/about" },
+      ],
     },
   ];
 
@@ -107,7 +72,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className=" fixed top-0 left-0 w-full bg-gray-950 text-white  z-40">
+    <header className="fixed top-0 left-0 w-full bg-gray-950 text-white z-40">
       {/* Neon glow background effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 opacity-50"></div>
 
@@ -131,38 +96,63 @@ export default function Navbar() {
           <nav className="hidden lg:flex items-center gap-4">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
+              const isOpen = activeDropdown === item.name;
 
               return (
-                <Link
-                  to={item.navlink}
+                <div
                   key={item.name}
                   className="relative"
                   onMouseEnter={() => handleMouseEnter(item.name)}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <button className="flex items-center space-x-1 text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group">
-                    <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
-                    <span className="text-[14px]">{item.name}</span>
-                  </button>
-                </Link>
+                  <Link to={item.navlink}>
+                    <button className="flex items-center space-x-1 text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group">
+                      <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
+                      <span className="text-[14px]">{item.name}</span>
+                      {item.subItems && (
+                        <ChevronDown
+                          className={`w-4 h-4 ml-1 transition-transform duration-300 ${
+                            isOpen ? "rotate-180 text-cyan-400" : ""
+                          }`}
+                        />
+                      )}
+                    </button>
+                  </Link>
+
+                  {item.subItems && isOpen && (
+                    <div className="absolute -left-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
+                      {item.subItems.map((subItem, idx) => (
+                        <Link
+                          key={idx}
+                          to={subItem.link}
+                          className={`block px-4 py-2 text-sm text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 ${
+                            idx === 0 ? "rounded-t-xl" : idx === item.subItems.length - 1 ? "rounded-b-xl" : ""
+                          }`}
+                        >
+                          {subItem.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
         </div>
 
         {/* Right Side - Portfolio, Watchlist, Search, Login */}
-        <div className="flex items-center md:gap-4 ">
+        <div className="flex items-center md:gap-4">
           {/* Portfolio */}
-          <button
-            onClick={handlePortfolioClick}
-            className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group"
+          <Link
+            to="/portfolioform"
+            className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group"
           >
-            <Portfolio className="w-4 h-4 mr-2  group-hover:text-cyan-400 transition-colors duration-300" />
+            <Portfolio className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
             Portfolio
-          </button>
+          </Link>
 
           {/* Watchlist */}
-          <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group">
+          <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group">
             <Star className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
             Watchlist
           </button>
@@ -224,14 +214,10 @@ export default function Navbar() {
               onMouseLeave={() => setShowProfileMenu(false)}
             >
               <button
-                // onClick={() => setShowProfileMenu((s) => !s)}
-                className="flex items-center gap-2  rounded-lg hover:bg-gray-800/50 transition-colors text-gray-300"
+                className="flex items-center gap-2 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-300"
                 aria-expanded={showProfileMenu ? "true" : "false"}
               >
-                {/* you can keep the avatar/icon here */}
                 <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
-                  {/* small avatar placeholder */}
-                  {/* <MessageCircle className="w-4 h-4 text-gray-300" /> */}
                   <img
                     src="https://i.pravatar.cc/150?img=47"
                     alt=""
@@ -246,10 +232,9 @@ export default function Navbar() {
                   role="menu"
                 >
                   <div className="p-4">
-                    {/* top actions */}
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex flex-row gap-4">
-                        <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm ">
+                        <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
                           Log In
                         </button>
                         <button className="w-auto border border-blue-600 text-blue-600 px-3 py-1 rounded-md text-sm">
@@ -258,17 +243,12 @@ export default function Navbar() {
                       </div>
                       <div className="ml-3 flex items-start">
                         <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow">
-                          {/* small diamond icon style */}
-                          <span className="text-white text-xs font-semibold">
-                            ♦
-                          </span>
+                          <span className="text-white text-xs font-semibold">♦</span>
                         </div>
                       </div>
                     </div>
 
                     <hr className="border-gray-800/40 my-2" />
-
-                    {/* survey link */}
                     <button className="w-full text-left text-[13px] text-blue-500 font-semibold px-1 py-2 rounded-md hover:bg-gray-800/50 flex items-center justify-between">
                       <span>💙 Help us improve by taking our survey</span>
                       <ChevronRight className="w-4 h-4 opacity-70" />
@@ -276,25 +256,19 @@ export default function Navbar() {
                     <hr className="border-gray-800/40 my-2" />
 
                     <div className="mt-3 space-y-2 text-sm">
-                      {/* Language */}
                       <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
                         <div className="text-gray-300">Language</div>
                         <div className="text-gray-200">English</div>
                       </div>
-
-                      {/* Currency */}
                       <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
                         <div className="text-gray-300">Currency</div>
                         <div className="text-gray-200 flex items-center gap-1">
                           USD <span className="text-green-400">●</span>
                         </div>
                       </div>
-
-                      {/* Theme toggle */}
-
-                      <div className="flex items-center justify-between px-1 py-2 rounded-md ">
+                      <div className="flex items-center justify-between px-1 py-2 rounded-md">
                         <div className="text-gray-300">Theme</div>
-                        <div className="flex items-center  bg-gray-800 py-1 px-1 rounded-lg">
+                        <div className="flex items-center bg-gray-800 py-1 px-1 rounded-lg">
                           {["Light", "Dark", "System"].map((theme) => (
                             <button
                               key={theme}
@@ -340,7 +314,6 @@ export default function Navbar() {
       {showMobileMenu && (
         <div className="lg:hidden bg-gray-900/95 backdrop-blur-md border-b border-gray-700/50">
           <nav className="flex flex-col space-y-2 px-4 py-4">
-            {/* Search in mobile */}
             <div className="relative mb-3">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -366,24 +339,25 @@ export default function Navbar() {
                       <IconComponent className="w-4 h-4" />
                       <span>{item.name}</span>
                     </div>
-                    <ChevronDown
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        isOpen ? "rotate-180 text-cyan-400" : ""
-                      }`}
-                    />
+                    {item.subItems && (
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-300 ${
+                          isOpen ? "rotate-180 text-cyan-400" : ""
+                        }`}
+                      />
+                    )}
                   </button>
 
-                  {/* Mobile dropdown for subitems */}
-                  {isOpen && (
+                  {isOpen && item.subItems && (
                     <div className="pl-8 mt-1 space-y-1">
-                      {item.items.map((sub, idx) => (
-                        <a
+                      {item.subItems.map((subItem, idx) => (
+                        <Link
                           key={idx}
-                          href="#"
+                          to={subItem.link}
                           className="block py-1 text-sm text-gray-400 hover:text-cyan-400"
                         >
-                          {sub}
-                        </a>
+                          {subItem.name}
+                        </Link>
                       ))}
                     </div>
                   )}
@@ -394,25 +368,20 @@ export default function Navbar() {
             <div>
               <Link
                 to="/portfolio"
-                className="flex text-sm  items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group"
+                className="flex text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group"
               >
-                <Portfolio className="w-4 h-4 mr-2  group-hover:text-cyan-400 transition-colors duration-300" />
+                <Portfolio className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
                 Portfolio
               </Link>
 
-              {/* Watchlist */}
               <button className="flex text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group">
                 <Star className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
                 Watchlist
               </button>
             </div>
-
-            {/* Language selector */}
           </nav>
         </div>
       )}
-
-      {/* Market Data Ticker with neon effects */}
 
       {/* Custom CSS for neon glow effects */}
       <style jsx>{`
