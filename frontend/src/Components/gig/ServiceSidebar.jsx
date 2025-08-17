@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import React, { useMemo, useState, useEffect } from "react";
-import { Check, Clock, Shield, X } from "lucide-react";
+import { useMemo, useState, useEffect } from "react"
+import { Check, Clock, Shield, X } from "lucide-react"
 
-const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
+const ServiceSidebar = ({ basic = {}, standard = {}, pro = {}, username }) => {
   // Build normalized tiers from props
   const serviceTiers = useMemo(() => {
     const getPrice = (t) =>
       // prefer explicit price, then hourlyPay, then fallback 0
-      (t && (t.price ?? t.hourlyPay ?? t.amount)) ?? 0;
+      (t && (t.price ?? t.hourlyPay ?? t.amount)) ?? 0
 
     const normalize = (key, t, defaultName) => ({
       key,
@@ -19,26 +19,26 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
       deliveryTime: t?.deliveryTime ?? t?.duration ?? t?.days ?? null,
       revisions: t?.revisions ?? t?.code_reviews ?? t?.revs ?? 0,
       pages: t?.pages ?? t?.numPages ?? null,
-    });
+    })
 
     return {
       basic: normalize("basic", basic, "Basic"),
       standard: normalize("standard", standard, "Standard"),
       pro: normalize("pro", pro, "Pro"),
-    };
-  }, [basic, standard, pro]);
+    }
+  }, [basic, standard, pro])
 
   // default to the first available tier key
-  const firstKey = useMemo(() => Object.keys(serviceTiers)[0], [serviceTiers]);
-  const [selectedTier, setSelectedTier] = useState(firstKey);
+  const firstKey = useMemo(() => Object.keys(serviceTiers)[0], [serviceTiers])
+  const [selectedTier, setSelectedTier] = useState(firstKey)
 
   // keep selection synced if props change (e.g., parent loads data asynchronously)
   useEffect(() => {
-    setSelectedTier(firstKey);
-  }, [firstKey]);
+    setSelectedTier(firstKey)
+  }, [firstKey])
 
   // safe selected object
-  const selected = serviceTiers[selectedTier] ?? serviceTiers[firstKey];
+  const selected = serviceTiers[selectedTier] ?? serviceTiers[firstKey]
 
   return (
     <div className="lg:w-96">
@@ -48,25 +48,18 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-white text-lg">Select service tier</h3>
-            <a
-              href="#"
-              className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors"
-            >
+            <a href="#" className="text-cyan-400 text-sm hover:text-cyan-300 transition-colors">
               Compare tiers
             </a>
           </div>
 
           <div className="space-y-4 mb-6">
             {Object.entries(serviceTiers).map(([key, tier]) => {
-              const id = `serviceTier-${key}`;
-              const isSelected = selectedTier === key;
+              const id = `serviceTier-${key}`
+              const isSelected = selectedTier === key
 
               return (
-                <label
-                  key={key}
-                  htmlFor={id}
-                  className="flex items-center space-x-4 cursor-pointer group"
-                >
+                <label key={key} htmlFor={id} className="flex items-center space-x-4 cursor-pointer group">
                   <input
                     id={id}
                     type="radio"
@@ -91,12 +84,10 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
                       )}
                     </div>
 
-                    <span className="font-bold text-xl text-cyan-400">
-                      ${tier.price}
-                    </span>
+                    <span className="font-bold text-xl text-cyan-400">${tier.price}</span>
                   </div>
                 </label>
-              );
+              )
             })}
           </div>
 
@@ -122,16 +113,12 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
         {/* Tier details / features */}
         <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-6 shadow-2xl shadow-cyan-500/10">
           <h4 className="font-bold text-white mb-3 text-lg">Basic Token Deployment</h4>
-          <p className="text-sm text-gray-400 mb-6">
-            Deploy an ERC-20 token contract with basic settings
-          </p>
+          <p className="text-sm text-gray-400 mb-6">Deploy an ERC-20 token contract with basic settings</p>
 
           <div className="space-y-4 mb-6">
             <div className="flex justify-between text-sm">
               <span className="text-gray-400">Delivery Time</span>
-              <span className="font-semibold text-cyan-300">
-                {selected.deliveryTime ?? "TBD"}
-              </span>
+              <span className="font-semibold text-cyan-300">{selected.deliveryTime ?? "TBD"}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-gray-400 underline">Number of Revisions</span>
@@ -140,7 +127,11 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
             <div className="flex justify-between text-sm">
               <span className="text-gray-400 underline">custom_ui</span>
               <span className="font-semibold text-gray-300">
-                {selected.custom_ui=="Yes" ?  <Check className="w-5 h-5 text-green-400" /> : <X className="w-5 h-5 text-red-400" />}
+                {selected.custom_ui === "Yes" ? (
+                  <Check className="w-5 h-5 text-green-400" />
+                ) : (
+                  <X className="w-5 h-5 text-red-400" />
+                )}
               </span>
             </div>
           </div>
@@ -162,11 +153,7 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
 
           <div className="flex items-center space-x-2 text-sm text-gray-400 mb-6">
             <Clock className="w-4 h-4" />
-            <span>
-              {selected.deliveryTime
-                ? `${selected.deliveryTime} days delivery`
-                : "Delivery time: TBD"}
-            </span>
+            <span>{selected.deliveryTime ? `${selected.deliveryTime} days delivery` : "Delivery time: TBD"}</span>
           </div>
           <p className="text-xs text-gray-400 mb-6">Revisions may occur after this date.</p>
 
@@ -197,7 +184,7 @@ const ServiceSidebar = ({ basic = {}, standard = {}, pro = {} ,username}) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ServiceSidebar;
+export default ServiceSidebar

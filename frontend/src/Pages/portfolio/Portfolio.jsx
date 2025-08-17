@@ -17,6 +17,11 @@ import ContactInfo from "../../Components/portfolio/ContactInfo"
 import Navbar from "../../Components/Navbar"
 import styles from "./Portfolio.module.css"
 
+// import {
+//   fetchPortfolio,
+//   setActiveTab,
+// } from "../../store/portfolioSlice/portfolioSlice"
+
 function Portfolio() {
   const [activeTab, setActiveTab] = useState("overview")
   const [portfolioData, setPortfolioData] = useState(null)

@@ -3,10 +3,8 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-const FAQSection = ({faqs}) => {
+const FAQSection = ({ faqs }) => {
   const [expandedFaq, setExpandedFaq] = useState(null)
-
- 
 
   return (
     <div className="mb-8">

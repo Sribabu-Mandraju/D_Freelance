@@ -1,7 +1,6 @@
-import React from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from "lucide-react"
 
-const ProjectSteps = ({username}) => {
+const ProjectSteps = ({ username }) => {
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-6 mb-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
@@ -15,9 +14,7 @@ const ProjectSteps = ({username}) => {
             <h3 className="font-semibold text-white mb-3 text-lg">
               After purchasing the project, send requirements so {username} can start the project.
             </h3>
-            <p className="text-gray-400 mb-4">
-              Delivery time starts when {username} receives requirements from you.
-            </p>
+            <p className="text-gray-400 mb-4">Delivery time starts when {username} receives requirements from you.</p>
             <button className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 transition-colors">
               <span>View requirements</span>
               <ChevronDown className="w-4 h-4" />
@@ -32,17 +29,14 @@ const ProjectSteps = ({username}) => {
             <h3 className="font-semibold text-white mb-3 text-lg">
               {username} works on your project following the steps below.
             </h3>
-            <p className="text-gray-400 mb-6">
-              Revisions may occur after the delivery date.
-            </p>
+            <p className="text-gray-400 mb-6">Revisions may occur after the delivery date.</p>
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <Check className="w-6 h-6 text-green-400 mt-1" />
                 <div>
                   <h4 className="font-semibold text-white mb-2">Requirement Collection</h4>
                   <p className="text-gray-400">
-                    Client submits token name, symbol, total supply, decimals, network preference, and wallet
-                    address.
+                    Client submits token name, symbol, total supply, decimals, network preference, and wallet address.
                   </p>
                 </div>
               </div>
@@ -51,8 +45,8 @@ const ProjectSteps = ({username}) => {
                 <div>
                   <h4 className="font-semibold text-white mb-2">Smart Contract Development</h4>
                   <p className="text-gray-400">
-                    I write a custom ERC-20 token contract in Solidity, following best practices for security
-                    and gas optimization.
+                    I write a custom ERC-20 token contract in Solidity, following best practices for security and gas
+                    optimization.
                   </p>
                 </div>
               </div>
@@ -78,7 +72,7 @@ const ProjectSteps = ({username}) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ProjectSteps;
+export default ProjectSteps

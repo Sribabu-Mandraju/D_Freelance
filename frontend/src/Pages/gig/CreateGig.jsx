@@ -145,7 +145,7 @@ export default function CreateGig() {
     <div className="min-h-screen bg-slate-900 font-sans">
       <Navbar />
       <div className="pt-24 md:pt-32 pb-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="text-center mb-8 md:mb-12">
             <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-white">Create Your Gig</h1>
             <p className="text-sm md:text-base text-gray-400">Showcase your skills and services to potential clients</p>
@@ -196,17 +196,17 @@ export default function CreateGig() {
               {renderStep()}
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center py-4 border-t border-slate-700 mt-6">
+            <div className="flex  justify-between items-center py-4 border-t border-slate-700 mt-6">
               {currentStep > 1 && (
                 <button
                   type="button"
                   onClick={() => setCurrentStep((s) => s - 1)}
-                  className="w-full sm:w-auto px-6 py-3 text-gray-300 hover:text-white transition-colors text-sm font-medium bg-red-600 rounded-lg mb-2 sm:mb-0"
+                  className="w-auto px-6 py-3 text-gray-300 hover:text-white transition-colors text-sm font-medium bg-red-600 rounded-lg mb-2 sm:mb-0"
                 >
                   Back
                 </button>
               )}
-              <div className="w-full sm:w-auto ml-auto">
+              <div className="w-auto ml-auto">
                 {currentStep < 3 ? (
                   <button
                     type="button"
@@ -221,7 +221,7 @@ export default function CreateGig() {
                 ) : (
                   <button
                     type="submit"
-                    className="w-full px-8 py-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-lg font-semibold transition-all text-sm"
+                    className="w-full px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-500   rounded-lg font-semibold transition-all text-sm"
                   >
                     Create Gig
                   </button>
@@ -231,7 +231,7 @@ export default function CreateGig() {
           </form>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

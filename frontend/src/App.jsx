@@ -29,9 +29,6 @@ import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
 import Gigs from "./Pages/gig/Gigs";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
-<<<<<<< HEAD
-import AdminDashboard from "./Pages/admin/AdminDashboard";
-=======
 import PaySecondMilestone from "./Components/testingContracts/PaySecondMileStone";
 import PayThirdMilestone from "./Components/testingContracts/PayThirdMileStone";
 import CompleteProposal from "./Components/testingContracts/CompleteProposal";
@@ -40,7 +37,6 @@ import CancelProposal from "./Components/testingContracts/CancelProposal";
 import AdminDashboard from "./Pages/admin/AdminDashboard"
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
->>>>>>> 4ee6ecc4033902eea9f1e619702cd363c7cd561e
 
 const App = () => {
   const handleAuthSuccess = () => {
