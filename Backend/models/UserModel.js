@@ -13,8 +13,8 @@ const userSchema = new mongoose.Schema(
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     rating: { type: Number, default: 0 },
-    projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }], // Replace with actual project model
-    gigs: [{ type: String }], // Can be strings or change to object later
+    projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Proposal" }], // Replace with actual project model
+    gigs: [{ type: mongoose.Schema.Types.ObjectId, ref:"Gig" }], // Can be strings or change to object later
     experience: [experienceSchema],
     role: {
       type: String,

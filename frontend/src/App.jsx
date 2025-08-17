@@ -10,7 +10,7 @@ import HelpDocs from "./Pages/HelpDocs";
 import WalletConnect from "./Components/walletConnection/WalletConnect";
 import Authenticate from "./Components/walletConnection/Authenticate";
 import GigPage from "./Pages/gig/GigPage";
-import CreateGig from "./Pages/CreateGig";
+import CreateGig from "./Pages/gig/CreateGig";
 import EditGig from "./Pages/EditGig";
 import Portfolio from "./Pages/portfolio/Portfolio";
 import Navbar from "./Components/Navbar";
@@ -26,9 +26,21 @@ import Proposal from "./Pages/proposal/Proposal";
 import StartWork from "./Components/testingContracts/StartWork";
 import PortfolioForm from "./Components/portfolio/portfolioForm";
 import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
+import Gigs from "./Pages/gig/Gigs";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
+<<<<<<< HEAD
 import AdminDashboard from "./Pages/admin/AdminDashboard";
+=======
+import PaySecondMilestone from "./Components/testingContracts/PaySecondMileStone";
+import PayThirdMilestone from "./Components/testingContracts/PayThirdMileStone";
+import CompleteProposal from "./Components/testingContracts/CompleteProposal";
+import CancelProposal from "./Components/testingContracts/CancelProposal";
+
+import AdminDashboard from "./Pages/admin/AdminDashboard"
+
+// import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
+>>>>>>> 4ee6ecc4033902eea9f1e619702cd363c7cd561e
 
 const App = () => {
   const handleAuthSuccess = () => {
@@ -48,12 +60,15 @@ const App = () => {
             <Route path="/freelancer/:id" element={<FreelancerProfile />} />
             <Route path="/dashboard" element={<ClientDashboard />} />
             <Route path="/help" element={<HelpDocs />} />
+            <Route path="/gigs" element={<Gigs />} />
+            <Route path="/adminDashboard" element={<AdminDashboard />} />
+
             <Route path="/jobDetails/:id" element={<ProposalDetails />} />
             <Route
               path="/connect"
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
             />
-            <Route path="/gigpage" element={<GigPage />} />
+            {/* <Route path="/gigpage" element={<GigPage />} /> */}
             <Route path="/create-gig" element={<CreateGig />} />
             <Route path="/edit-gig/:id" element={<EditGig />} />
             <Route path="/gig/:id" element={<GigPage />} />
@@ -68,11 +83,20 @@ const App = () => {
             <Route path="/depositBidAmount" element={<DepositBidAmount />} />
             <Route path="/placeBid" element={<PlaceBid />} />
             <Route path="/startWork" element={<StartWork />} />
+            <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />
+            <Route path="/paySecondMileStone" element={<PaySecondMilestone />} />
+            <Route path="/payThirdMileStone" element={<PayThirdMilestone />} />
+            <Route path="/completeProposal" element={<CompleteProposal />} />
+            <Route path="/cancelProposal" element={<CancelProposal />} />
+            
+
+
+
             <Route path="/portfolioForm" element={<PortfolioForm/>}/>
             <Route path="otpverification" element={<OtpVerification/>}/>
 
             
-            <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />
+            
           </Routes>
         </Router>
         {/* Add Toaster for toast notifications */}

@@ -7,10 +7,14 @@ import FAQSection from "../../Components/gig/FAQSection";
 import ProjectSteps from "../../Components/gig/ProjectSteps";
 import AboutSection from "../../Components/gig/AboutSection";
 import ServiceSidebar from "../../Components/gig/ServiceSidebar";
+import { useLocation, useParams } from "react-router-dom";
 
 import Navbar from "../../Components/Navbar";
 
 const GigPage = () => {
+  const { id } = useParams();
+  const { state } = useLocation();
+  if (!state) return <p>No gig data passed</p>
   return (
     <>
       <Navbar />
@@ -26,18 +30,18 @@ const GigPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Content */}
             <div className="flex-1">
-              <GigHeader />
-              <ImageShowcase />
+              <GigHeader username={state.username} avatar={state.avatar} rating={state.rating} title={state.title} about={state.gig} badges={state.badges}/>
+              <ImageShowcase images={state.images}/>
               <ProHandleSection />
-              <ProjectDetails />
-              <ServiceTiersTable />
-              <FAQSection />
-              <ProjectSteps />
-              <AboutSection />
+              <ProjectDetails description={state.description} skills={state.skills} tags={state.tags} />
+              <ServiceTiersTable basic={state.basic} standard={state.standard} pro={state.pro}/>
+              <FAQSection faqs={state.faqs}/>
+              <ProjectSteps username={state.username}/>
+              <AboutSection avatar={state.avatar} username={state.username} tags={state.tags} skills={state.skills} about={state.about} location={state.location}/>
             </div>
 
             {/* Right Sidebar */}
-            <ServiceSidebar />
+            <ServiceSidebar basic={state.basic} standard={state.standard} pro={state.pro} username={state.username}/>
           </div>
         </div>
       </div>
