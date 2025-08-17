@@ -16,7 +16,7 @@ import SkillProgress from "../../Components/portfolio/SkillProgess"
 import ContactInfo from "../../Components/portfolio/ContactInfo"
 import Navbar from "../../Components/Navbar"
 import styles from "./Portfolio.module.css"
-
+import YourGigs from "./YourGigs"
 function Portfolio() {
   const [activeTab, setActiveTab] = useState("overview")
   const [portfolioData, setPortfolioData] = useState(null)
@@ -51,6 +51,7 @@ function Portfolio() {
       }
 
       setPortfolioData(result.data)
+
       setLoading(false)
       toast.success("Portfolio loaded successfully!", { id: toastId })
     } catch (err) {
@@ -61,7 +62,7 @@ function Portfolio() {
     }
   }
 
-  fetchPortfolio()
+  fetchPortfolio();
 }, []) // ✅ empty dependency array since no portfolioId needed
 
   useEffect(() => {
@@ -87,12 +88,12 @@ function Portfolio() {
   }, [portfolioData, activeTab])
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: User },
-    { id: "skills", label: "Tech Stack", icon: Code },
-    { id: "experience", label: "Experience", icon: Briefcase },
-    { id: "education", label: "Education", icon: GraduationCap },
-    { id: "progress", label: "Skill Progress", icon: TrendingUp },
-    { id: "contact", label: "Contact", icon: Mail },
+    { id: "Bidded Proposals", label: "Bidded Proposals", icon: User },
+    { id: "Gigs", label: "Your Gigs", icon: Code },
+    { id: "Accepted Proposals", label: "Accepted Proposals", icon: Briefcase },
+    // { id: "education", label: "Education", icon: GraduationCap },
+    // { id: "progress", label: "Skill Progress", icon: TrendingUp },
+    // { id: "contact", label: "Contact", icon: Mail },
   ]
 
   if (loading) {
@@ -138,6 +139,18 @@ function Portfolio() {
             aria-label="About content"
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
+
+          {
+  portfolioData.userGigs && portfolioData.userGigs.length > 0 && (
+    <div className="mb-8">
+      {portfolioData.userGigs.map((gigId, index) => (
+        <div key={index}>{gigId}</div>
+      ))}
+    </div>
+  )
+}
+
+
             <HeroSection
               personalInfo={personalInfo}
               setPersonalInfo={setPortfolioData}
@@ -150,11 +163,11 @@ function Portfolio() {
                   <FeaturedProjects featuredProjects={featuredProjects} setFeaturedProjects={setPortfolioData} />
                 </div>
               )}
-              {activeTab === "skills" && <TechStack techStack={techStack} />}
-              {activeTab === "experience" && <Experience workExperience={workExperience} />}
-              {activeTab === "education" && <Education education={education} />}
-              {activeTab === "progress" && <SkillProgress />}
-              {activeTab === "contact" && <ContactInfo personalInfo={personalInfo} />}
+              {activeTab === "Bidded Proposals" && <TechStack techStack={techStack} />}
+              {activeTab === "Gigs" && <YourGigs yourgigs={portfolioData.userGigs} />}
+              {activeTab === "Accepted Proposals" && <Education education={education} />}
+              {/* {activeTab === "progress" && <SkillProgress />}
+              {activeTab === "contact" && <ContactInfo personalInfo={personalInfo} />} */}
             </div>
           </main>
 
