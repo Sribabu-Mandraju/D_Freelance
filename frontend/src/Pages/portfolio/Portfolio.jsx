@@ -141,8 +141,9 @@ function Portfolio() {
             <HeroSection
               personalInfo={personalInfo}
               setPersonalInfo={setPortfolioData}
+              portfolioId={portfolioData?._id}
             />
-            <TabNavigation tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <TabNavigation tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab}  />
             <div className="space-y-8">
               {activeTab === "overview" && (
                 <div className="space-y-6">
@@ -164,8 +165,8 @@ function Portfolio() {
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
             <QuickContact personalInfo={personalInfo} />
-            <CurrentStatus currentStatus={currentStatus} setCurrentStatus={setPortfolioData}  />
-            <TechHighlights techHighlights={techHighlights} setTechHighlights={setPortfolioData} />
+            <CurrentStatus currentStatus={currentStatus} setCurrentStatus={setPortfolioData}  portfolioId={portfolioData?._id} />
+            <TechHighlights techHighlights={techHighlights} setTechHighlights={setPortfolioData}  portfolioId={portfolioData?._id} />
           </aside>
         </div>
       </div>
