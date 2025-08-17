@@ -107,16 +107,16 @@ const HelpDocs = () => {
   })
 
   return (
-    <div className="min-h-screen bg-gray-900">
-<Navbar/>
+    <div className="min-h-screen bg-black">
+      <Navbar />
       <div className="pt-32 pb-12">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+          <div className="text-center mb-12 animate__animated animate__fadeIn animate__delay-1s">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500 animate__animated animate__pulse">
               Help Center
             </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-lg animate__animated animate__fadeInUp">
               Find answers to your questions and learn how to use CryptoLance
             </p>
           </div>
@@ -124,13 +124,13 @@ const HelpDocs = () => {
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto mb-12">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 w-6 h-6 animate__animated animate__bounceIn" />
               <input
                 type="text"
                 placeholder="Search for help articles..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-14 pr-4 py-4 bg-gray-800/70 border border-purple-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent shadow-lg transition-all duration-300 hover:shadow-2xl animate__animated animate__zoomIn"
               />
             </div>
           </div>
@@ -138,17 +138,17 @@ const HelpDocs = () => {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Categories Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-xl p-6 sticky top-24">
+              <div className="bg-gray-800/60 backdrop-blur-md border border-purple-700 rounded-xl p-6 sticky top-24 shadow-2xl animate__animated animate__slideInLeft">
                 <h3 className="text-lg font-bold text-white mb-4">Categories</h3>
                 <div className="space-y-2">
                   {categories.map((category) => (
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
+                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
                         selectedCategory === category.id
-                          ? "bg-purple-600/20 text-purple-400 border border-purple-500/30"
-                          : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                          ? "bg-purple-600/30 text-purple-300 border border-purple-500 shadow-inner animate__animated animate__pulse"
+                          : "text-gray-400 hover:text-white hover:bg-gray-700/50 hover:shadow-md"
                       }`}
                     >
                       {category.icon}
@@ -163,20 +163,20 @@ const HelpDocs = () => {
             <div className="lg:col-span-3 space-y-8">
               {/* Help Articles */}
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Help Articles</h2>
+                <h2 className="text-3xl font-bold text-white mb-6 glow animate__animated animate__fadeInDown">Help Articles</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredArticles.map((article) => (
                     <div
                       key={article.id}
-                      className="bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-xl p-6 hover:border-purple-500/50 transition-all cursor-pointer group"
+                      className="bg-gray-800/60 backdrop-blur-md border border-purple-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer group shadow-md hover:shadow-xl transform hover:-translate-y-2 animate__animated animate__zoomIn animate__delay-0.5s"
                     >
-                      <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-300 transition-colors">
+                      <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-300 transition-colors">
                         {article.title}
                       </h3>
                       <p className="text-gray-400 mb-4">{article.description}</p>
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-500">{article.readTime}</span>
-                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors" />
+                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors animate__animated animate__bounce" />
                       </div>
                     </div>
                   ))}
@@ -185,11 +185,11 @@ const HelpDocs = () => {
 
               {/* FAQ Section */}
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Frequently Asked Questions</h2>
+                <h2 className="text-3xl font-bold text-white mb-6 glow animate__animated animate__fadeInDown">Frequently Asked Questions</h2>
                 <div className="space-y-4">
                   {faqs.map((faq, index) => (
-                    <div key={index} className="bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-xl p-6">
-                      <h3 className="text-lg font-semibold text-white mb-3">{faq.question}</h3>
+                    <div key={index} className="bg-gray-800/60 backdrop-blur-md border border-purple-700 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 animate__animated animate__fadeInUp animate__delay-0.5s">
+                      <h3 className="text-xl font-semibold text-white mb-3">{faq.question}</h3>
                       <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                     </div>
                   ))}
@@ -197,16 +197,16 @@ const HelpDocs = () => {
               </div>
 
               {/* Contact Support */}
-              <div className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 text-center">
-                <h3 className="text-2xl font-bold text-white mb-4">Still Need Help?</h3>
+              <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 backdrop-blur-sm border border-purple-700 rounded-xl p-8 text-center shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 animate__animated animate__zoomIn">
+                <h3 className="text-3xl font-bold text-white mb-4 glow">Still Need Help?</h3>
                 <p className="text-gray-400 mb-6">
                   Can't find what you're looking for? Our community and support team are here to help.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-semibold transition-all">
+                  <button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 animate__animated animate__pulse">
                     Contact Support
                   </button>
-                  <button className="border border-gray-600 hover:border-purple-500 text-gray-200 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all">
+                  <button className="border border-purple-700 hover:border-cyan-500 text-gray-200 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 animate__animated animate__pulse">
                     Join Community
                   </button>
                 </div>
@@ -215,8 +215,9 @@ const HelpDocs = () => {
           </div>
         </div>
       </div>
-
+      <Footer />
     </div>
   )
 }
-export default HelpDocs;
+
+export default HelpDocs
