@@ -7,7 +7,7 @@ const proposalSchema = new mongoose.Schema(
     image: { type: String },
     budget: { type: Number, required: true },
     project_duration: { type: String, required: true },
-    user_wallet_address: { type: String, required: true },
+    userWalletAddress: { type: String, required: true },
     tags: { type: [String], default: [] },
     skills_requirement: { type: [String], required: true },
     bids: {
@@ -20,9 +20,9 @@ const proposalSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
-    isEditable:{
-      type:Boolean,
-    }
+    isEditable: {
+      type: Boolean,
+    },
   },
   { timestamps: true }
 );

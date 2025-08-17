@@ -1,14 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useAccount, useBalance } from "wagmi";
 import { useCreateProposal } from "../../interactions/ProposalManager_interactions";
 import { baseSepolia } from "wagmi/chains";
 import toast from "react-hot-toast";
 
-function CreateProposal() {
+function CreateProposalButton({ deadline, budget }) {
   const { address, isConnected, chain } = useAccount();
-  const [deadline, setDeadline] = useState("");
-  const [budget, setBudget] = useState("");
-  const [proposalMetaData, setProposalMetaData] = useState({}); // Reserved for future metadata
   const {
     createProposal,
     isPending,
@@ -32,7 +29,7 @@ function CreateProposal() {
   // Ref to track toast IDs for each state
   const toastIdRef = useRef(null);
 
-  // Handle form submission
+  // Handle button click
   const handleCreateProposal = async () => {
     if (!isConnected) {
       toast.error("Please connect your wallet.");
@@ -47,11 +44,11 @@ function CreateProposal() {
       return;
     }
     if (!deadline || deadlineTimestamp <= Math.floor(Date.now() / 1000)) {
-      toast.error("Please enter a valid deadline in the future (Unix timestamp).");
+      toast.error("Please provide a valid deadline in the future (Unix timestamp).");
       return;
     }
     if (!budget || budgetValue <= 0) {
-      toast.error("Please enter a valid budget greater than 0 (in Wei).");
+      toast.error("Please provide a valid budget greater than 0 (in Wei).");
       return;
     }
 
@@ -99,59 +96,43 @@ function CreateProposal() {
   }, [isPending, isConfirming, isConfirmed, error, hash, proposalEvent]);
 
   return (
-    <div className="p-5 max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg">
-      <h3 className="text-xl font-semibold mb-4 text-gray-100">Create Proposal</h3>
-      <div className="mb-4">
-        <label className="block text-gray-200 mb-2">Deadline (Unix Timestamp)</label>
-        <input
-          type="number"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          className="w-full p-2 rounded-md bg-gray-700 text-gray-200 border border-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-          placeholder="Enter deadline (Unix timestamp)"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-200 mb-2">Budget (in Wei)</label>
-        <input
-          type="number"
-          value={budget}
-          onChange={(e) => setBudget(e.target.value)}
-          className="w-full p-2 rounded-md bg-gray-700 text-gray-200 border border-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-          placeholder="Enter budget (in Wei)"
-        />
-      </div>
-      <button
-        onClick={handleCreateProposal}
-        disabled={
-          isPending ||
-          isConfirming ||
-          !hasEnoughGas ||
-          !isConnected ||
-          !isCorrectNetwork 
-          // !deadline ||
-          // deadlineTimestamp <= Math.floor(Date.now() / 1000) ||
-          // !budget ||
-          // budgetValue <= 0
-        }
-        className={`w-full py-2 px-4 rounded-md text-white font-medium transition-all duration-300 ${
-          isPending ||
-          isConfirming ||
-          !hasEnoughGas ||
-          !isConnected ||
-          !isCorrectNetwork ||
-          !deadline ||
-          deadlineTimestamp <= Math.floor(Date.now() / 1000) ||
-          !budget ||
-          budgetValue <= 0
-            ? "bg-gray-600 cursor-not-allowed"
-            : "bg-cyan-600 hover:bg-cyan-700"
-        }`}
-      >
+    <button
+      onClick={handleCreateProposal}
+      // disabled={
+      //   isPending ||
+      //   isConfirming ||
+      //   !hasEnoughGas ||
+      //   !isConnected ||
+      //   !isCorrectNetwork ||
+      //   !deadline ||
+      //   deadlineTimestamp <= Math.floor(Date.now() / 1000) ||
+      //   !budget ||
+      //   budgetValue <= 0
+      // }
+      className={`
+        relative w-full py-3 px-6 rounded-lg font-semibold text-lg transition-all duration-300
+        bg-gradient-to-r from-cyan-600 to-blue-600
+        text-white
+        border border-cyan-500/30
+        shadow-lg shadow-cyan-500/20
+        hover:from-cyan-500 hover:to-blue-500
+        hover:shadow-xl hover:shadow-cyan-500/30
+        active:from-cyan-700 active:to-blue-700
+        disabled:bg-gray-700
+        disabled:text-gray-400
+        disabled:border-gray-600
+        disabled:shadow-none
+        disabled:cursor-not-allowed
+        overflow-hidden
+        group
+      `}
+    >
+      <span className="relative z-10">
         {isPending || isConfirming ? "Processing..." : "Create Proposal"}
-      </button>
-    </div>
+      </span>
+      <span className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+    </button>
   );
 }
 
-export default CreateProposal;
+export default CreateProposalButton;
