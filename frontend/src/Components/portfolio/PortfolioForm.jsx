@@ -109,13 +109,13 @@ function PortfolioForm() {
     try {
       // Store portfolio data in sessionStorage for OTP verification
       sessionStorage.setItem("portfolioData", JSON.stringify(formData))
-
+      const token = localStorage.getItem("authToken")
       // Send portfolio data to create portfolio
       const createPortfolioResponse = await fetch("http://localhost:3001/api/portfolio", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("authToken")}`, 
+          "Authorization": `Bearer ${token}`, 
         },
         body: JSON.stringify(formData),
       })
