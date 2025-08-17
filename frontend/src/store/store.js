@@ -1,6 +1,7 @@
 import {configureStore} from "@reduxjs/toolkit";
 import authReducer from './authSlice/authSlice';
 import portfolioReducer from './portfolioSlice/portfolioSlice';
+import gigReducer from './gigSlice/gigSlice';
 import { saveState, loadState } from "./localStorageUtils";
 
 // Load persisted state from localStorage
@@ -10,6 +11,7 @@ const store= configureStore({
     reducer:{
         auth : authReducer,
         portfolio : portfolioReducer,
+        gig : gigReducer,
        
     },
     preloadedState,

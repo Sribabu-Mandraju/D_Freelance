@@ -9,58 +9,92 @@ import SkillsNfaqs from "../../Components/gig/CreateGig/SkillsNfaqs";
 import ReviewSubmit from "../../Components/gig/CreateGig/ReviewSubmit";
 import { Info, BookOpen, CheckCircle } from "lucide-react";
 
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setFormData,
+  setPackageData,
+  nextStep,
+  prevStep,
+  submitGig,
+} from "../../store/gigSlice/gigSlice";
+
 export default function CreateGig() {
-  const [formData, setFormData] = useState({
-    username: "",
-    title: "",
-    description: "",
-    gigimage: "",
-    images: [{ url: "" }],
-    category: "",
-    price: "",
-    deliveryTime: "",
-    faqs: [],
-    about: "",
-    tags: [],
-    skills: [],
-    badges: [],
-    projects: undefined,
-    status: "Available",
-    location: "",
-    responseTime: "",
-    successRate: undefined,
-    avatar: "",
-  });
+  const dispatch = useDispatch();
+  const { formData, packageData, currentStep, loading } = useSelector(
+    (state) => state.gig
+  );
+  // const [formData, setFormData] = useState({
+  //   username: "",
+  //   title: "",
+  //   description: "",
+  //   gigimage: "",
+  //   images: [{ url: "" }],
+  //   category: "",
+  //   price: "",
+  //   deliveryTime: "",
+  //   faqs: [],
+  //   about: "",
+  //   tags: [],
+  //   skills: [],
+  //   badges: [],
+  //   projects: undefined,
+  //   status: "Available",
+  //   location: "",
+  //   responseTime: "",
+  //   successRate: undefined,
+  //   avatar: "",
+  // });
 
-  const [packageData, setPackageData] = useState({
-    basic: createInitialPackage(),
-    standard: createInitialPackage(),
-    pro: createInitialPackage(),
-  });
+  // const [packageData, setPackageData] = useState({
+  //   basic: createInitialPackage(),
+  //   standard: createInitialPackage(),
+  //   pro: createInitialPackage(),
+  // });
 
-  const [currentStep, setCurrentStep] = useState(1);
+  // const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
 
-  function createInitialPackage() {
-    return {
-      hourlyPay: "",
-      duration: "",
-      custom_ui: "no",
-      code_reviews: "",
-    };
-  }
+  // function createInitialPackage() {
+  //   return {
+  //     hourlyPay: "",
+  //     duration: "",
+  //     custom_ui: "no",
+  //     code_reviews: "",
+  //   };
+  // }
 
   const validateStep1 = () => {
-    const { username, title, category, description, deliveryTime, gigimage,price } = formData;
-    if (!username || !title || !category || !description || !deliveryTime || !gigimage || !price) {
+    const {
+      username,
+      title,
+      category,
+      description,
+      deliveryTime,
+      gigimage,
+      price,
+    } = formData;
+    if (
+      !username ||
+      !title ||
+      !category ||
+      !description ||
+      !deliveryTime ||
+      !gigimage ||
+      !price
+    ) {
       alert("Please fill in all top-level required fields.");
       return false;
     }
     const packages = ["basic", "standard", "pro"];
     for (const pkgName of packages) {
       const pkg = packageData[pkgName];
-      if (!pkg.hourlyPay || !pkg.duration || !pkg.custom_ui || !pkg.code_reviews) {
-        alert(`Please fill in all fields for the ${pkgName} package.`);
+      if (
+        !pkg.hourlyPay ||
+        !pkg.duration ||
+        !pkg.custom_ui ||
+        !pkg.code_reviews
+      ) {
+        alert("Please fill in all fields for the ${pkgName} package.");
         return false;
       }
     }
@@ -69,42 +103,19 @@ export default function CreateGig() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateStep1()) {
-      return;
-    }
+    if (!validateStep1()) return;
+
     const termsCheckbox = e.target.elements["terms-checkbox"];
     if (!termsCheckbox || !termsCheckbox.checked) {
       alert("You must agree to the terms and conditions to submit your gig.");
       return;
     }
-    const payload = {
-      ...formData,
-      deliveryTime: Number(formData.deliveryTime),
-      images: formData.images.filter((img) => img.url),
-      basic: { ...packageData.basic, hourlyPay: Number(packageData.basic.hourlyPay) },
-      standard: { ...packageData.standard, hourlyPay: Number(packageData.standard.hourlyPay) },
-      pro: { ...packageData.pro, hourlyPay: Number(packageData.pro.hourlyPay) },
-    };
-    Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
-    try {
-      const userToken = localStorage.getItem("authToken");
-      if (!userToken) {
-        alert("You are not logged in. Please log in to create a gig.");
-        return;
-      }
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`, 
-        },
-      };
-      const { data } = await axios.post("http://localhost:3001/api/gigs", payload, config);
-      console.log("Gig created successfully:", data);
-      navigate(`/gig/${data._id}`);
-    } catch (error) {
-      const errorMessage = error.response ? error.response.data.message : error.message;
-      console.error("Error creating gig:", errorMessage);
-      alert(`Error creating gig: ${errorMessage}`);
+
+    const result = await dispatch(submitGig({ formData, packageData }));
+    if (result.meta.requestStatus === "fulfilled") {
+      navigate(`/gig/${result.payload._id}`);
+    } else {
+      alert(`Error: ${result.payload}`);
     }
   };
 
@@ -117,25 +128,20 @@ export default function CreateGig() {
         return (
           <BasicInfo
             formData={formData}
-            setFormData={setFormData}
+            setFormData={(data) => dispatch(setFormData(data))}
             packageData={packageData}
-            setPackageData={setPackageData}
+            setPackageData={(data) => dispatch(setPackageData(data))}
           />
         );
       case 2:
         return (
           <SkillsNfaqs
             formData={formData}
-            setFormData={setFormData}
+            setFormData={(data) => dispatch(setFormData(data))}
           />
         );
       case 3:
-        return (
-          <ReviewSubmit
-            formData={formData}
-            packageData={packageData}
-          />
-        );
+        return <ReviewSubmit formData={formData} packageData={packageData} />;
       default:
         return null;
     }
@@ -144,11 +150,15 @@ export default function CreateGig() {
   return (
     <div className="min-h-screen bg-slate-900 font-sans">
       <Navbar />
-      <div className="pt-24 md:pt-32 pb-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+      <div className="pt-24 md:pt-32 pb-12  md:w-[80vw]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[90%]">
           <div className="text-center mb-8 md:mb-12">
-            <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-white">Create Your Gig</h1>
-            <p className="text-sm md:text-base text-gray-400">Showcase your skills and services to potential clients</p>
+            <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-white">
+              Create Your Gig
+            </h1>
+            <p className="text-sm md:text-base text-gray-400">
+              Showcase your skills and services to potential clients
+            </p>
           </div>
 
           <div className="flex justify-center mb-8 md:mb-12">
@@ -189,7 +199,6 @@ export default function CreateGig() {
               })}
             </div>
           </div>
-          
 
           <form onSubmit={handleSubmit}>
             <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 sm:p-6 min-h-[500px]">
@@ -200,7 +209,7 @@ export default function CreateGig() {
               {currentStep > 1 && (
                 <button
                   type="button"
-                  onClick={() => setCurrentStep((s) => s - 1)}
+                  onClick={() => dispatch(prevStep())}
                   className="w-auto px-6 py-3 text-gray-300 hover:text-white transition-colors text-sm font-medium bg-red-600 rounded-lg mb-2 sm:mb-0"
                 >
                   Back
@@ -212,7 +221,7 @@ export default function CreateGig() {
                     type="button"
                     onClick={() => {
                       if (currentStep === 1 && !validateStep1()) return;
-                      setCurrentStep((s) => s + 1);
+                      dispatch(nextStep());
                     }}
                     className="w-full px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg font-semibold transition-all text-sm"
                   >
@@ -221,9 +230,10 @@ export default function CreateGig() {
                 ) : (
                   <button
                     type="submit"
+                    disabled={loading}
                     className="w-full px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-500   rounded-lg font-semibold transition-all text-sm"
                   >
-                    Create Gig
+                    {loading ? "Creating..." : "Create Gig"}
                   </button>
                 )}
               </div>

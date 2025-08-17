@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import BasicInfo from "../Components/gig/CreateGig/BasicInfo";
 import SkillsNfaqs from "../Components/gig/CreateGig/SkillsNfaqs";
 import ReviewSubmit from "../Components/gig/CreateGig/ReviewSubmit";
 import { Info, BookOpen, CheckCircle } from "lucide-react";
+import { fetchGig, setFormData, setPackageData, updateGig, nextStep, prevStep, setCurrentGigId } from "../store/gigSlice/gigSlice"; // Adjust path
 
 function createInitialPackage() {
   return {
@@ -22,139 +23,19 @@ function createInitialPackage() {
 export default function EditGig() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [formData, setFormData] = useState({
-    username: "",
-    title: "",
-    description: "",
-    gigimage: "",
-    images: [{ url: "" }],
-    category: "",
-    price: "",
-    deliveryTime: "",
-    faqs: [],
-    about: "",
-    tags: [],
-    skills: [],
-    badges: [],
-    projects: undefined,
-    status: "Available",
-    location: "",
-    responseTime: "",
-    successRate: undefined,
-    avatar: "",
-  });
+  const { formData, packageData, currentStep, loading, error, submissionStatus, currentGigId } = useSelector((state) => state.gig);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
-  const [packageData, setPackageData] = useState({
-    basic: createInitialPackage(),
-    standard: createInitialPackage(),
-    pro: createInitialPackage(),
-  });
-
-  const [currentStep, setCurrentStep] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Fetch gig and prefill form + packages
   useEffect(() => {
-    const fetchGig = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get(`http://localhost:3001/api/gigs/${id}`);
+    dispatch(setCurrentGigId(id));
+    dispatch(fetchGig(id));
+  }, [id, dispatch]);
 
-        // Populate top-level fields safely
-        setFormData((prev) => ({
-          ...prev,
-          username: data.username ?? prev.username,
-          title: data.title ?? prev.title,
-          description: data.description ?? prev.description,
-          gigimage:
-            data.gigimage ??
-            (Array.isArray(data.images) && data.images[0]?.url) ??
-            prev.gigimage,
-          images:
-            Array.isArray(data.images) && data.images.length > 0
-              ? data.images
-              : prev.images,
-          category: data.category ?? prev.category,
-          price: data.price ?? prev.price,
-          deliveryTime: data.deliveryTime ?? prev.deliveryTime,
-          faqs: Array.isArray(data.faqs) ? data.faqs : prev.faqs,
-          about: data.about ?? prev.about,
-          tags: Array.isArray(data.tags) ? data.tags : prev.tags,
-          skills: Array.isArray(data.skills) ? data.skills : prev.skills,
-          badges: Array.isArray(data.badges) ? data.badges : prev.badges,
-          projects: data.projects ?? prev.projects,
-          status: data.status ?? prev.status,
-          location: data.location ?? prev.location,
-          responseTime: data.responseTime ?? prev.responseTime,
-          successRate: data.successRate ?? prev.successRate,
-          avatar: data.avatar ?? prev.avatar,
-        }));
-
-        // Populate packages (basic/standard/pro) with safe defaults
-        setPackageData({
-          basic: {
-            hourlyPay:
-              data.basic?.hourlyPay !== undefined
-                ? String(data.basic.hourlyPay)
-                : "",
-            duration: data.basic?.duration ?? "",
-            custom_ui: data.basic?.custom_ui ?? "no",
-            code_reviews: data.basic?.code_reviews ?? "",
-          },
-          standard: {
-            hourlyPay:
-              data.standard?.hourlyPay !== undefined
-                ? String(data.standard.hourlyPay)
-                : "",
-            duration: data.standard?.duration ?? "",
-            custom_ui: data.standard?.custom_ui ?? "no",
-            code_reviews: data.standard?.code_reviews ?? "",
-          },
-          pro: {
-            hourlyPay:
-              data.pro?.hourlyPay !== undefined ? String(data.pro.hourlyPay) : "",
-            duration: data.pro?.duration ?? "",
-            custom_ui: data.pro?.custom_ui ?? "no",
-            code_reviews: data.pro?.code_reviews ?? "",
-          },
-        });
-
-        setLoading(false);
-      } catch (err) {
-        console.error(
-          "Error fetching gig for edit:",
-          err.response ? err.response.data : err.message
-        );
-        setError(err);
-        setLoading(false);
-      }
-    };
-
-    fetchGig();
-  }, [id]);
-
-  // validation same as CreateGig
   const validateStep1 = () => {
-    const {
-      username,
-      title,
-      category,
-      description,
-      deliveryTime,
-      gigimage,
-      price,
-    } = formData;
-    if (
-      !username ||
-      !title ||
-      !category ||
-      !description ||
-      !deliveryTime ||
-      !gigimage ||
-      !price
-    ) {
+    const { username, title, category, description, deliveryTime, gigimage, price } = formData;
+    if (!username || !title || !category || !description || !deliveryTime || !gigimage || !price) {
       alert("Please fill in all top-level required fields.");
       return false;
     }
@@ -169,58 +50,20 @@ export default function EditGig() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateStep1()) return;
 
-    const termsCheckbox = e.target.elements["terms-checkbox"];
-    if (!termsCheckbox || !termsCheckbox.checked) {
+    if (!termsAccepted) {
       alert("You must agree to the terms and conditions to submit your gig.");
       return;
     }
 
-    const payload = {
-      ...formData,
-      deliveryTime: Number(formData.deliveryTime),
-      images: Array.isArray(formData.images)
-        ? formData.images.filter((img) => img?.url)
-        : [],
-      basic: { ...packageData.basic, hourlyPay: Number(packageData.basic.hourlyPay) },
-      standard: {
-        ...packageData.standard,
-        hourlyPay: Number(packageData.standard.hourlyPay),
-      },
-      pro: { ...packageData.pro, hourlyPay: Number(packageData.pro.hourlyPay) },
-    };
-
-    // remove undefined fields
-    Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
-
-    try {
-      const userToken = localStorage.getItem("authToken");
-      if (!userToken) {
-        alert("You are not logged in. Please log in to update the gig.");
-        return;
+    dispatch(updateGig({ id, formData, packageData })).then(() => {
+      if (submissionStatus === "succeeded") {
+        navigate(`/gig/${currentGigId || id}`);
       }
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
-        },
-      };
-
-      const { data } = await axios.put(
-        `http://localhost:3001/api/gigs/${id}`,
-        payload,
-        config
-      );
-      console.log("Gig updated successfully:", data);
-      navigate(`/gig/${data._id}`);
-    } catch (err) {
-      const errorMessage = err.response ? err.response.data.message : err.message;
-      console.error("Error updating gig:", errorMessage);
-      alert(`Error updating gig: ${errorMessage}`);
-    }
+    });
   };
 
   const stepTitles = ["Basic Info", "Details & FAQs", "Review & Submit"];
@@ -237,7 +80,7 @@ export default function EditGig() {
   if (error) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center text-red-500 text-xl">
-        Error loading gig: {error.message || "Unknown error"}
+        Error loading gig: {error || "Unknown error"}
       </div>
     );
   }
@@ -248,13 +91,15 @@ export default function EditGig() {
         return (
           <BasicInfo
             formData={formData}
-            setFormData={setFormData}
+            setFormData={(data) => dispatch(setFormData(data))}
             packageData={packageData}
-            setPackageData={setPackageData}
+            setPackageData={(pkgName, field, value) =>
+              dispatch(setPackageData({ pkgName, field, value }))
+            }
           />
         );
       case 2:
-        return <SkillsNfaqs formData={formData} setFormData={setFormData} />;
+        return <SkillsNfaqs formData={formData} setFormData={(data) => dispatch(setFormData(data))} />;
       case 3:
         return <ReviewSubmit formData={formData} packageData={packageData} />;
       default:
@@ -322,7 +167,7 @@ export default function EditGig() {
               {currentStep > 1 && (
                 <button
                   type="button"
-                  onClick={() => setCurrentStep((s) => s - 1)}
+                  onClick={() => dispatch(prevStep())}
                   className="w-full sm:w-auto px-6 py-3 text-gray-300 hover:text-white transition-colors text-sm font-medium bg-red-600 rounded-lg mb-2 sm:mb-0"
                 >
                   Back
@@ -334,7 +179,7 @@ export default function EditGig() {
                     type="button"
                     onClick={() => {
                       if (currentStep === 1 && !validateStep1()) return;
-                      setCurrentStep((s) => s + 1);
+                      dispatch(nextStep());
                     }}
                     className="w-full px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-lg font-semibold transition-all text-sm"
                   >
@@ -351,6 +196,21 @@ export default function EditGig() {
               </div>
             </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <label className="flex items-center justify-center cursor-pointer">
+              <input
+                type="checkbox"
+                name="terms-checkbox"
+                className="mr-3 accent-cyan-500 h-5 w-5 rounded-md border-2 border-slate-600 bg-slate-800 focus:ring-2 focus:ring-cyan-500/20"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+              />
+              <span className="text-md text-gray-300 select-none">
+                I agree to the terms and conditions
+              </span>
+            </label>
+          </div>
         </div>
       </div>
       <Footer />

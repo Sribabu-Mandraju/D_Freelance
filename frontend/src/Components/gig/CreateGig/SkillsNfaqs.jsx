@@ -1,78 +1,102 @@
-"use client"
+"use client";
 
-import { X, Plus } from "lucide-react"
-import { useState } from "react"
+import { X, Plus } from "lucide-react";
+import { useState } from "react";
 
 export default function SkillsNfaqs({ formData, setFormData }) {
-  const [newFaqQuestion, setNewFaqQuestion] = useState("")
-  const [newFaqAnswer, setNewFaqAnswer] = useState("")
-  const [newTag, setNewTag] = useState("")
-  const [newSkill, setNewSkill] = useState("")
-  const [newBadge, setNewBadge] = useState("")
+  const [newFaqQuestion, setNewFaqQuestion] = useState("");
+  const [newFaqAnswer, setNewFaqAnswer] = useState("");
+  const [newTag, setNewTag] = useState("");
+  const [newSkill, setNewSkill] = useState("");
+  const [newBadge, setNewBadge] = useState("");
 
   const addFaq = () => {
     if (newFaqQuestion.trim() && newFaqAnswer.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        faqs: [...prev.faqs, { question: newFaqQuestion.trim(), answer: newFaqAnswer.trim() }],
-      }))
-      setNewFaqQuestion("")
-      setNewFaqAnswer("")
+      const currentFaqs = formData.faqs || []; // Default to empty array if undefined
+      const updatedFormData = {
+        ...formData,
+        faqs: [...currentFaqs, { question: newFaqQuestion.trim(), answer: newFaqAnswer.trim() }],
+      };
+      console.log("Before addFaq, formData.faqs:", formData.faqs);
+      console.log("Adding FAQ, updatedFormData:", updatedFormData);
+      setFormData(updatedFormData);
+      console.log("After addFaq, expected formData.faqs:", updatedFormData.faqs);
+      setNewFaqQuestion("");
+      setNewFaqAnswer("");
     }
-  }
+  };
 
   const removeFaq = (indexToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      faqs: prev.faqs.filter((_, index) => index !== indexToRemove),
-    }))
-  }
+    const currentFaqs = formData.faqs || [];
+    const updatedFormData = {
+      ...formData,
+      faqs: currentFaqs.filter((_, index) => index !== indexToRemove),
+    };
+    console.log("Before removeFaq, formData.faqs:", formData.faqs);
+    console.log("Removing FAQ at index", indexToRemove, "updatedFormData:", updatedFormData);
+    setFormData(updatedFormData);
+    console.log("After removeFaq, expected formData.faqs:", updatedFormData.faqs);
+  };
 
   const addTag = () => {
     if (newTag.trim()) {
-      setFormData((prev) => ({ ...prev, tags: [...prev.tags, newTag.trim()] }))
-      setNewTag("")
+      const updatedFormData = {
+        ...formData,
+        tags: [...(formData.tags || []), newTag.trim()],
+      };
+      setFormData(updatedFormData);
+      setNewTag("");
     }
-  }
+  };
 
   const removeTag = (indexToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.filter((_, index) => index !== indexToRemove),
-    }))
-  }
+    const updatedFormData = {
+      ...formData,
+      tags: (formData.tags || []).filter((_, index) => index !== indexToRemove),
+    };
+    setFormData(updatedFormData);
+  };
 
   const addSkill = () => {
     if (newSkill.trim()) {
-      setFormData((prev) => ({ ...prev, skills: [...prev.skills, newSkill.trim()] }))
-      setNewSkill("")
+      const updatedFormData = {
+        ...formData,
+        skills: [...(formData.skills || []), newSkill.trim()],
+      };
+      setFormData(updatedFormData);
+      setNewSkill("");
     }
-  }
+  };
 
   const removeSkill = (indexToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      skills: prev.skills.filter((_, index) => index !== indexToRemove),
-    }))
-  }
+    const updatedFormData = {
+      ...formData,
+      skills: (formData.skills || []).filter((_, index) => index !== indexToRemove),
+    };
+    setFormData(updatedFormData);
+  };
 
   const addBadge = () => {
     if (newBadge.trim()) {
-      setFormData((prev) => ({ ...prev, badges: [...prev.badges, newBadge.trim()] }))
-      setNewBadge("")
+      const updatedFormData = {
+        ...formData,
+        badges: [...(formData.badges || []), newBadge.trim()],
+      };
+      setFormData(updatedFormData);
+      setNewBadge("");
     }
-  }
+  };
 
   const removeBadge = (indexToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      badges: prev.badges.filter((_, index) => index !== indexToRemove),
-    }))
-  }
+    const updatedFormData = {
+      ...formData,
+      badges: (formData.badges || []).filter((_, index) => index !== indexToRemove),
+    };
+    setFormData(updatedFormData);
+  };
 
   return (
     <div className="space-y-8 bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 p-4 sm:p-8">
-      
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text mb-6 text-center drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">
         Additional Details & FAQs
       </h2>
@@ -80,8 +104,11 @@ export default function SkillsNfaqs({ formData, setFormData }) {
       <div className="space-y-4">
         <label className="block text-cyan-400 font-medium">About Your Gig (Optional)</label>
         <textarea
-          value={formData.about}
-          onChange={(e) => setFormData({ ...formData, about: e.target.value })}
+          value={formData.about || ""}
+          onChange={(e) => {
+            const updatedFormData = { ...formData, about: e.target.value };
+            setFormData(updatedFormData);
+          }}
           placeholder="Provide more information about yourself or your service..."
           rows={4}
           className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 resize-none transition-colors"
@@ -98,12 +125,12 @@ export default function SkillsNfaqs({ formData, setFormData }) {
               onChange={(e) => setNewTag(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  e.preventDefault()
-                  addTag()
+                  e.preventDefault();
+                  addTag();
                 }
               }}
               placeholder="Enter tag and press Enter"
-              className="flex-1 px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+              className="flex-1 px-4 py-3 sm:w-auto w-[80%] bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
             />
             <button
               type="button"
@@ -141,12 +168,12 @@ export default function SkillsNfaqs({ formData, setFormData }) {
               onChange={(e) => setNewSkill(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  e.preventDefault()
-                  addSkill()
+                  e.preventDefault();
+                  addSkill();
                 }
               }}
               placeholder="Enter skill and press Enter"
-              className="flex-1 px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+              className="flex-1 px-4 py-3 sm:w-auto w-[80%] bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
             />
             <button
               type="button"
@@ -182,8 +209,14 @@ export default function SkillsNfaqs({ formData, setFormData }) {
               type="text"
               value={newBadge}
               onChange={(e) => setNewBadge(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addBadge();
+                }
+              }}
               placeholder="Enter badge and press Enter"
-              className="flex-1 px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
+              className="flex-1 px-4 py-3 sm:w-auto w-[80%] bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
             />
             <button
               type="button"
@@ -218,8 +251,11 @@ export default function SkillsNfaqs({ formData, setFormData }) {
           <label className="block text-cyan-400 font-medium">Avatar URL</label>
           <input
             type="url"
-            value={formData.avatar}
-            onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+            value={formData.avatar || ""}
+            onChange={(e) => {
+              const updatedFormData = { ...formData, avatar: e.target.value };
+              setFormData(updatedFormData);
+            }}
             placeholder="https://..."
             className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
           />
@@ -229,8 +265,11 @@ export default function SkillsNfaqs({ formData, setFormData }) {
           <label className="block text-cyan-400 font-medium">Location</label>
           <input
             type="text"
-            value={formData.location}
-            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+            value={formData.location || ""}
+            onChange={(e) => {
+              const updatedFormData = { ...formData, location: e.target.value };
+              setFormData(updatedFormData);
+            }}
             placeholder="e.g., Mumbai, India"
             className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
           />
@@ -242,9 +281,13 @@ export default function SkillsNfaqs({ formData, setFormData }) {
             type="number"
             min="0"
             value={formData.projects || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, projects: e.target.value ? Number.parseInt(e.target.value, 10) : undefined })
-            }
+            onChange={(e) => {
+              const updatedFormData = {
+                ...formData,
+                projects: e.target.value ? Number.parseInt(e.target.value, 10) : undefined,
+              };
+              setFormData(updatedFormData);
+            }}
             placeholder="e.g., 32"
             className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
           />
@@ -254,8 +297,11 @@ export default function SkillsNfaqs({ formData, setFormData }) {
           <label className="block text-cyan-400 font-medium">Response Time (e.g., 1h, 24h)</label>
           <input
             type="text"
-            value={formData.responseTime}
-            onChange={(e) => setFormData({ ...formData, responseTime: e.target.value })}
+            value={formData.responseTime || ""}
+            onChange={(e) => {
+              const updatedFormData = { ...formData, responseTime: e.target.value };
+              setFormData(updatedFormData);
+            }}
             placeholder="e.g., 1h"
             className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
           />
@@ -268,9 +314,13 @@ export default function SkillsNfaqs({ formData, setFormData }) {
             min="0"
             max="100"
             value={formData.successRate || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, successRate: e.target.value ? Number(e.target.value) : undefined })
-            }
+            onChange={(e) => {
+              const updatedFormData = {
+                ...formData,
+                successRate: e.target.value ? Number(e.target.value) : undefined,
+              };
+              setFormData(updatedFormData);
+            }}
             placeholder="e.g., 95"
             className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400 transition-colors"
           />
@@ -279,8 +329,11 @@ export default function SkillsNfaqs({ formData, setFormData }) {
         <div className="space-y-2">
           <label className="block text-cyan-400 font-medium">Status</label>
           <select
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            value={formData.status || "Available"}
+            onChange={(e) => {
+              const updatedFormData = { ...formData, status: e.target.value };
+              setFormData(updatedFormData);
+            }}
             className="w-full px-4 py-3 bg-slate-800/90 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors"
           >
             <option value="Available" className="bg-slate-800">
@@ -293,7 +346,7 @@ export default function SkillsNfaqs({ formData, setFormData }) {
         </div>
       </div>
 
-      <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-6 space-y-6">
+      <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 space-y-4">
         <h4 className="text-xl font-bold text-cyan-400">Frequently Asked Questions (FAQs)</h4>
 
         <div className="space-y-4">
@@ -317,7 +370,7 @@ export default function SkillsNfaqs({ formData, setFormData }) {
           ))}
         </div>
 
-        <div className="bg-slate-700/30 border border-slate-600 rounded-lg p-4 space-y-4">
+        <div className="flex flex-col gap-2">
           <h5 className="text-white font-medium">Add New FAQ</h5>
           <input
             type="text"
@@ -344,5 +397,5 @@ export default function SkillsNfaqs({ formData, setFormData }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
