@@ -26,37 +26,43 @@ function Portfolio() {
   const mainRef = useRef(null)
   const asideRef = useRef(null)
 
-  const { portfolioId } = useParams()
-
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      if (!portfolioId) {
-        setError("Portfolio ID is missing")
-        setLoading(false)
-        toast.error("Portfolio ID is missing")
-        return
+ useEffect(() => {
+  const fetchPortfolio = async () => {
+    const toastId = toast.loading("Loading portfolio...")
+    try {
+      // get token from localStorage (or Context/Redux if you store it there)
+      const token = localStorage.getItem("authToken")
+      if (!token) {
+        throw new Error("No auth token found. Please log in.")
       }
 
-      const toastId = toast.loading("Loading portfolio...")
-      try {
-        const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`)
-        const result = await response.json()
-        if (!response.ok || !result.success) {
-          throw new Error(result.message || "Failed to fetch portfolio")
-        }
-        setPortfolioData(result.data)
-        setLoading(false)
-        toast.success("Portfolio loaded successfully!", { id: toastId })
-      } catch (err) {
-        console.error("Error fetching portfolio:", err)
-        setError(err.message)
-        toast.error(`Error: ${err.message}`, { id: toastId })
-        setLoading(false)
+      const response = await fetch("http://localhost:3001/api/portfolio/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // ✅ important
+        },
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to fetch portfolio")
       }
+
+      setPortfolioData(result.data)
+      setLoading(false)
+      toast.success("Portfolio loaded successfully!", { id: toastId })
+    } catch (err) {
+      console.error("Error fetching portfolio:", err)
+      setError(err.message)
+      toast.error(`Error: ${err.message}`, { id: toastId })
+      setLoading(false)
     }
+  }
 
-    fetchPortfolio()
-  }, [portfolioId])
+  fetchPortfolio()
+}, []) // ✅ empty dependency array since no portfolioId needed
 
   useEffect(() => {
     const adjustHeights = () => {
@@ -135,9 +141,9 @@ function Portfolio() {
             <HeroSection
               personalInfo={personalInfo}
               setPersonalInfo={setPortfolioData}
-              portfolioId={portfolioId}
+              portfolioId={portfolioData?._id}
             />
-            <TabNavigation tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+            <TabNavigation tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab}  />
             <div className="space-y-8">
               {activeTab === "overview" && (
                 <div className="space-y-6">
@@ -159,8 +165,8 @@ function Portfolio() {
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
             <QuickContact personalInfo={personalInfo} />
-            <CurrentStatus currentStatus={currentStatus} setCurrentStatus={setPortfolioData} portfolioId={portfolioId} />
-            <TechHighlights techHighlights={techHighlights} setTechHighlights={setPortfolioData} portfolioId={portfolioId}/>
+            <CurrentStatus currentStatus={currentStatus} setCurrentStatus={setPortfolioData}  portfolioId={portfolioData?._id} />
+            <TechHighlights techHighlights={techHighlights} setTechHighlights={setPortfolioData}  portfolioId={portfolioData?._id} />
           </aside>
         </div>
       </div>
