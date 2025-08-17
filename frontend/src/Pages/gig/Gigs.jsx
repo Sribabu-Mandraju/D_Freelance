@@ -36,6 +36,8 @@ console.log("Gigs fetched successfully:", gigs);
                 title={gig.title}
                 description={gig.description}
                 price={gig.price}
+                gigimage={gig.gigimage}
+                images={gig.images}
                 avatar={gig.avatar}
                 rating={gig.rating}
                 projects={gig.projects}
@@ -46,8 +48,11 @@ console.log("Gigs fetched successfully:", gigs);
                 category={gig.category}
                 deliveryTime={gig.deliveryTime}
                 faqs={gig.faqs}
-                about={gig.about} 
-      
+                about={gig.about}
+                createdAt={gig.createdAt} 
+                basic={gig.basic}
+                standard={gig.standard}
+                pro={gig.pro}
                  />
             ))}
           </div>

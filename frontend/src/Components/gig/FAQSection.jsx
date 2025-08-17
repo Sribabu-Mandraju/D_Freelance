@@ -3,26 +3,10 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp } from "lucide-react"
 
-const FAQSection = () => {
+const FAQSection = ({faqs}) => {
   const [expandedFaq, setExpandedFaq] = useState(null)
 
-  const faqs = [
-    {
-      question: "Contract Testing",
-      answer:
-        "I provide comprehensive smart contract testing including unit tests, integration tests, and security audits to ensure your ERC-20 token functions correctly and securely.",
-    },
-    {
-      question: "What blockchain networks do you support?",
-      answer:
-        "I support deployment on Ethereum mainnet, Binance Smart Chain, Polygon, and other EVM-compatible networks based on your requirements.",
-    },
-    {
-      question: "Do you provide ongoing support?",
-      answer:
-        "Yes, I provide post-deployment support and can help with any issues or modifications needed after the token is deployed.",
-    },
-  ]
+ 
 
   return (
     <div className="mb-8">

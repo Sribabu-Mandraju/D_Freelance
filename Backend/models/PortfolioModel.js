@@ -53,7 +53,7 @@ const portfolioSchema = new mongoose.Schema({
       type: String,
       required: true,
       trim: true,
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+      match: [/^\w+([.-]?\w+)@\w+([.-]?\w+)(\.\w{2,3})+$/, 'Please enter a valid email']
     },
     phoneNumber: {
       type: String,
@@ -113,8 +113,8 @@ const portfolioSchema = new mongoose.Schema({
     trim: true
   }],
   
-  acceptedBids: [{
-    type: mongoose.Schema.Types.Mixed, // Allows both String and Number
+  acceptedProposals: [{
+    type: String, // Allows both String and Number
     trim: true
   }],
   
@@ -124,7 +124,7 @@ const portfolioSchema = new mongoose.Schema({
   }],
   
   savedProposals: [{
-    type: mongoose.Schema.Types.ObjectId, // MongoDB ObjectId for saved proposals
+    type: String, // MongoDB ObjectId for saved proposals
     ref: 'Proposal' // Assuming there's a Proposal model
   }],
   
@@ -133,7 +133,7 @@ const portfolioSchema = new mongoose.Schema({
     ref: 'Gig' // Assuming there's a Gig model
   }],
   
-  ownGigs: [{
+  userGigs: [{
     type: mongoose.Schema.Types.ObjectId, // MongoDB ObjectId for user's own gigs
     ref: 'Gig' // Assuming there's a Gig model
   }],

@@ -88,7 +88,7 @@ function MarketSection() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 grid-cols-1  w-[95%] md:w-full items-center justify-center mx-auto  gap-8">
+      {/* <div className="grid md:grid-cols-3 grid-cols-1  w-[95%] md:w-full items-center justify-center mx-auto  gap-8">
         {projects.map((project, index) => (
           <motion.div
             key={index}
@@ -120,7 +120,7 @@ function MarketSection() {
             <MarketCard service={project} index={index} />
           </motion.div>
         ))}
-      </div>
+      </div> */}
 
       <div className="text-center mt-12">
         <h3 className="text-2xl font-semibold">

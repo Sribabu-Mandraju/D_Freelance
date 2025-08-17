@@ -1,18 +1,22 @@
 import Gig from '../models/GigModel.js';
+import Portfolio from "../models/PortfolioModel.js";
+
 
 const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 const hasPayload = (obj) =>
   obj && typeof obj === 'object' && Object.keys(obj).length > 0;
 
 export const createGig = async (req, res) => {
-  console.log('CreateGig - content-type:', req.headers['content-type']);
-  console.log('CreateGig - body:', req.body);
+  // console.log('CreateGig - content-type:', req.headers['content-type']);
+  // console.log('CreateGig - body:', req.body);
   try {
     const {
       username,
       title,
       description,
+      gigimage,
       images,
+      price,
       category,
       deliveryTime,
       faqs,
@@ -33,7 +37,7 @@ export const createGig = async (req, res) => {
     } = req.body;
 
     // Required top-level fields
-    if (!username || !title || !description || !category || !deliveryTime) {
+    if (!username || !title || !description || !category || !deliveryTime || !price || !gigimage) {
       return res.status(400).json({ message: 'Please enter all required fields' });
     }
 
@@ -52,6 +56,8 @@ export const createGig = async (req, res) => {
       username, // Added username to the payload as it's required by the schema
       title,
       description,
+      price,
+      gigimage,
       images: toArray(images),
       tags: toArray(tags),
       skills: toArray(skills),
@@ -87,11 +93,23 @@ export const createGig = async (req, res) => {
     if (avatar !== undefined) payload.avatar = String(avatar).trim();
 
     const newGig = new Gig(payload);
+    
     const savedGig = await newGig.save();
+    console.log('Gig created successfully:', savedGig.walletAddress);
+
+    const portfolio = await Portfolio.findOne({  "heroSection.walletAddress":walletAddress });
+    if (!portfolio) {
+      throw new Error("Portfolio not found");
+    }
+
+    if (!portfolio.userGigs.includes(savedGig._id)) {
+      portfolio.userGigs.push(savedGig._id);
+      await portfolio.save();
+    }
     return res.status(201).json(savedGig);
   } catch (error) {
     console.error('❌ Create gig error:', error);
-    return res.status(500).json({ message: 'Server error while creating gig' });
+    return res.status(500).json({ message:error.message });
   }
 };
 
@@ -102,6 +120,8 @@ export const updateGig = async (req, res) => {
       username,
       title,
       description,
+      price,
+      gigimage,
       images,
       category,
       deliveryTime,
@@ -132,8 +152,10 @@ export const updateGig = async (req, res) => {
     }
 
     if (title !== undefined) gig.title = title;
+    if (price !== undefined) gig.price = price;
     if (username !== undefined) gig.username = username;
     if (description !== undefined) gig.description = description;
+    if (gigimage !== undefined) gig.gigimage = gigimage;
     if (images !== undefined) gig.images = toArray(images);
     if (category !== undefined) gig.category = category;
     if (deliveryTime !== undefined) gig.deliveryTime = deliveryTime;

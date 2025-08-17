@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../../Components/Navbar";
 import Footer from "../../Components/Footer";
+import Navbar from "../../Components/Navbar";
 import BasicInfo from "../../Components/gig/CreateGig/BasicInfo";
 import SkillsNfaqs from "../../Components/gig/CreateGig/SkillsNfaqs";
 import ReviewSubmit from "../../Components/gig/CreateGig/ReviewSubmit";
@@ -14,8 +14,10 @@ export default function CreateGig() {
     username: "",
     title: "",
     description: "",
+    gigimage: "",
     images: [{ url: "" }],
     category: "",
+    price: "",
     deliveryTime: "",
     faqs: [],
     about: "",
@@ -49,8 +51,8 @@ export default function CreateGig() {
   }
 
   const validateStep1 = () => {
-    const { username, title, category, description, deliveryTime } = formData;
-    if (!username || !title || !category || !description || !deliveryTime) {
+    const { username, title, category, description, deliveryTime, gigimage,price } = formData;
+    if (!username || !title || !category || !description || !deliveryTime || !gigimage || !price) {
       alert("Please fill in all top-level required fields.");
       return false;
     }

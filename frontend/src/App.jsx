@@ -35,6 +35,7 @@ import CompleteProposal from "./Components/testingContracts/CompleteProposal";
 import CancelProposal from "./Components/testingContracts/CancelProposal";
 
 import AdminDashboard from "./Pages/admin/AdminDashboard"
+import About from "./Pages/About";
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
@@ -87,8 +88,8 @@ const App = () => {
 
 
             <Route path="/portfolioForm" element={<PortfolioForm/>}/>
-            <Route path="otpverification" element={<OtpVerification/>}/>
-
+            <Route path="/otpverification" element={<OtpVerification/>}/>
+            <Route path="/about" element={<About/>}/>
             
             
           </Routes>
