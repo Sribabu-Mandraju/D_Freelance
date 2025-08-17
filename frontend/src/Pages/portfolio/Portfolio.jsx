@@ -139,18 +139,6 @@ function Portfolio() {
             aria-label="About content"
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
-
-          {
-  portfolioData.userGigs && portfolioData.userGigs.length > 0 && (
-    <div className="mb-8">
-      {portfolioData.userGigs.map((gigId, index) => (
-        <div key={index}>{gigId}</div>
-      ))}
-    </div>
-  )
-}
-
-
             <HeroSection
               personalInfo={personalInfo}
               setPersonalInfo={setPortfolioData}
