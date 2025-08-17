@@ -52,6 +52,15 @@ export const fetchGig = createAsyncThunk("gig/fetchGig", async (id, { rejectWith
   }
 });
 
+export const fetchGigs = createAsyncThunk("gig/fetchGigs", async (_, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.get("http://localhost:3001/api/gigs");
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.response ? err.response.data : err.message);
+  }
+});
+
 // ✅ Async thunk for submitting gig
 export const submitGig = createAsyncThunk(
   "gig/submitGig",
@@ -225,6 +234,18 @@ const gigSlice = createSlice({
         };
       })
       .addCase(fetchGig.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchGigs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchGigs.fulfilled, (state, action) => {
+        state.loading = false;
+        state.gigs = action.payload; // Store the array of gigs
+      })
+      .addCase(fetchGigs.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

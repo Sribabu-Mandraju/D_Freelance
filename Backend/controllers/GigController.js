@@ -241,7 +241,7 @@ export const deleteGig = async (req, res) => {
     if (!gig) {
       return res.status(404).json({ message: 'Gig not found' });
     }
-    if(!req.user || req.user.address==gig.walletAddress){
+    if(!req.user || req.user.address !== gig.walletAddress){
       return res.status(400).json({ message: 'User wallet address is required' });
     }
     // You have to fix the issue in the backend controller. I fixed the issue.

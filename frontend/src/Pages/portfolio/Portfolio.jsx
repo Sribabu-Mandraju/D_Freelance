@@ -1,128 +1,109 @@
-"use client"
-import { useState, useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
-import { User, Code, Briefcase, GraduationCap, TrendingUp, Mail } from "lucide-react"
-import { toast } from "react-hot-toast"
-import HeroSection from "../../Components/portfolio/HeroSection"
-import FeaturedProjects from "../../Components/portfolio/FeaturesProjects"
-import TabNavigation from "../../Components/portfolio/TabNavigation"
-import QuickContact from "../../Components/portfolio/QuickContact"
-import CurrentStatus from "../../Components/portfolio/CurrentStatus"
-import TechHighlights from "../../Components/portfolio/TechHighlights"
-import TechStack from "../../Components/portfolio/TechStack"
-import Experience from "../../Components/portfolio/Experience"
-import Education from "../../Components/portfolio/Education"
-import SkillProgress from "../../Components/portfolio/SkillProgess"
-import ContactInfo from "../../Components/portfolio/ContactInfo"
-import Navbar from "../../Components/Navbar"
-import styles from "./Portfolio.module.css"
-
-// import {
-//   fetchPortfolio,
-//   setActiveTab,
-// } from "../../store/portfolioSlice/portfolioSlice"
+"use client";
+import { useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { User, Code, Briefcase, GraduationCap, TrendingUp, Mail } from "lucide-react";
+import { toast } from "react-hot-toast";
+import HeroSection from "../../Components/portfolio/HeroSection";
+import FeaturedProjects from "../../Components/portfolio/FeaturesProjects";
+import TabNavigation from "../../Components/portfolio/TabNavigation";
+import QuickContact from "../../Components/portfolio/QuickContact";
+import CurrentStatus from "../../Components/portfolio/CurrentStatus";
+import TechHighlights from "../../Components/portfolio/TechHighlights";
+import TechStack from "../../Components/portfolio/TechStack";
+import Experience from "../../Components/portfolio/Experience";
+import Education from "../../Components/portfolio/Education";
+import SkillProgress from "../../Components/portfolio/SkillProgess";
+import ContactInfo from "../../Components/portfolio/ContactInfo";
+import Navbar from "../../Components/Navbar";
+import styles from "./Portfolio.module.css";
+import YourGigs from "./YourGigs";
+import { fetchPortfolio, setActiveTab } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
 function Portfolio() {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [portfolioData, setPortfolioData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { portfolioData, loading, error, activeTab } = useSelector((state) => state.portfolio);
+  const mainRef = useRef(null);
+  const asideRef = useRef(null);
 
-  const mainRef = useRef(null)
-  const asideRef = useRef(null)
-
- useEffect(() => {
-  const fetchPortfolio = async () => {
-    const toastId = toast.loading("Loading portfolio...")
-    try {
-      // get token from localStorage (or Context/Redux if you store it there)
-      const token = localStorage.getItem("authToken")
-      if (!token) {
-        throw new Error("No auth token found. Please log in.")
+  useEffect(() => {
+    dispatch(fetchPortfolio()).then((action) => {
+      // Check if the fetch succeeded but no portfolio data is returned
+      if (
+        action.payload &&
+        (!portfolioData.heroSection || Object.keys(portfolioData).length === 0)
+      ) {
+        toast.error("No portfolio found. Redirecting to create one...");
+        navigate("/portfolioForm");
       }
-
-      const response = await fetch("http://localhost:3001/api/portfolio/me", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // ✅ important
-        },
-      })
-
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Failed to fetch portfolio")
-      }
-
-      setPortfolioData(result.data)
-      setLoading(false)
-      toast.success("Portfolio loaded successfully!", { id: toastId })
-    } catch (err) {
-      console.error("Error fetching portfolio:", err)
-      setError(err.message)
-      toast.error(`Error: ${err.message}`, { id: toastId })
-      setLoading(false)
-    }
-  }
-
-  fetchPortfolio()
-}, []) // ✅ empty dependency array since no portfolioId needed
+    });
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     const adjustHeights = () => {
       try {
         if (mainRef.current && asideRef.current) {
-          const mainHeight = mainRef.current.scrollHeight
-          const asideHeight = asideRef.current.scrollHeight
-          const maxHeight = Math.max(mainHeight, asideHeight)
+          const mainHeight = mainRef.current.scrollHeight;
+          const asideHeight = asideRef.current.scrollHeight;
+          const maxHeight = Math.max(mainHeight, asideHeight);
 
-          mainRef.current.style.height = `${maxHeight}px`
-          asideRef.current.style.height = `${maxHeight}px`
+          mainRef.current.style.height = `${maxHeight}px`;
+          asideRef.current.style.height = `${maxHeight}px`;
         }
       } catch (err) {
-        console.error("Error adjusting heights:", err)
-        toast.error("Failed to adjust layout heights")
+        console.error("Error adjusting heights:", err);
+        toast.error("Failed to adjust layout heights");
       }
-    }
+    };
 
-    adjustHeights()
-    window.addEventListener("resize", adjustHeights)
-    return () => window.removeEventListener("resize", adjustHeights)
-  }, [portfolioData, activeTab])
+    adjustHeights();
+    window.addEventListener("resize", adjustHeights);
+    return () => window.removeEventListener("resize", adjustHeights);
+  }, [portfolioData, activeTab]);
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: User },
-    { id: "skills", label: "Tech Stack", icon: Code },
-    { id: "experience", label: "Experience", icon: Briefcase },
-    { id: "education", label: "Education", icon: GraduationCap },
-    { id: "progress", label: "Skill Progress", icon: TrendingUp },
-    { id: "contact", label: "Contact", icon: Mail },
-  ]
+    { id: "Bidded Proposals", label: "Bidded Proposals", icon: User },
+    { id: "Gigs", label: "Your Gigs", icon: Code },
+    { id: "Accepted Proposals", label: "Accepted Proposals", icon: Briefcase },
+  ];
 
   if (loading) {
     return (
       <div className={`${styles.container} flex items-center justify-center`}>
         <p>Loading portfolio...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
+    // Handle specific "not found" error or general error
+    if (error.includes("not found") || error.includes("Portfolio not found")) {
+      toast.error("No portfolio found. Redirecting to create one...");
+      navigate("/portfolioForm");
+      return null; // Prevent further rendering after navigation
+    }
     return (
       <div className={`${styles.container} flex items-center justify-center`}>
         <p className="text-red-500">Error: {error}</p>
       </div>
-    )
+    );
   }
 
-  const personalInfo = portfolioData?.heroSection || {}
-  const featuredProjects = portfolioData?.projects || []
-  const currentStatus = portfolioData?.currentStatus || []
-  const techHighlights = portfolioData?.techHighlights || []
-  const techStack = portfolioData?.techStack || []
-  const workExperience = portfolioData?.workExperience || []
-  const education = portfolioData?.education || []
+  if (!portfolioData.heroSection || Object.keys(portfolioData).length === 0) {
+    // Fallback check after data is loaded
+    toast.error("No portfolio data available. Redirecting to create one...");
+    navigate("/portfolioForm");
+    return null;
+  }
+
+  const personalInfo = portfolioData?.heroSection || {};
+  const featuredProjects = portfolioData?.projects || [];
+  const currentStatus = portfolioData?.currentStatus || [];
+  const techHighlights = portfolioData?.techHighlights || [];
+  const techStack = portfolioData?.techStack || [];
+  const workExperience = portfolioData?.workExperience || [];
+  const education = portfolioData?.education || [];
 
   return (
     <>
@@ -145,21 +126,30 @@ function Portfolio() {
           >
             <HeroSection
               personalInfo={personalInfo}
-              setPersonalInfo={setPortfolioData}
+              setPersonalInfo={(data) =>
+                dispatch(setPortfolioData({ heroSection: data }))
+              }
               portfolioId={portfolioData?._id}
             />
-            <TabNavigation tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab}  />
+            <TabNavigation
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={(tab) => dispatch(setActiveTab(tab))}
+            />
             <div className="space-y-8">
               {activeTab === "overview" && (
                 <div className="space-y-6">
-                  <FeaturedProjects featuredProjects={featuredProjects} setFeaturedProjects={setPortfolioData} />
+                  <FeaturedProjects
+                    featuredProjects={featuredProjects}
+                    setFeaturedProjects={(data) =>
+                      dispatch(setPortfolioData({ projects: data }))
+                    }
+                  />
                 </div>
               )}
-              {activeTab === "skills" && <TechStack techStack={techStack} />}
-              {activeTab === "experience" && <Experience workExperience={workExperience} />}
-              {activeTab === "education" && <Education education={education} />}
-              {activeTab === "progress" && <SkillProgress />}
-              {activeTab === "contact" && <ContactInfo personalInfo={personalInfo} />}
+              {activeTab === "Bidded Proposals" && <TechStack techStack={techStack} />}
+              {activeTab === "Gigs" && <YourGigs yourgigs={portfolioData.userGigs || []} />}
+              {activeTab === "Accepted Proposals" && <Education education={education} />}
             </div>
           </main>
 
@@ -170,13 +160,25 @@ function Portfolio() {
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
             <QuickContact personalInfo={personalInfo} />
-            <CurrentStatus currentStatus={currentStatus} setCurrentStatus={setPortfolioData}  portfolioId={portfolioData?._id} />
-            <TechHighlights techHighlights={techHighlights} setTechHighlights={setPortfolioData}  portfolioId={portfolioData?._id} />
+            <CurrentStatus
+              currentStatus={currentStatus}
+              setCurrentStatus={(data) =>
+                dispatch(setPortfolioData({ currentStatus: data }))
+              }
+              portfolioId={portfolioData?._id}
+            />
+            <TechHighlights
+              techHighlights={techHighlights}
+              setTechHighlights={(data) =>
+                dispatch(setPortfolioData({ techHighlights: data }))
+              }
+              portfolioId={portfolioData?._id}
+            />
           </aside>
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export default Portfolio
+export default Portfolio;

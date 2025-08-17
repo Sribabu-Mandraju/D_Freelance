@@ -9,6 +9,7 @@ import BasicInfo from "../Components/gig/CreateGig/BasicInfo";
 import SkillsNfaqs from "../Components/gig/CreateGig/SkillsNfaqs";
 import ReviewSubmit from "../Components/gig/CreateGig/ReviewSubmit";
 import { Info, BookOpen, CheckCircle } from "lucide-react";
+import { useState } from "react";
 import { fetchGig, setFormData, setPackageData, updateGig, nextStep, prevStep, setCurrentGigId } from "../store/gigSlice/gigSlice"; // Adjust path
 
 function createInitialPackage() {
@@ -108,10 +109,10 @@ export default function EditGig() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-900 font-sans flex flex-col items-center w-screen">
       <Navbar />
-      <div className="pt-24 md:pt-32 pb-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+      <div className="pt-24 md:pt-32 pb-12 md:w-[80vw] ">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-[96%] md:max-w-[90%]">
           <div className="text-center mb-8 md:mb-12">
             <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-white">
               Edit Your Gig

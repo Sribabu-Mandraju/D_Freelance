@@ -7,18 +7,60 @@ import FAQSection from "../../Components/gig/FAQSection";
 import ProjectSteps from "../../Components/gig/ProjectSteps";
 import AboutSection from "../../Components/gig/AboutSection";
 import ServiceSidebar from "../../Components/gig/ServiceSidebar";
-import { useLocation, useParams } from "react-router-dom";
-
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../../Components/Navbar";
+import { fetchGig } from "../../store/gigSlice/gigSlice"; // Adjust path
 
 const GigPage = () => {
   const { id } = useParams();
-  const { state } = useLocation();
-  if (!state) return <p>No gig data passed</p>
+  const dispatch = useDispatch();
+  const { formData, packageData, loading, error } = useSelector((state) => state.gig);
+
+  useEffect(() => {
+    dispatch(fetchGig(id));
+  }, [id, dispatch]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white text-xl">
+        Loading gig data...
+      </div>
+    );
+  }
+
+  if (error || !formData.title) { // Check if formData is populated
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-red-500 text-xl">
+        Error loading gig: {error || "No gig data available"}
+      </div>
+    );
+  }
+
+  // Map Redux state to props expected by child components
+  const gigProps = {
+    username: formData.username,
+    avatar: formData.avatar,
+    rating: 0, // Placeholder; replace with actual rating logic if available
+    title: formData.title,
+    about: formData.about || formData.description, // Use about or fall back to description
+    badges: formData.badges || [],
+    images: formData.images || [{ url: "" }],
+    description: formData.description,
+    skills: formData.skills || [],
+    tags: formData.tags || [],
+    faqs: formData.faqs || [],
+    location: formData.location,
+    basic: packageData.basic,
+    standard: packageData.standard,
+    pro: packageData.pro,
+  };
+
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br relative overflow-hidden">
+      <div className="min-h-screen w-screen pb-12 bg-gradient-to-br relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -30,18 +72,45 @@ const GigPage = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Content */}
             <div className="flex-1">
-              <GigHeader username={state.username} avatar={state.avatar} rating={state.rating} title={state.title} about={state.gig} badges={state.badges}/>
-              <ImageShowcase images={state.images}/>
+              <GigHeader
+                username={gigProps.username}
+                avatar={gigProps.avatar}
+                rating={gigProps.rating}
+                title={gigProps.title}
+                about={gigProps.about}
+                badges={gigProps.badges}
+              />
+              <ImageShowcase images={gigProps.images} />
               <ProHandleSection />
-              <ProjectDetails description={state.description} skills={state.skills} tags={state.tags} />
-              <ServiceTiersTable basic={state.basic} standard={state.standard} pro={state.pro}/>
-              <FAQSection faqs={state.faqs}/>
-              <ProjectSteps username={state.username}/>
-              <AboutSection avatar={state.avatar} username={state.username} tags={state.tags} skills={state.skills} about={state.about} location={state.location}/>
+              <ProjectDetails
+                description={gigProps.description}
+                skills={gigProps.skills}
+                tags={gigProps.tags}
+              />
+              <ServiceTiersTable
+                basic={gigProps.basic}
+                standard={gigProps.standard}
+                pro={gigProps.pro}
+              />
+              <FAQSection faqs={gigProps.faqs} />
+              <ProjectSteps username={gigProps.username} />
+              <AboutSection
+                avatar={gigProps.avatar}
+                username={gigProps.username}
+                tags={gigProps.tags}
+                skills={gigProps.skills}
+                about={gigProps.about}
+                location={gigProps.location}
+              />
             </div>
 
             {/* Right Sidebar */}
-            <ServiceSidebar basic={state.basic} standard={state.standard} pro={state.pro} username={state.username}/>
+            <ServiceSidebar
+              basic={gigProps.basic}
+              standard={gigProps.standard}
+              pro={gigProps.pro}
+              username={gigProps.username}
+            />
           </div>
         </div>
       </div>
