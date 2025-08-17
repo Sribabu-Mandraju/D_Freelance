@@ -13,23 +13,33 @@ const GigHeader = ({ title, avatar, username, rating, about, badges }) => {
       {/* Main Content Row */}
       <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
         {/* Left Side: User Info */}
-        <div className="flex items-center space-x-4 bg-gray-800/60 border border-gray-700/50 rounded-lg p-4 flex-1 hover:border-cyan-500/30 transition-all duration-300">
+        <div className="flex items-center space-x-4 bg-gray-900/50 border border-cyan-500/20 rounded-lg p-4 flex-1">
           <img
-            src={avatar || "/placeholder.svg"}
+            src={avatar}
             alt={username}
-            className="w-12 h-12 rounded-full border-2 border-cyan-400/60 shadow-lg"
+            className="w-12 h-12 rounded-full border-2 border-cyan-500/50"
           />
           <div>
             <span className="font-semibold text-white text-lg">{username}</span>
             <div className="flex items-center space-x-2 mt-1">
               <div className="flex items-center">
-                {[...Array(safeRating)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`w-4 h-4 ${
+                      i < rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
                 ))}
               </div>
-              <span className="text-sm text-gray-400">({rating}) • 127 reviews</span>
+
+              <span className="text-sm text-gray-400">
+                ({rating}) • 127 reviews
+              </span>
             </div>
-            <div className="text-gray-300 mt-1 text-sm">{about}</div>
+            <div className="text-white mt-1">{about}</div>
           </div>
         </div>
 
@@ -37,11 +47,11 @@ const GigHeader = ({ title, avatar, username, rating, about, badges }) => {
         <div className="flex flex-col items-end gap-4">
           {/* Buttons */}
           <div className="flex space-x-3">
-            <button className="flex items-center space-x-2 bg-gray-800/60 border border-gray-700/50 text-cyan-300 px-4 py-2 rounded-lg hover:bg-gray-700/60 hover:border-cyan-400/50 hover:text-cyan-200 transition-all duration-300">
+            <button className="flex items-center space-x-2 bg-gray-900/50 border border-cyan-500/50 text-cyan-300 px-4 py-2 rounded-lg hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300">
               <Heart className="w-5 h-5" />
               <span>Save</span>
             </button>
-            <button className="flex items-center space-x-2 bg-gray-800/60 border border-gray-700/50 text-blue-300 px-4 py-2 rounded-lg hover:bg-gray-700/60 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-300">
+            <button className="flex items-center space-x-2 bg-gray-900/50 border border-purple-500/50 text-purple-300 px-4 py-2 rounded-lg hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300">
               <Share2 className="w-5 h-5" />
               <span>Share</span>
             </button>

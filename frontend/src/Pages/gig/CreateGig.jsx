@@ -95,7 +95,7 @@ export default function CreateGig() {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+          Authorization: `Bearer ${userToken}`, 
         },
       };
       const { data } = await axios.post("http://localhost:3001/api/gigs", payload, config);

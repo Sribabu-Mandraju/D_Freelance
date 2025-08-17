@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Code, Star, Plus, Trash2, Send } from "lucide-react";
-import { createPortfolio } from "../../store/portfolioSlice/portfolioSlice";
 
 function PortfolioForm() {
-  const dispatch = useDispatch();
+  const [authToken, setAuthToken] = useState("");
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     heroSection: {
       name: "",
@@ -39,11 +37,21 @@ function PortfolioForm() {
       },
     ],
   });
-  const { isSubmitting, error, successMessage, email } = useSelector(
-    (state) => state.portfolio
-  );
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
 
   const colorOptions = ["purple", "blue", "cyan", "indigo", "violet", "pink"];
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      setAuthToken(token);
+      console.log("Auth token loaded:", token);
+    } else {
+      console.log("No auth token found");
+    }
+  }, []);
 
   // Add item to array
   const addArrayItem = (section, field, defaultValue) => {
@@ -112,21 +120,85 @@ function PortfolioForm() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const result = await dispatch(createPortfolio(formData)).unwrap(); // if using RTK
-    console.log("✅ Portfolio created successfully:", result);
-    
-  } catch (error) {
-    console.error("❌ Error creating portfolio:", error);
-  }
-};
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage("");
 
-  useEffect(() => {
-    if (successMessage && email) {
-      navigate(`/otpverification?email=${encodeURIComponent(email)}`);
+    // Check if auth token exists
+    if (!authToken) {
+      setSubmitMessage(
+        "Error: Authentication token not found. Please login again."
+      );
+      setIsSubmitting(false);
+      return;
     }
-  }, [successMessage, email, navigate]);
+
+    // Validate required fields
+    if (!formData.heroSection.name.trim()) {
+      setSubmitMessage("Error: Name is required");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!formData.contactInfo.email.trim()) {
+      setSubmitMessage("Error: Email is required");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.contactInfo.email)) {
+      setSubmitMessage("Error: Please enter a valid email address");
+      setIsSubmitting(false);
+      return;
+    }
+
+    console.log("[v0] Auth token being sent:", authToken);
+    console.log(
+      "[v0] Form data being sent:",
+      JSON.stringify(formData, null, 2)
+    );
+
+    try {
+      // Send complete form data to create portfolio and get OTP
+      const otpResponse = await fetch(
+        "http://localhost:3001/api/portfolio/otp/send",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      console.log("[v0] OTP Response status:", otpResponse.status);
+      const otpResult = await otpResponse.json();
+      console.log("[v0] OTP Response data:", otpResult);
+
+      if (otpResponse.ok && otpResult.success) {
+        // Store portfolio ID for OTP verification
+        sessionStorage.setItem("portfolioId", otpResult.portfolioId);
+        // Redirect to OTP verification page with email parameter
+        navigate(
+          `/otpverification?email=${encodeURIComponent(
+            formData.contactInfo.email
+          )}`
+        );
+      } else {
+        setSubmitMessage(
+          `Error sending OTP: ${otpResult.message || "Unknown error"}`
+        );
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      setSubmitMessage(`Error: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const renderStars = (rating, onChange) => {
     return (

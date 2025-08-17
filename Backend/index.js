@@ -83,18 +83,18 @@ const server = http.createServer(app);
 // Middleware to parse JSON and enable CORS
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:3001",
-      "http://localhost:3000",
-    ],
-    credentials: true, // if you want to allow cookies/auth headers
-  })
-);
-
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "http://localhost:5174",
+//       "http://localhost:3001",
+//       "http://localhost:3000",
+//     ],
+//     credentials: true, // if you want to allow cookies/auth headers
+//   })
+// );
+app.use(cors())
 // All your existing routes
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
