@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Search, Book, MessageCircle, Shield, DollarSign, Users, ChevronRight } from "lucide-react"
-import Navbar from "../Components/Navbar"
-import Footer from "../Components/Footer"
+import { useState } from "react";
+import { Search, Book, MessageCircle, Shield, DollarSign, Users, ChevronRight } from "lucide-react";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 const HelpDocs = () => {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const categories = [
     { id: "all", name: "All Topics", icon: <Book className="w-5 h-5" /> },
@@ -15,7 +15,7 @@ const HelpDocs = () => {
     { id: "payments", name: "Payments & Escrow", icon: <DollarSign className="w-5 h-5" /> },
     { id: "security", name: "Security", icon: <Shield className="w-5 h-5" /> },
     { id: "disputes", name: "Disputes", icon: <MessageCircle className="w-5 h-5" /> },
-  ]
+  ];
 
   const helpArticles = [
     {
@@ -74,7 +74,7 @@ const HelpDocs = () => {
       description: "What to look for when auditing smart contracts",
       readTime: "8 min read",
     },
-  ]
+  ];
 
   const faqs = [
     {
@@ -96,128 +96,154 @@ const HelpDocs = () => {
       question: "Are there any platform fees?",
       answer: "CryptoLance charges zero platform fees. You only pay blockchain gas fees for transactions.",
     },
-  ]
+  ];
 
   const filteredArticles = helpArticles.filter((article) => {
     const matchesSearch =
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.description.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "all" || article.category === selectedCategory
-    return matchesSearch && matchesCategory
-  })
+      article.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || article.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
-    <div className="min-h-screen bg-black">
-      <Navbar />
-      <div className="pt-32 pb-12">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-12 animate__animated animate__fadeIn animate__delay-1s">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500 animate__animated animate__pulse">
-              Help Center
-            </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-lg animate__animated animate__fadeInUp">
-              Find answers to your questions and learn how to use CryptoLance
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-white font-sans">
+      {/* Subtle Neon Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-cyan-500/10 rounded-full filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-teal-500/10 rounded-full filter blur-3xl animate-pulse" style={{ animationDelay: "1.5s" }}></div>
+      </div>
 
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto mb-12">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-300 w-6 h-6 animate__animated animate__bounceIn" />
-              <input
-                type="text"
-                placeholder="Search for help articles..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-14 pr-4 py-4 bg-gray-800/70 border border-purple-700 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent shadow-lg transition-all duration-300 hover:shadow-2xl animate__animated animate__zoomIn"
-              />
-            </div>
-          </div>
+      <div className="relative z-10">
+        <Navbar />
+        <div className="pt-20 pb-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+           
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Categories Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-gray-800/60 backdrop-blur-md border border-purple-700 rounded-xl p-6 sticky top-24 shadow-2xl animate__animated animate__slideInLeft">
-                <h3 className="text-lg font-bold text-white mb-4">Categories</h3>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                        selectedCategory === category.id
-                          ? "bg-purple-600/30 text-purple-300 border border-purple-500 shadow-inner animate__animated animate__pulse"
-                          : "text-gray-400 hover:text-white hover:bg-gray-700/50 hover:shadow-md"
-                      }`}
-                    >
-                      {category.icon}
-                      <span>{category.name}</span>
-                    </button>
-                  ))}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-3 ">
+              <div className="lg:col-span-3">
+
+            {/* Search Bar */}
+            <div className="mb-8">
+              <div className="max-w-3xl mx-auto">
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-cyan-300 w-5 h-5 transition-transform group-hover:scale-110" />
+                  <input
+                    type="text"
+                    placeholder="Search help articles..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-cyan-500/50 rounded-lg text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all duration-300 hover:bg-gray-800/70"
+                  />
                 </div>
               </div>
             </div>
+              </div>
+              {/* Categories Sidebar */}
+              <div className="lg:col-span-3">
+                <div className="bg-gray-800/30 backdrop-blur-lg border border-cyan-500/30 rounded-xl p-6 sticky top-40 shadow-lg transition-all duration-300 hover:shadow-cyan-500/20">
+                  <h3 className="text-xl font-semibold text-cyan-300 mb-4">Categories</h3>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-all duration-300 ${
+                          selectedCategory === category.id
+                            ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400 shadow-inner"
+                            : "text-gray-300 hover:text-cyan-200 hover:bg-gray-700/30"
+                        }`}
+                      >
+                        {category.icon}
+                        <span className="text-sm font-medium">{category.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              </div>
 
-            {/* Main Content */}
-            <div className="lg:col-span-3 space-y-8">
-              {/* Help Articles */}
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-6 glow animate__animated animate__fadeInDown">Help Articles</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filteredArticles.map((article) => (
-                    <div
-                      key={article.id}
-                      className="bg-gray-800/60 backdrop-blur-md border border-purple-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer group shadow-md hover:shadow-xl transform hover:-translate-y-2 animate__animated animate__zoomIn animate__delay-0.5s"
-                    >
-                      <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-cyan-300 transition-colors">
-                        {article.title}
-                      </h3>
-                      <p className="text-gray-400 mb-4">{article.description}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-500">{article.readTime}</span>
-                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors animate__animated animate__bounce" />
+
+              {/* Main Content */}
+              <div className="lg:col-span-9 space-y-12">
+                {/* Help Articles */}
+                <div>
+                  <h2 className="text-2xl font-semibold text-cyan-300 mb-6">Help Articles</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {filteredArticles.map((article) => (
+                      <div
+                        key={article.id}
+                        className="bg-gray-800/30 backdrop-blur-lg border border-cyan-500/30 rounded-lg p-6 shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 cursor-pointer group"
+                      >
+                        <h3 className="text-lg font-semibold text-gray-100 group-hover:text-cyan-300 transition-colors">
+                          {article.title}
+                        </h3>
+                        <p className="text-gray-400 text-sm mt-2">{article.description}</p>
+                        <div className="flex justify-between items-center mt-4">
+                          <span className="text-xs text-gray-500">{article.readTime}</span>
+                          <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-cyan-400 transition-colors" />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* FAQ Section */}
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-6 glow animate__animated animate__fadeInDown">Frequently Asked Questions</h2>
-                <div className="space-y-4">
-                  {faqs.map((faq, index) => (
-                    <div key={index} className="bg-gray-800/60 backdrop-blur-md border border-purple-700 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 animate__animated animate__fadeInUp animate__delay-0.5s">
-                      <h3 className="text-xl font-semibold text-white mb-3">{faq.question}</h3>
-                      <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
-                    </div>
-                  ))}
+                {/* FAQ Section */}
+                <div>
+                  <h2 className="text-2xl font-semibold text-cyan-300 mb-6">Frequently Asked Questions</h2>
+                  <div className="space-y-4">
+                    {faqs.map((faq, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-800/30 backdrop-blur-lg border border-cyan-500/30 rounded-lg p-6 shadow-lg hover:shadow-cyan-500/20 transition-all duration-300"
+                      >
+                        <h3 className="text-lg font-semibold text-gray-100 mb-2">{faq.question}</h3>
+                        <p className="text-gray-300 text-sm">{faq.answer}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Contact Support */}
-              <div className="bg-gradient-to-r from-purple-900/30 to-cyan-900/30 backdrop-blur-sm border border-purple-700 rounded-xl p-8 text-center shadow-2xl hover:shadow-cyan-500/50 transition-all duration-300 animate__animated animate__zoomIn">
-                <h3 className="text-3xl font-bold text-white mb-4 glow">Still Need Help?</h3>
-                <p className="text-gray-400 mb-6">
-                  Can't find what you're looking for? Our community and support team are here to help.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 animate__animated animate__pulse">
-                    Contact Support
-                  </button>
-                  <button className="border border-purple-700 hover:border-cyan-500 text-gray-200 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 animate__animated animate__pulse">
-                    Join Community
-                  </button>
+                {/* Contact Support */}
+                <div className="bg-gray-800/30 backdrop-blur-lg border border-cyan-500/30 rounded-lg p-8 text-center shadow-lg hover:shadow-cyan-500/20 transition-all duration-300">
+                  <h3 className="text-2xl font-semibold text-cyan-300 mb-4">Still Need Help?</h3>
+                  <p className="text-gray-300 mb-6">
+                    Can't find what you're looking for? Reach out to our community or support team.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button className="bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-600 hover:to-teal-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105">
+                      Contact Support
+                    </button>
+                    <button className="border border-cyan-500 text-cyan-300 hover:bg-cyan-500/20 hover:text-cyan-200 px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105">
+                      Join Community
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
-  )
-}
 
-export default HelpDocs
+      {/* Tailwind CSS Configuration for Neon Effects */}
+      <style jsx>{`
+        @keyframes neon-glow {
+          0% {
+            text-shadow: 0 0 5px rgba(6, 182, 212, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
+          }
+          100% {
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.8), 0 0 20px rgba(6, 182, 212, 0.5);
+          }
+        }
+        .neon-glow {
+          animation: neon-glow 1.5s ease-in-out infinite alternate;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default HelpDocs;

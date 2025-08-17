@@ -5,7 +5,7 @@ import {
   getProposalById,
   updateProposal,
   deleteProposal,
-  acceptBid
+  // acceptBid
 } from '../controllers/ProposalController.js';
 
 const router = express.Router();
@@ -15,6 +15,6 @@ router.get('/', getAllProposals);
 router.get('/:id', getProposalById);
 router.put('/:id', updateProposal);
 router.delete('/:id', deleteProposal);
-router.patch('/:id/accept/:bidId', acceptBid);
+// router.patch('/:id/accept/:bidId', acceptBid);
 
 export default router;

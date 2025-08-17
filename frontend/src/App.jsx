@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Home from "./Pages/Home";
@@ -17,7 +17,7 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import ClaimTokens from "./Components/testingContracts/ClaimTokens";
 import PurchaseTokens from "./Components/testingContracts/PurchaseTokens";
-import CreateProposal from "./Components/testingContracts/CreateProposal";
+import CreateProposalButton from "./Components/testingContracts/CreateProposal";
 import OpenProposalToBid from "./Components/testingContracts/OpenProposalToBid";
 import AcceptBid from "./Components/testingContracts/AcceptBid";
 import DepositBidAmount from "./Components/testingContracts/DepositBidAmount";
@@ -40,9 +40,17 @@ import About from "./Pages/About";
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
 const App = () => {
+  const [authToken,setAuthToken] = useState("")
   const handleAuthSuccess = () => {
     return;
   };
+
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken")
+    setAuthToken(token)
+    console.log(token)
+  },[])
 
   return (
     <>
@@ -72,7 +80,7 @@ const App = () => {
 
             <Route path="/claimTokens" element={<ClaimTokens />} />
             <Route path="/purchaseTokens" element={<PurchaseTokens />} />
-            <Route path="/createProposal" element={<CreateProposal />} />
+            <Route path="/createProposal" element={<CreateProposalButton deadline={"1758015222"}  budget={1000000} />} />
             <Route path="/openProposalToBid" element={<OpenProposalToBid />} />
             <Route path="/acceptBid" element={<AcceptBid />} />
             <Route path="/depositBidAmount" element={<DepositBidAmount />} />
@@ -122,7 +130,7 @@ const App = () => {
           }}
         />
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };
