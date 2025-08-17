@@ -1,6 +1,7 @@
 import Bid from '../models/BidModel.js';
 import mongoose from 'mongoose';
 
+
 // @desc    Create a bid
 // @route   POST /api/bids
 export const createBid = async (req, res) => {
