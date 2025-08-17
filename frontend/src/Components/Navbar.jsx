@@ -1,10 +1,10 @@
-
-
 "use client";
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import WalletConnect from "./walletConnection/WalletConnect";
+import { useAccount } from "wagmi";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Briefcase,
@@ -29,6 +29,7 @@ import {
   Award,
   Target,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
@@ -36,24 +37,58 @@ export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedTheme, setTheme] = useState("Dark");
+  const { address, isConnected, chain } = useAccount();
+  const navigate = useNavigate();
+  const handlePortfolioClick = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Please Connect your wallet to view your portfolio");
+        return;
+      }
 
+      const res = await fetch("http://localhost:3001/api/portfolio/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      let result = null;
+      try {
+        result = await res.json();
+      } catch (err) {
+        toast.error("Failed to parse response. Please try again.");
+      }
+
+      if (res.ok && result?.success && result?.data) {
+        navigate("/portfolio/me");
+        return;
+      }
+      navigate("/portfolioForm");
+    } catch (err) {
+      console.error("Error checking portfolio:", err);
+      toast.error("Unable to check portfolio. Please try again.");
+      navigate("/portfolioForm");
+    }
+  };
   const navigationItems = [
     {
       name: "Find talent",
-      navlink:"/gigs",
+      navlink: "/gigs",
       icon: Coins,
     },
     {
       name: "Find work",
-      navlink:"/browse-jobs",
+      navlink: "/browse-jobs",
       icon: Users,
-  
     },
     {
       name: "Why CryptoLance",
-      navlink:"/help",
+      navlink: "/help",
       icon: Package,
-
     },
   ];
 
@@ -96,11 +131,10 @@ export default function Navbar() {
           <nav className="hidden lg:flex items-center gap-4">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
-           
 
               return (
                 <Link
-                 to={item.navlink}
+                  to={item.navlink}
                   key={item.name}
                   className="relative"
                   onMouseEnter={() => handleMouseEnter(item.name)}
@@ -109,10 +143,7 @@ export default function Navbar() {
                   <button className="flex items-center space-x-1 text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group">
                     <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
                     <span className="text-[14px]">{item.name}</span>
-                   
                   </button>
-
-                
                 </Link>
               );
             })}
@@ -122,13 +153,13 @@ export default function Navbar() {
         {/* Right Side - Portfolio, Watchlist, Search, Login */}
         <div className="flex items-center md:gap-4 ">
           {/* Portfolio */}
-          <Link
-            to="/portfolioform"
+          <button
+            onClick={handlePortfolioClick}
             className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group"
           >
             <Portfolio className="w-4 h-4 mr-2  group-hover:text-cyan-400 transition-colors duration-300" />
             Portfolio
-          </Link>
+          </button>
 
           {/* Watchlist */}
           <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group">
@@ -136,164 +167,163 @@ export default function Navbar() {
             Watchlist
           </button>
           <div className="flex flex-row gap-1 items-center">
+            {/* Search Bar with neon effect */}
+            <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="pl-10 pr-8 py-1 w-56 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none focus:shadow-lg focus:shadow-cyan-500/20 backdrop-blur-sm transition-all duration-300"
+              />
+              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs bg-gray-800 px-1 rounded">
+                /
+              </span>
+            </div>
 
-          {/* Search Bar with neon effect */}
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              className="pl-10 pr-8 py-1 w-56 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none focus:shadow-lg focus:shadow-cyan-500/20 backdrop-blur-sm transition-all duration-300"
-            />
-            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs bg-gray-800 px-1 rounded">
-              /
-            </span>
-          </div>
-
-          {/* Language Selector */}
-          <div
-            className="relative"
-            onMouseEnter={() => handleMouseEnter("language")}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
-              <Globe className="w-4 h-4" />
-            </button>
-            {activeDropdown === "language" && (
-              <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
-                >
-                  English
-                </a>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
-                >
-                  Español
-                </a>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
-                >
-                  Français
-                </a>
-              </div>
-            )}
-          </div>
-
-          {/* Log in Button with neon effect */}
-          <WalletConnect />
-          {/* Account / Settings dropdown (desktop only) */}
-          <div
-            className="relative ml-3 hidden md:block"
-            onMouseEnter={() => setShowProfileMenu(true)}
-            onMouseLeave={() => setShowProfileMenu(false)}
-          >
-            <button
-              // onClick={() => setShowProfileMenu((s) => !s)}
-              className="flex items-center gap-2  rounded-lg hover:bg-gray-800/50 transition-colors text-gray-300"
-              aria-expanded={showProfileMenu ? "true" : "false"}
+            {/* Language Selector */}
+            <div
+              className="relative"
+              onMouseEnter={() => handleMouseEnter("language")}
+              onMouseLeave={handleMouseLeave}
             >
-              {/* you can keep the avatar/icon here */}
-              <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
-                {/* small avatar placeholder */}
-                {/* <MessageCircle className="w-4 h-4 text-gray-300" /> */}
-                <img
-                  src="https://i.pravatar.cc/150?img=47"
-                  alt=""
-                  className="rounded-full w-full h-full"
-                />
-              </div>
-            </button>
+              <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
+                <Globe className="w-4 h-4" />
+              </button>
+              {activeDropdown === "language" && (
+                <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
+                  >
+                    English
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
+                  >
+                    Español
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
+                  >
+                    Français
+                  </a>
+                </div>
+              )}
+            </div>
 
-            {showProfileMenu && (
-              <div
-                className="absolute right-0 top-[40px] w-80 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50"
-                role="menu"
+            {/* Log in Button with neon effect */}
+            <WalletConnect />
+            {/* Account / Settings dropdown (desktop only) */}
+            <div
+              className="relative ml-3 hidden md:block"
+              onMouseEnter={() => setShowProfileMenu(true)}
+              onMouseLeave={() => setShowProfileMenu(false)}
+            >
+              <button
+                // onClick={() => setShowProfileMenu((s) => !s)}
+                className="flex items-center gap-2  rounded-lg hover:bg-gray-800/50 transition-colors text-gray-300"
+                aria-expanded={showProfileMenu ? "true" : "false"}
               >
-                <div className="p-4">
-                  {/* top actions */}
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="flex flex-row gap-4">
-                      <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm ">
-                        Log In
-                      </button>
-                      <button className="w-auto border border-blue-600 text-blue-600 px-3 py-1 rounded-md text-sm">
-                        Sign Up
-                      </button>
-                    </div>
-                    <div className="ml-3 flex items-start">
-                      <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow">
-                        {/* small diamond icon style */}
-                        <span className="text-white text-xs font-semibold">
-                          ♦
-                        </span>
+                {/* you can keep the avatar/icon here */}
+                <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
+                  {/* small avatar placeholder */}
+                  {/* <MessageCircle className="w-4 h-4 text-gray-300" /> */}
+                  <img
+                    src="https://i.pravatar.cc/150?img=47"
+                    alt=""
+                    className="rounded-full w-full h-full"
+                  />
+                </div>
+              </button>
+
+              {showProfileMenu && (
+                <div
+                  className="absolute right-0 top-[40px] w-80 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50"
+                  role="menu"
+                >
+                  <div className="p-4">
+                    {/* top actions */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="flex flex-row gap-4">
+                        <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm ">
+                          Log In
+                        </button>
+                        <button className="w-auto border border-blue-600 text-blue-600 px-3 py-1 rounded-md text-sm">
+                          Sign Up
+                        </button>
                       </div>
-                    </div>
-                  </div>
-
-                  <hr className="border-gray-800/40 my-2" />
-
-                  {/* survey link */}
-                  <button className="w-full text-left text-[13px] text-blue-500 font-semibold px-1 py-2 rounded-md hover:bg-gray-800/50 flex items-center justify-between">
-                    <span>💙 Help us improve by taking our survey</span>
-                    <ChevronRight className="w-4 h-4 opacity-70" />
-                  </button>
-                  <hr className="border-gray-800/40 my-2" />
-
-                  <div className="mt-3 space-y-2 text-sm">
-                    {/* Language */}
-                    <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
-                      <div className="text-gray-300">Language</div>
-                      <div className="text-gray-200">English</div>
-                    </div>
-
-                    {/* Currency */}
-                    <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
-                      <div className="text-gray-300">Currency</div>
-                      <div className="text-gray-200 flex items-center gap-1">
-                        USD <span className="text-green-400">●</span>
+                      <div className="ml-3 flex items-start">
+                        <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow">
+                          {/* small diamond icon style */}
+                          <span className="text-white text-xs font-semibold">
+                            ♦
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Theme toggle */}
+                    <hr className="border-gray-800/40 my-2" />
 
-                    <div className="flex items-center justify-between px-1 py-2 rounded-md ">
-                      <div className="text-gray-300">Theme</div>
-                      <div className="flex items-center  bg-gray-800 py-1 px-1 rounded-lg">
-                        {["Light", "Dark", "System"].map((theme) => (
-                          <button
-                            key={theme}
-                            onClick={() => setTheme(theme)}
-                            className={`px-2 py-1 text-[12px] rounded transition-colors duration-200 ${
-                              selectedTheme === theme
-                                ? "bg-gray-900 text-white"
-                                : "bg-gray-800 text-gray-300 hover:bg-gray-700/60 hover:text-white"
-                            }`}
-                          >
-                            {theme}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex items-center gap-2">
-                    <button className="flex w-1/2 border border-gray-700 px-3 py-2 text-sm rounded-md text-gray-200 hover:bg-gray-800/50">
-                      Get listed ▾
+                    {/* survey link */}
+                    <button className="w-full text-left text-[13px] text-blue-500 font-semibold px-1 py-2 rounded-md hover:bg-gray-800/50 flex items-center justify-between">
+                      <span>💙 Help us improve by taking our survey</span>
+                      <ChevronRight className="w-4 h-4 opacity-70" />
                     </button>
-                    <button className="px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md">
-                      API
-                    </button>
+                    <hr className="border-gray-800/40 my-2" />
+
+                    <div className="mt-3 space-y-2 text-sm">
+                      {/* Language */}
+                      <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
+                        <div className="text-gray-300">Language</div>
+                        <div className="text-gray-200">English</div>
+                      </div>
+
+                      {/* Currency */}
+                      <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
+                        <div className="text-gray-300">Currency</div>
+                        <div className="text-gray-200 flex items-center gap-1">
+                          USD <span className="text-green-400">●</span>
+                        </div>
+                      </div>
+
+                      {/* Theme toggle */}
+
+                      <div className="flex items-center justify-between px-1 py-2 rounded-md ">
+                        <div className="text-gray-300">Theme</div>
+                        <div className="flex items-center  bg-gray-800 py-1 px-1 rounded-lg">
+                          {["Light", "Dark", "System"].map((theme) => (
+                            <button
+                              key={theme}
+                              onClick={() => setTheme(theme)}
+                              className={`px-2 py-1 text-[12px] rounded transition-colors duration-200 ${
+                                selectedTheme === theme
+                                  ? "bg-gray-900 text-white"
+                                  : "bg-gray-800 text-gray-300 hover:bg-gray-700/60 hover:text-white"
+                              }`}
+                            >
+                              {theme}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center gap-2">
+                      <button className="flex w-1/2 border border-gray-700 px-3 py-2 text-sm rounded-md text-gray-200 hover:bg-gray-800/50">
+                        Get listed ▾
+                      </button>
+                      <button className="px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md">
+                        API
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu */}
