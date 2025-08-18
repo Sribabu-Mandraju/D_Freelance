@@ -118,7 +118,7 @@ function Portfolio() {
     <>
       <Navbar />
       <div
-        className={`${styles.container} bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden`}
+        className={` bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden`}
       >
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
