@@ -329,7 +329,7 @@ export default function BasicInfo({
 
       alert("Image replaced successfully!");
     } catch (err) {
-      console.error("Replace upload failed:", err);
+      
       alert("Replacing image failed. Please try again.");
     } finally {
       setReplaceIndex(null);

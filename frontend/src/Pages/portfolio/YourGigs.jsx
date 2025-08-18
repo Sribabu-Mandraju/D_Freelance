@@ -1,112 +1,26 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import MarketCard from "../../Components/main/marketSection/MarketCard";
+import { fetchGigs } from "../../store/gigSlice/gigSlice"; // Adjust path
+import { toast } from "react-hot-toast";
+import { useEffect } from "react";
 
 const YourGigs = ({ yourgigs = [] }) => {
-  const [gigs, setGigs] = useState([]); // fetched gig objects
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+  const dispatch = useDispatch();
+  const { gigs, gigsLoading, gigsError } = useSelector((state) => state.portfolio);
 
   useEffect(() => {
-    // If no IDs, clear state and exit early
-    if (!Array.isArray(yourgigs) || yourgigs.length === 0) {
-      setGigs([]);
-      setError(null);
-      setLoading(false);
-      return;
+    if (Array.isArray(yourgigs) && yourgigs.length > 0) {
+      dispatch(fetchGigs(yourgigs));
     }
-
-    let cancelled = false;
-    const controller = new AbortController();
-
-    const fetchGigs = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        // Build requests for each id
-        const requests = yourgigs.map((id) =>
-          axios.get(`${API_BASE}/api/gigs/${id}`, { signal: controller.signal })
-        );
-
-        const results = await Promise.allSettled(requests);
-
-        if (cancelled) return;
-
-        // Normalize different response shapes (resp.data, resp.data.data, resp)
-        const extract = (resp) => {
-          if (!resp) return null;
-          // resp is an axios response when fulfilled: resp.value
-          const candidate = resp.data ?? resp;
-          // candidate may be { success: true, data: { ... } }
-          if (candidate && candidate.data && typeof candidate.data === "object") {
-            return candidate.data;
-          }
-          return candidate;
-        };
-
-        const successful = results
-          .filter((r) => r.status === "fulfilled" && r.value)
-          .map((r) => extract(r.value))
-          .filter(Boolean);
-
-        // If API returns wrapper { success: true, data: {...} } ensure we unwrap again
-        const normalized = successful.map((item) =>
-          // if the API still wrapped the gig in `data`, unwrap
-          (item && item.data) ? item.data : item
-        );
-
-        if (normalized.length === 0) {
-          setGigs([]);
-          setError("No gigs found for the provided IDs.");
-        } else {
-          setGigs(normalized);
-        }
-      } catch (err) {
-        if (err.name === "CanceledError" || axios.isCancel?.(err)) {
-          console.log("Request cancelled");
-        } else {
-          console.error("Error fetching gigs:", err);
-          setError("Failed to load gigs. Please try again later.");
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchGigs();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [yourgigs, API_BASE]);
+  }, [yourgigs, dispatch]);
 
   // UI states
-  if (loading) return <div className="p-4 text-cyan-300">Loading your gigs…</div>;
-  if (error) return <div className="p-4 text-red-400">{error}</div>;
+  if (gigsLoading) return <div className="p-4 text-cyan-300">Loading your gigs…</div>;
+  if (gigsError) return <div className="p-4 text-red-400">{gigsError}</div>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-      {/* Quick raw-ID view (optional) */}
-      {/* {yourgigs && yourgigs.length > 0 && (
-        <div className="mb-8 col-span-full">
-          <h3 className="text-sm font-medium mb-2">Gig IDs (provided)</h3>
-          <div className="flex flex-wrap gap-2">
-            {yourgigs.map((gigId, i) => (
-              <div
-                key={gigId ?? i}
-                className="px-2 py-1 bg-gray-800 text-sm rounded"
-              >
-                {gigId}
-              </div>
-            ))}
-          </div>
-        </div>
-      )} */}
-
       {/* Render fetched gig cards */}
       {gigs && gigs.length > 0 ? (
         gigs.map((gig) => (
@@ -137,7 +51,6 @@ const YourGigs = ({ yourgigs = [] }) => {
           />
         ))
       ) : (
-        // If no fetched gigs, and no IDs either, helpful message:
         (!yourgigs || yourgigs.length === 0) && (
           <div className="p-4 text-gray-400 col-span-full">No gigs to show.</div>
         )

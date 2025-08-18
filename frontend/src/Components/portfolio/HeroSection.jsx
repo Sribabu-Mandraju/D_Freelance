@@ -1,134 +1,137 @@
-// HeroSection.jsx
-"use client"
-import { useState } from "react"
-import { User, Shield, Zap, Edit, Save, X } from "lucide-react"
-import { toast } from "react-hot-toast"
+"use client";
+import { useDispatch, useSelector } from "react-redux";
+import { User, Shield, Zap, Edit, Save, X } from "lucide-react";
+import { toast } from "react-hot-toast";
+import {
+  toggleEditingHero,
+  updateHeroField,
+  saveHeroSection,
+  updatePortfolio,
+  setPortfolioData
+} from "../../store/portfolioSlice/portfolioSlice";
 
 function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editData, setEditData] = useState({ ...personalInfo })
+  const dispatch = useDispatch();
+  const { isEditingHero, editHeroData } = useSelector(
+    (state) => state.portfolio
+  );
 
   const handleChange = (field, value) => {
-    setEditData((prev) => ({ ...prev, [field]: value }))
-  }
+    dispatch(updateHeroField({ field, value }));
+  };
 
   const validateLimits = () => {
-    const expertise = editData.expertise || []
-    const focusAreas = editData.focusAreas || []
+    const expertise = editHeroData.expertise || [];
+    const focusAreas = editHeroData.focusAreas || [];
 
-    if ((editData.name || "").length > 100) {
-      toast.error("Name cannot exceed 100 characters")
-      return false
+    if ((editHeroData.name || "").length > 100) {
+      toast.error("Name cannot exceed 100 characters");
+      return false;
     }
 
-    if (editData.domains && editData.domains.some((domain) => domain.length > 50)) {
-      toast.error("Each domain cannot exceed 50 characters")
-      return false
+    if (
+      editHeroData.domains &&
+      editHeroData.domains.some((domain) => domain.length > 50)
+    ) {
+      toast.error("Each domain cannot exceed 50 characters");
+      return false;
     }
 
-    if ((editData.thoughtLine || "").length > 200) {
-      toast.error("Thought line cannot exceed 200 characters")
-      return false
+    if ((editHeroData.thoughtLine || "").length > 200) {
+      toast.error("Thought line cannot exceed 200 characters");
+      return false;
     }
 
-    if ((editData.aboutMe || "").length > 300) {
-      toast.error("About me cannot exceed 300 characters")
-      return false
+    if ((editHeroData.aboutMe || "").length > 300) {
+      toast.error("About me cannot exceed 300 characters");
+      return false;
     }
 
     if (expertise.length > 4) {
-      toast.error("Expertise can have a maximum of 4 items")
-      return false
+      toast.error("Expertise can have a maximum of 4 items");
+      return false;
     }
 
     if (expertise.some((item) => item.length > 40)) {
-      toast.error("Each expertise item cannot exceed 40 characters")
-      return false
+      toast.error("Each expertise item cannot exceed 40 characters");
+      return false;
     }
 
     if (focusAreas.length > 4) {
-      toast.error("Focus areas can have a maximum of 4 items")
-      return false
+      toast.error("Focus areas can have a maximum of 4 items");
+      return false;
     }
 
     if (focusAreas.some((item) => item.length > 40)) {
-      toast.error("Each focus area item cannot exceed 40 characters")
-      return false
+      toast.error("Each focus area item cannot exceed 40 characters");
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleSave = async () => {
     if (!validateLimits()) {
-      return
+      return;
     }
 
-    const toastId = toast.loading("Saving hero section...")
+    const toastId = toast.loading("Saving hero section...");
     try {
       // Update frontend state
-      setPersonalInfo((prev) => ({
-        ...prev,
-        heroSection: { ...editData },
-      }))
-      
-      // get token from localStorage (or Context/Redux if you store it there)
-      const token = localStorage.getItem("authToken")
+      dispatch(saveHeroSection());
+
       // Update backend
-      const response = await fetch(`http://localhost:3001/api/portfolio/`, {
-        method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, 
-         },
-        body: JSON.stringify({ heroSection: editData }),
-      },
-      
-    )
-      const result = await response.json()
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Failed to update")
+      const action = await dispatch(
+        updatePortfolio({ portfolioId, data: { heroSection: editHeroData } })
+      );
+      if (updatePortfolio.fulfilled.match(action)) {
+        dispatch(
+          setPortfolioData({
+            heroSection: { ...editHeroData },
+          })
+        );
+        toast.success("Hero section updated successfully!", { id: toastId });
+        
       }
-
-      setIsEditing(false)
-      toast.success("Hero section updated successfully!", { id: toastId })
-      console.log("Updated hero section:", result.data.heroSection)
     } catch (err) {
-      console.error("Error updating hero section:", err.message)
-      toast.error(`Failed to save changes: ${err.message}`, { id: toastId })
+      
+      toast.error(`Failed to save changes: ${err.message}`, { id: toastId });
     }
-  }
+  };
 
   const handleEdit = () => {
-    setIsEditing(true)
-    setEditData({ ...personalInfo })
-  }
+    dispatch(toggleEditingHero());
+  };
 
   const handleCancel = () => {
-    setEditData({ ...personalInfo })
-    setIsEditing(false)
-  }
+    dispatch(toggleEditingHero());
+  };
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden mb-6">
       {/* Hero Content */}
       <div className="mb-8">
         <div className="mb-4">
-          {isEditing ? (
+          {isEditingHero ? (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-sm text-gray-400">Name:</label>
-                <span className={`text-xs ${(editData.name || "").length > 100 ? "text-red-400" : "text-gray-500"}`}>
-                  {(editData.name || "").length}/100
+                <span
+                  className={`text-xs ${
+                    (editHeroData.name || "").length > 100
+                      ? "text-red-400"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {(editHeroData.name || "").length}/100
                 </span>
               </div>
               <input
                 type="text"
-                value={editData.name || ""}
+                value={editHeroData.name || ""}
                 onChange={(e) => handleChange("name", e.target.value)}
                 className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-white text-4xl sm:text-5xl lg:text-6xl font-bold focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent ${
-                  (editData.name || "").length > 100
+                  (editHeroData.name || "").length > 100
                     ? "border-red-500/50 focus:border-red-400"
                     : "border-cyan-500/50 focus:border-cyan-400"
                 }`}
@@ -144,13 +147,18 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
         </div>
 
         <div className="mb-6">
-          {isEditing ? (
+          {isEditingHero ? (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="text-sm text-gray-400">Domains (comma separated):</label>
+                <label className="text-sm text-gray-400">
+                  Domains (comma separated):
+                </label>
                 <span
                   className={`text-xs ${
-                    editData.domains && editData.domains.some((d) => d.length > 50) ? "text-red-400" : "text-gray-500"
+                    editHeroData.domains &&
+                    editHeroData.domains.some((d) => d.length > 50)
+                      ? "text-red-400"
+                      : "text-gray-500"
                   }`}
                 >
                   Max 50 chars each
@@ -158,7 +166,7 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
               </div>
               <input
                 type="text"
-                value={editData.domains?.join(", ") || ""}
+                value={editHeroData.domains?.join(", ") || ""}
                 onChange={(e) =>
                   handleChange(
                     "domains",
@@ -166,41 +174,50 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
                   )
                 }
                 className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-gray-300 text-xl sm:text-1xl focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] ${
-                  editData.domains && editData.domains.some((d) => d.length > 50)
+                  editHeroData.domains &&
+                  editHeroData.domains.some((d) => d.length > 50)
                     ? "border-red-500/50 focus:border-red-400"
                     : "border-cyan-500/50 focus:border-cyan-400"
                 }`}
               />
             </div>
           ) : (
-            <p className="text-xl sm:text-1xl text-gray-300">{personalInfo.domains?.join(" | ") || ""}</p>
+            <p className="text-xl sm:text-1xl text-gray-300">
+              {personalInfo.domains?.join(" | ") || ""}
+            </p>
           )}
         </div>
 
         <div>
-          {isEditing ? (
+          {isEditingHero ? (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-sm text-gray-400">Thought Line:</label>
                 <span
-                  className={`text-xs ${(editData.thoughtLine || "").length > 200 ? "text-red-400" : "text-gray-500"}`}
+                  className={`text-xs ${
+                    (editHeroData.thoughtLine || "").length > 200
+                      ? "text-red-400"
+                      : "text-gray-500"
+                  }`}
                 >
-                  {(editData.thoughtLine || "").length}/200
+                  {(editHeroData.thoughtLine || "").length}/200
                 </span>
               </div>
               <input
                 type="text"
-                value={editData.thoughtLine || ""}
+                value={editHeroData.thoughtLine || ""}
                 onChange={(e) => handleChange("thoughtLine", e.target.value)}
                 className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-cyan-300 text-lg font-medium focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] ${
-                  (editData.thoughtLine || "").length > 200
+                  (editHeroData.thoughtLine || "").length > 200
                     ? "border-red-500/50 focus:border-red-400"
                     : "border-cyan-500/50 focus:border-cyan-400"
                 }`}
               />
             </div>
           ) : (
-            <p className="text-lg text-cyan-300 font-medium">{personalInfo.thoughtLine || ""}</p>
+            <p className="text-lg text-cyan-300 font-medium">
+              {personalInfo.thoughtLine || ""}
+            </p>
           )}
         </div>
       </div>
@@ -214,7 +231,7 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
           About Me
         </h2>
 
-        {!isEditing ? (
+        {!isEditingHero ? (
           <button
             onClick={handleEdit}
             className="flex items-center gap-2 px-3 py-2 bg-gray-900/50 border border-cyan-500/50 hover:border-cyan-400 rounded-lg transition-all duration-300 hover:shadow-[0_0_10px_rgba(0,255,255,0.3)] group w-full sm:w-auto justify-center"
@@ -243,19 +260,25 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
       </div>
 
       <div className="space-y-4 text-gray-300 leading-relaxed">
-        {isEditing ? (
+        {isEditingHero ? (
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="text-sm text-gray-400">About Me:</label>
-              <span className={`text-xs ${(editData.aboutMe || "").length > 300 ? "text-red-400" : "text-gray-500"}`}>
-                {(editData.aboutMe || "").length}/300
+              <span
+                className={`text-xs ${
+                  (editHeroData.aboutMe || "").length > 300
+                    ? "text-red-400"
+                    : "text-gray-500"
+                }`}
+              >
+                {(editHeroData.aboutMe || "").length}/300
               </span>
             </div>
             <textarea
-              value={editData.aboutMe || ""}
+              value={editHeroData.aboutMe || ""}
               onChange={(e) => handleChange("aboutMe", e.target.value)}
               className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-gray-300 focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] resize-none ${
-                (editData.aboutMe || "").length > 300
+                (editHeroData.aboutMe || "").length > 300
                   ? "border-red-500/50 focus:border-red-400"
                   : "border-cyan-500/50 focus:border-cyan-400"
               }`}
@@ -271,29 +294,39 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
             <h3 className="text-lg sm:text-xl font-semibold text-cyan-300 mb-3 flex items-center">
               <Shield className="w-5 h-5 mr-2" />
               Expertise
-              {isEditing && (
+              {isEditingHero && (
                 <span
                   className={`ml-2 text-xs px-2 py-1 rounded ${
-                    (editData.expertise?.length || 0) > 4 || (editData.expertise || []).some((item) => item.length > 40)
+                    (editHeroData.expertise?.length || 0) > 4 ||
+                    (editHeroData.expertise || []).some(
+                      (item) => item.length > 40
+                    )
                       ? "bg-red-500/20 text-red-400"
                       : "bg-gray-500/20 text-gray-400"
                   }`}
                 >
-                  {editData.expertise?.length || 0}/4
+                  {editHeroData.expertise?.length || 0}/4
                 </span>
               )}
             </h3>
-            {isEditing ? (
+            {isEditingHero ? (
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Expertise (one per line, max 4 items, 40 chars each):</label>
+                <label className="text-sm text-gray-400">
+                  Expertise (one per line, max 4 items, 40 chars each):
+                </label>
                 <textarea
-                  value={editData.expertise?.join("\n") || ""}
+                  value={editHeroData.expertise?.join("\n") || ""}
                   onChange={(e) => {
-                    const items = e.target.value.split("\n").filter((item) => item.trim())
-                    handleChange("expertise", items)
+                    const items = e.target.value
+                      .split("\n")
+                      .filter((item) => item.trim());
+                    handleChange("expertise", items);
                   }}
                   className={`w-full bg-gray-900/50 border rounded-lg px-3 py-2 text-gray-300 text-[13px] focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] resize-none ${
-                    (editData.expertise?.length || 0) > 4 || (editData.expertise || []).some((item) => item.length > 40)
+                    (editHeroData.expertise?.length || 0) > 4 ||
+                    (editHeroData.expertise || []).some(
+                      (item) => item.length > 40
+                    )
                       ? "border-red-500/50 focus:border-red-400"
                       : "border-cyan-500/50 focus:border-cyan-400"
                   }`}
@@ -306,7 +339,14 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
                   <li key={index} className="flex items-center gap-2">
                     <div
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: ["#00FFFF", "#3B82F6", "#8B5CF6", "#22C55E"][index % 4] }}
+                      style={{
+                        backgroundColor: [
+                          "#00FFFF",
+                          "#3B82F6",
+                          "#8B5CF6",
+                          "#22C55E",
+                        ][index % 4],
+                      }}
                     ></div>
                     {item}
                   </li>
@@ -319,31 +359,39 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
             <h3 className="text-lg sm:text-xl font-semibold text-purple-300 mb-3 flex items-center">
               <Zap className="w-5 h-5 mr-2" />
               Focus Areas
-              {isEditing && (
+              {isEditingHero && (
                 <span
                   className={`ml-2 text-xs px-2 py-1 rounded ${
-                    (editData.focusAreas?.length || 0) > 4 ||
-                    (editData.focusAreas || []).some((item) => item.length > 40)
+                    (editHeroData.focusAreas?.length || 0) > 4 ||
+                    (editHeroData.focusAreas || []).some(
+                      (item) => item.length > 40
+                    )
                       ? "bg-red-500/20 text-red-400"
                       : "bg-gray-500/20 text-gray-400"
                   }`}
                 >
-                  {editData.focusAreas?.length || 0}/4
+                  {editHeroData.focusAreas?.length || 0}/4
                 </span>
               )}
             </h3>
-            {isEditing ? (
+            {isEditingHero ? (
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Focus Areas (one per line, max 4 items, 40 chars each):</label>
+                <label className="text-sm text-gray-400">
+                  Focus Areas (one per line, max 4 items, 40 chars each):
+                </label>
                 <textarea
-                  value={editData.focusAreas?.join("\n") || ""}
+                  value={editHeroData.focusAreas?.join("\n") || ""}
                   onChange={(e) => {
-                    const items = e.target.value.split("\n").filter((item) => item.trim())
-                    handleChange("focusAreas", items)
+                    const items = e.target.value
+                      .split("\n")
+                      .filter((item) => item.trim());
+                    handleChange("focusAreas", items);
                   }}
                   className={`w-full bg-gray-900/50 border rounded-lg px-3 py-2 text-gray-300 text-[13px] focus:outline-none focus:shadow-[0_0_10px_rgba(0,255,255,0.3)] resize-none ${
-                    (editData.focusAreas?.length || 0) > 4 ||
-                    (editData.focusAreas || []).some((item) => item.length > 40)
+                    (editHeroData.focusAreas?.length || 0) > 4 ||
+                    (editHeroData.focusAreas || []).some(
+                      (item) => item.length > 40
+                    )
                       ? "border-red-500/50 focus:border-red-400"
                       : "border-cyan-500/50 focus:border-cyan-400"
                   }`}
@@ -356,7 +404,14 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
                   <li key={index} className="flex items-center gap-2">
                     <div
                       className="w-2 h-2 rounded-full"
-                      style={{ backgroundColor: ["#8B5CF6", "#F472B6", "#00FFFF", "#3B82F6"][index % 4] }}
+                      style={{
+                        backgroundColor: [
+                          "#8B5CF6",
+                          "#F472B6",
+                          "#00FFFF",
+                          "#3B82F6",
+                        ][index % 4],
+                      }}
                     ></div>
                     {item}
                   </li>
@@ -367,7 +422,7 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default HeroSection
+export default HeroSection;

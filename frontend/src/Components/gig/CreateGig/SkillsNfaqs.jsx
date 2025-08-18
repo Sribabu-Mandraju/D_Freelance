@@ -17,10 +17,9 @@ export default function SkillsNfaqs({ formData, setFormData }) {
         ...formData,
         faqs: [...currentFaqs, { question: newFaqQuestion.trim(), answer: newFaqAnswer.trim() }],
       };
-      console.log("Before addFaq, formData.faqs:", formData.faqs);
-      console.log("Adding FAQ, updatedFormData:", updatedFormData);
+      
       setFormData(updatedFormData);
-      console.log("After addFaq, expected formData.faqs:", updatedFormData.faqs);
+      
       setNewFaqQuestion("");
       setNewFaqAnswer("");
     }
@@ -32,10 +31,9 @@ export default function SkillsNfaqs({ formData, setFormData }) {
       ...formData,
       faqs: currentFaqs.filter((_, index) => index !== indexToRemove),
     };
-    console.log("Before removeFaq, formData.faqs:", formData.faqs);
-    console.log("Removing FAQ at index", indexToRemove, "updatedFormData:", updatedFormData);
+    
     setFormData(updatedFormData);
-    console.log("After removeFaq, expected formData.faqs:", updatedFormData.faqs);
+    
   };
 
   const addTag = () => {

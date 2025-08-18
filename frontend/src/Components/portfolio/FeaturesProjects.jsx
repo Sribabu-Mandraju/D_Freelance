@@ -1,56 +1,48 @@
-import { useState } from 'react';
-import { Cpu, Edit, Save, X, Plus } from 'lucide-react';
-import ProjectCard from './PrjectCard';
+"use client";
+import { useDispatch, useSelector } from "react-redux";
+import { Cpu, Edit, Save, X, Plus } from "lucide-react";
+import ProjectCard from "./PrjectCard";
+import { toast } from "react-hot-toast";
+import { toggleEditingProjects, updateProjectField, addNewProject, removeProject, saveProjects, updatePortfolio } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
-function FeaturedProjects({ featuredProjects, setFeaturedProjects }) {
-  const [isEditingProjects, setIsEditingProjects] = useState(false);
-  const [editProjects, setEditProjects] = useState(featuredProjects);
+function FeaturedProjects({ featuredProjects, portfolioId }) {
+  const dispatch = useDispatch();
+  const { isEditingProjects, editProjects } = useSelector((state) => state.portfolio);
 
   const handleEditProjects = () => {
-    setIsEditingProjects(true);
-    setEditProjects([...featuredProjects]);
+    dispatch(toggleEditingProjects());
   };
 
-  const handleSaveProjects = () => {
-    setFeaturedProjects(editProjects);
-    setIsEditingProjects(false);
+  const handleSaveProjects = async () => {
+    const toastId = toast.loading("Saving projects...");
+    try {
+      dispatch(saveProjects());
+      const action = await dispatch(updatePortfolio({ portfolioId, data: { projects: editProjects } }));
+      if (updatePortfolio.fulfilled.match(action)) {
+        // setFeaturedProjects(editProjects); 
+        toast.success("Projects updated successfully!", { id: toastId });
+        
+      }
+    } catch (err) {
+      
+      toast.error(`Failed to save changes: ${err.message}`, { id: toastId });
+    }
   };
 
   const handleCancelProjects = () => {
-    setEditProjects([...featuredProjects]);
-    setIsEditingProjects(false);
-  };
-
-  const addNewProject = () => {
-    const newProject = {
-      id: Date.now(),
-      name: "New Project",
-      description: "Project description here...",
-      technologies: ["React"],
-      liveUrl: "",
-      githubUrl: "",
-      icon: "🚀",
-      category: "Web App",
-    };
-    setEditProjects([...editProjects, newProject]);
+    dispatch(toggleEditingProjects());
   };
 
   const updateProject = (id, field, value) => {
-    setEditProjects(prev =>
-      prev.map(project =>
-        project.id === id ? { ...project, [field]: value } : project
-      )
-    );
+    dispatch(updateProjectField({ id, field, value }));
   };
 
-  const removeProject = (id) => {
-    setEditProjects(prev => prev.filter(project => project.id !== id));
+  const removeProjectHandler = (id) => {
+    dispatch(removeProject({ id }));
   };
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
-      {/* <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-cyan-500 to-blue-500"></div> */}
-
       {/* Section Header with Edit Button */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center">
@@ -71,7 +63,7 @@ function FeaturedProjects({ featuredProjects, setFeaturedProjects }) {
         ) : (
           <div className="flex w-full sm:w-auto gap-2">
             <button
-              onClick={addNewProject}
+              onClick={() => dispatch(addNewProject())}
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 bg-gray-900/50 border border-blue-500/50 hover:border-blue-400 rounded-lg transition-all duration-300 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] group"
             >
               <Plus className="w-4 h-4 text-blue-400" />
@@ -96,13 +88,13 @@ function FeaturedProjects({ featuredProjects, setFeaturedProjects }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {(isEditingProjects ? editProjects : featuredProjects).map(project => (
+        {(isEditingProjects ? editProjects : featuredProjects).map((project) => (
           <ProjectCard
             key={project.id}
             project={project}
             isEditing={isEditingProjects}
             onUpdate={updateProject}
-            onRemove={removeProject}
+            onRemove={removeProjectHandler}
           />
         ))}
       </div>

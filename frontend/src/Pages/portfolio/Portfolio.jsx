@@ -2,7 +2,14 @@
 import { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { User, Code, Briefcase, GraduationCap, TrendingUp, Mail } from "lucide-react";
+import {
+  User,
+  Code,
+  Briefcase,
+  GraduationCap,
+  TrendingUp,
+  Mail,
+} from "lucide-react";
 import { toast } from "react-hot-toast";
 import HeroSection from "../../Components/portfolio/HeroSection";
 import FeaturedProjects from "../../Components/portfolio/FeaturesProjects";
@@ -18,18 +25,22 @@ import ContactInfo from "../../Components/portfolio/ContactInfo";
 import Navbar from "../../Components/Navbar";
 import styles from "./Portfolio.module.css";
 import YourGigs from "./YourGigs";
-import { fetchPortfolio, setActiveTab } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
+import {
+  fetchPortfolio,
+  setActiveTab,
+} from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
 function Portfolio() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { portfolioData, loading, error, activeTab } = useSelector((state) => state.portfolio);
+  const { portfolioData, loading, error, activeTab } = useSelector(
+    (state) => state.portfolio
+  );
   const mainRef = useRef(null);
   const asideRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchPortfolio()).then((action) => {
-      // Check if the fetch succeeded but no portfolio data is returned
       if (
         action.payload &&
         (!portfolioData.heroSection || Object.keys(portfolioData).length === 0)
@@ -52,7 +63,7 @@ function Portfolio() {
           asideRef.current.style.height = `${maxHeight}px`;
         }
       } catch (err) {
-        console.error("Error adjusting heights:", err);
+        
         toast.error("Failed to adjust layout heights");
       }
     };
@@ -77,11 +88,10 @@ function Portfolio() {
   }
 
   if (error) {
-    // Handle specific "not found" error or general error
     if (error.includes("not found") || error.includes("Portfolio not found")) {
       toast.error("No portfolio found. Redirecting to create one...");
       navigate("/portfolioForm");
-      return null; // Prevent further rendering after navigation
+      return null;
     }
     return (
       <div className={`${styles.container} flex items-center justify-center`}>
@@ -91,7 +101,6 @@ function Portfolio() {
   }
 
   if (!portfolioData.heroSection || Object.keys(portfolioData).length === 0) {
-    // Fallback check after data is loaded
     toast.error("No portfolio data available. Redirecting to create one...");
     navigate("/portfolioForm");
     return null;
@@ -129,7 +138,7 @@ function Portfolio() {
               setPersonalInfo={(data) =>
                 dispatch(setPortfolioData({ heroSection: data }))
               }
-              portfolioId={portfolioData?._id}
+              portfolioId={portfolioData._id}
             />
             <TabNavigation
               tabs={tabs}
@@ -137,20 +146,23 @@ function Portfolio() {
               setActiveTab={(tab) => dispatch(setActiveTab(tab))}
             />
             <div className="space-y-8">
-              {activeTab === "overview" && (
-                <div className="space-y-6">
+              
+              {activeTab === "Bidded Proposals" && (
+                <TechStack techStack={techStack} />
+              )}
+              {activeTab === "Gigs" && (
+                <YourGigs yourgigs={portfolioData.userGigs || []} />
+              )}
+              {activeTab === "Accepted Proposals" && (
+                <Education education={education} />
+              )}
+            </div>
+            <div className="space-y-6 mt-6">
                   <FeaturedProjects
                     featuredProjects={featuredProjects}
-                    setFeaturedProjects={(data) =>
-                      dispatch(setPortfolioData({ projects: data }))
-                    }
+                    portfolioId={portfolioData._id}
                   />
                 </div>
-              )}
-              {activeTab === "Bidded Proposals" && <TechStack techStack={techStack} />}
-              {activeTab === "Gigs" && <YourGigs yourgigs={portfolioData.userGigs || []} />}
-              {activeTab === "Accepted Proposals" && <Education education={education} />}
-            </div>
           </main>
 
           <aside
@@ -161,18 +173,14 @@ function Portfolio() {
           >
             <QuickContact personalInfo={personalInfo} />
             <CurrentStatus
-              currentStatus={currentStatus}
-              setCurrentStatus={(data) =>
-                dispatch(setPortfolioData({ currentStatus: data }))
-              }
-              portfolioId={portfolioData?._id}
+              portfolioId={portfolioData._id} // Use _id directly from portfolioData
             />
             <TechHighlights
               techHighlights={techHighlights}
               setTechHighlights={(data) =>
                 dispatch(setPortfolioData({ techHighlights: data }))
               }
-              portfolioId={portfolioData?._id}
+              portfolioId={portfolioData._id} // Use _id directly from portfolioData
             />
           </aside>
         </div>

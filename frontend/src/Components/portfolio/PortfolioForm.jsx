@@ -9,9 +9,9 @@ import {
   removeArrayItem,
   updateArrayItem,
   updateNestedField,
-  updateCurrentStatus,
-  updateTechHighlight,
+  updateTechHighlightCreation,
   createPortfolio,
+  updateCurrentStatusCreation,
 } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
 function PortfolioForm() {
@@ -22,8 +22,8 @@ function PortfolioForm() {
   );
 
   useEffect(() => {
-    // No token loading needed; handled by thunk
-  }, []);
+    
+  }, [portfolioData]);
 
   const handleAddArrayItem = (section, field, defaultValue) => {
     dispatch(addArrayItem({ section, field, defaultValue }));
@@ -34,6 +34,7 @@ function PortfolioForm() {
   };
 
   const handleUpdateArrayItem = (section, field, index, value) => {
+   
     dispatch(updateArrayItem({ section, field, index, value }));
   };
 
@@ -42,40 +43,57 @@ function PortfolioForm() {
   };
 
   const handleUpdateCurrentStatus = (index, field, value) => {
-    dispatch(updateCurrentStatus({ index, field, value }));
+    
+    dispatch(updateCurrentStatusCreation({ index, field, value }));
   };
 
   const handleUpdateTechHighlight = (index, field, value) => {
-    dispatch(updateTechHighlight({ index, field, value }));
+    dispatch(updateTechHighlightCreation({ index, field, value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!portfolioData.heroSection.name.trim()) {
-      dispatch({ type: "portfolio/setSubmitMessage", payload: "Error: Name is required" });
+      dispatch({
+        type: "portfolio/setSubmitMessage",
+        payload: "Error: Name is required",
+      });
       return;
     }
 
     if (!portfolioData.contactInfo.email.trim()) {
-      dispatch({ type: "portfolio/setSubmitMessage", payload: "Error: Email is required" });
+      dispatch({
+        type: "portfolio/setSubmitMessage",
+        payload: "Error: Email is required",
+      });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(portfolioData.contactInfo.email)) {
-      dispatch({ type: "portfolio/setSubmitMessage", payload: "Error: Please enter a valid email address" });
+      dispatch({
+        type: "portfolio/setSubmitMessage",
+        payload: "Error: Please enter a valid email address",
+      });
       return;
     }
 
-    console.log("[Client] Submitting form data:", JSON.stringify(portfolioData, null, 2));
+    console.log(
+      "[Client] Submitting form data:",
+      JSON.stringify(portfolioData, null, 2)
+    );
 
     try {
       const action = await dispatch(createPortfolio(portfolioData));
       if (createPortfolio.fulfilled.match(action)) {
         const { payload } = action;
         sessionStorage.setItem("portfolioId", payload.portfolioId);
-        navigate(`/otpverification?email=${encodeURIComponent(portfolioData.contactInfo.email)}`);
+        navigate(
+          `/otpverification?email=${encodeURIComponent(
+            portfolioData.contactInfo.email
+          )}`
+        );
       }
     } catch (err) {
       console.error("[Client] Submit error details:", err);
@@ -90,7 +108,9 @@ function PortfolioForm() {
             key={star}
             type="button"
             onClick={() => onChange(star)}
-            className={`transition-colors duration-200 ${star <= rating ? "text-purple-400" : "text-gray-600"}`}
+            className={`transition-colors duration-200 ${
+              star <= rating ? "text-purple-400" : "text-gray-600"
+            }`}
           >
             <Star className="w-5 h-5 fill-current" />
           </button>
@@ -102,7 +122,7 @@ function PortfolioForm() {
   const colorOptions = ["purple", "blue", "cyan", "indigo", "violet", "pink"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-indigo-900 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen w-screen bg-gradient-to-br from-gray-900 via-black to-indigo-900 p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-6 sm:p-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500"></div>
@@ -114,7 +134,8 @@ function PortfolioForm() {
               </span>
             </h1>
             <p className="text-gray-300 text-lg">
-              Build your professional presence with our interactive portfolio builder
+              Build your professional presence with our interactive portfolio
+              builder
             </p>
           </div>
 
@@ -134,9 +155,13 @@ function PortfolioForm() {
                   </label>
                   <input
                     type="text"
-                    value={portfolioData.heroSection.name}
+                    value={portfolioData.heroSection.name || ""}
                     onChange={(e) =>
-                      handleUpdateNestedField("heroSection", "name", e.target.value)
+                      handleUpdateNestedField(
+                        "heroSection",
+                        "name",
+                        e.target.value
+                      )
                     }
                     className="w-full bg-gray-900/50 border border-purple-500/50 rounded-lg px-4 py-3 text-gray-300 focus:border-purple-400 focus:outline-none focus:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-all duration-300"
                     required
@@ -149,9 +174,13 @@ function PortfolioForm() {
                   </label>
                   <input
                     type="text"
-                    value={portfolioData.heroSection.thoughtLine}
+                    value={portfolioData.heroSection.thoughtLine || ""}
                     onChange={(e) =>
-                      handleUpdateNestedField("heroSection", "thoughtLine", e.target.value)
+                      handleUpdateNestedField(
+                        "heroSection",
+                        "thoughtLine",
+                        e.target.value
+                      )
                     }
                     className="w-full bg-gray-900/50 border border-purple-500/50 rounded-lg px-4 py-3 text-gray-300 focus:border-purple-400 focus:outline-none focus:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-all duration-300"
                   />
@@ -163,9 +192,13 @@ function PortfolioForm() {
                   About Me
                 </label>
                 <textarea
-                  value={portfolioData.heroSection.aboutMe}
+                  value={portfolioData.heroSection.aboutMe || ""}
                   onChange={(e) =>
-                    handleUpdateNestedField("heroSection", "aboutMe", e.target.value)
+                    handleUpdateNestedField(
+                      "heroSection",
+                      "aboutMe",
+                      e.target.value
+                    )
                   }
                   rows="4"
                   className="w-full bg-gray-900/50 border border-purple-500/50 rounded-lg px-4 py-3 text-gray-300 focus:border-purple-400 focus:outline-none focus:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-all duration-300 resize-none"
@@ -180,16 +213,23 @@ function PortfolioForm() {
                   <div key={index} className="flex gap-2 mb-2 items-center">
                     <input
                       type="text"
-                      value={domain}
+                      value={domain || ""}
                       onChange={(e) =>
-                        handleUpdateArrayItem("heroSection", "domains", index, e.target.value)
+                        handleUpdateArrayItem(
+                          "heroSection",
+                          "domains",
+                          index,
+                          e.target.value
+                        )
                       }
                       className="flex-1 bg-gray-900/50 border border-purple-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-purple-400 focus:outline-none focus:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-all duration-300"
                     />
                     {portfolioData.heroSection.domains.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveArrayItem("heroSection", "domains", index)}
+                        onClick={() =>
+                          handleRemoveArrayItem("heroSection", "domains", index)
+                        }
                         className="p-2 bg-red-500/20 border border-red-500/50 rounded-lg hover:border-red-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)]"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
@@ -199,7 +239,9 @@ function PortfolioForm() {
                 ))}
                 <button
                   type="button"
-                  onClick={() => handleAddArrayItem("heroSection", "domains", "")}
+                  onClick={() =>
+                    handleAddArrayItem("heroSection", "domains", "")
+                  }
                   className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 border border-purple-500/50 rounded-lg hover:border-purple-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(147,51,234,0.3)] mt-2"
                 >
                   <Plus className="w-4 h-4 text-purple-400" />
@@ -215,20 +257,31 @@ function PortfolioForm() {
                   <div key={index} className="flex gap-2 mb-2 items-center">
                     <input
                       type="text"
-                      value={item}
+                      value={item || ""}
                       onChange={(e) =>
-                        handleUpdateArrayItem("heroSection", "expertise", index, e.target.value)
+                        handleUpdateArrayItem(
+                          "heroSection",
+                          "expertise",
+                          index,
+                          e.target.value
+                        )
                       }
                       maxLength="40"
                       className="flex-1 bg-gray-900/50 border border-purple-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-purple-400 focus:outline-none focus:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-all duration-300"
                     />
                     <span className="text-xs text-gray-500 self-center min-w-[3rem]">
-                      {item.length}/40
+                      {item ? item.length : 0}/40
                     </span>
                     {portfolioData.heroSection.expertise.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveArrayItem("heroSection", "expertise", index)}
+                        onClick={() =>
+                          handleRemoveArrayItem(
+                            "heroSection",
+                            "expertise",
+                            index
+                          )
+                        }
                         className="p-2 bg-red-500/20 border border-red-500/50 rounded-lg hover:border-red-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)]"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
@@ -239,11 +292,15 @@ function PortfolioForm() {
                 {portfolioData.heroSection.expertise.length < 4 && (
                   <button
                     type="button"
-                    onClick={() => handleAddArrayItem("heroSection", "expertise", "")}
+                    onClick={() =>
+                      handleAddArrayItem("heroSection", "expertise", "")
+                    }
                     className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 border border-purple-500/50 rounded-lg hover:border-purple-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(147,51,234,0.3)] mt-2"
                   >
                     <Plus className="w-4 h-4 text-purple-400" />
-                    <span className="text-sm text-purple-400">Add Expertise</span>
+                    <span className="text-sm text-purple-400">
+                      Add Expertise
+                    </span>
                   </button>
                 )}
               </div>
@@ -256,20 +313,31 @@ function PortfolioForm() {
                   <div key={index} className="flex gap-2 mb-2 items-center">
                     <input
                       type="text"
-                      value={item}
+                      value={item || ""}
                       onChange={(e) =>
-                        handleUpdateArrayItem("heroSection", "focusAreas", index, e.target.value)
+                        handleUpdateArrayItem(
+                          "heroSection",
+                          "focusAreas",
+                          index,
+                          e.target.value
+                        )
                       }
                       maxLength="40"
                       className="flex-1 bg-gray-900/50 border border-purple-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-purple-400 focus:outline-none focus:shadow-[0_0_10px_rgba(147,51,234,0.3)] transition-all duration-300"
                     />
                     <span className="text-xs text-gray-500 self-center min-w-[3rem]">
-                      {item.length}/40
+                      {item ? item.length : 0}/40
                     </span>
                     {portfolioData.heroSection.focusAreas.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveArrayItem("heroSection", "focusAreas", index)}
+                        onClick={() =>
+                          handleRemoveArrayItem(
+                            "heroSection",
+                            "focusAreas",
+                            index
+                          )
+                        }
                         className="p-2 bg-red-500/20 border border-red-500/50 rounded-lg hover:border-red-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)]"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
@@ -280,11 +348,15 @@ function PortfolioForm() {
                 {portfolioData.heroSection.focusAreas.length < 4 && (
                   <button
                     type="button"
-                    onClick={() => handleAddArrayItem("heroSection", "focusAreas", "")}
+                    onClick={() =>
+                      handleAddArrayItem("heroSection", "focusAreas", "")
+                    }
                     className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 border border-purple-500/50 rounded-lg hover:border-purple-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(147,51,234,0.3)] mt-2"
                   >
                     <Plus className="w-4 h-4 text-purple-400" />
-                    <span className="text-sm text-purple-400">Add Focus Area</span>
+                    <span className="text-sm text-purple-400">
+                      Add Focus Area
+                    </span>
                   </button>
                 )}
               </div>
@@ -305,9 +377,13 @@ function PortfolioForm() {
                   </label>
                   <input
                     type="email"
-                    value={portfolioData.contactInfo.email}
+                    value={portfolioData.contactInfo.email || ""}
                     onChange={(e) =>
-                      handleUpdateNestedField("contactInfo", "email", e.target.value)
+                      handleUpdateNestedField(
+                        "contactInfo",
+                        "email",
+                        e.target.value
+                      )
                     }
                     className="w-full bg-gray-900/50 border border-indigo-500/50 rounded-lg px-4 py-3 text-gray-300 focus:border-indigo-400 focus:outline-none focus:shadow-[0_0_10px_rgba(99,102,241,0.3)] transition-all duration-300"
                     required
@@ -320,9 +396,13 @@ function PortfolioForm() {
                   </label>
                   <input
                     type="tel"
-                    value={portfolioData.contactInfo.phoneNumber}
+                    value={portfolioData.contactInfo.phoneNumber || ""}
                     onChange={(e) =>
-                      handleUpdateNestedField("contactInfo", "phoneNumber", e.target.value)
+                      handleUpdateNestedField(
+                        "contactInfo",
+                        "phoneNumber",
+                        e.target.value
+                      )
                     }
                     className="w-full bg-gray-900/50 border border-indigo-500/50 rounded-lg px-4 py-3 text-gray-300 focus:border-indigo-400 focus:outline-none focus:shadow-[0_0_10px_rgba(99,102,241,0.3)] transition-all duration-300"
                   />
@@ -334,9 +414,13 @@ function PortfolioForm() {
                   </label>
                   <input
                     type="url"
-                    value={portfolioData.contactInfo.linkedinProfile}
+                    value={portfolioData.contactInfo.linkedinProfile || ""}
                     onChange={(e) =>
-                      handleUpdateNestedField("contactInfo", "linkedinProfile", e.target.value)
+                      handleUpdateNestedField(
+                        "contactInfo",
+                        "linkedinProfile",
+                        e.target.value
+                      )
                     }
                     className="w-full bg-gray-900/50 border border-indigo-500/50 rounded-lg px-4 py-3 text-gray-300 focus:border-indigo-400 focus:outline-none focus:shadow-[0_0_10px_rgba(99,102,241,0.3)] transition-all duration-300"
                   />
@@ -363,9 +447,13 @@ function PortfolioForm() {
                     </label>
                     <input
                       type="text"
-                      value={status.status}
+                      value={status.status || ""}
                       onChange={(e) =>
-                        handleUpdateCurrentStatus(index, "status", e.target.value)
+                        handleUpdateCurrentStatus(
+                          index,
+                          "status",
+                          e.target.value
+                        )
                       }
                       className="w-full bg-gray-900/50 border border-blue-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-blue-400 focus:outline-none focus:shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
                     />
@@ -376,14 +464,22 @@ function PortfolioForm() {
                       Color
                     </label>
                     <select
-                      value={status.color}
+                      value={status.color || "purple"}
                       onChange={(e) =>
-                        handleUpdateCurrentStatus(index, "color", e.target.value)
+                        handleUpdateCurrentStatus(
+                          index,
+                          "color",
+                          e.target.value
+                        )
                       }
                       className="w-full bg-gray-900/50 border border-blue-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-blue-400 focus:outline-none focus:shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
                     >
                       {colorOptions.map((color) => (
-                        <option key={color} value={color} className="bg-gray-900">
+                        <option
+                          key={color}
+                          value={color}
+                          className="bg-gray-900"
+                        >
                           {color.charAt(0).toUpperCase() + color.slice(1)}
                         </option>
                       ))}
@@ -394,9 +490,13 @@ function PortfolioForm() {
                     <label className="flex items-center gap-2 text-blue-300 text-sm font-medium">
                       <input
                         type="checkbox"
-                        checked={status.isActive}
+                        checked={status.isActive || false}
                         onChange={(e) =>
-                          handleUpdateCurrentStatus(index, "isActive", e.target.checked)
+                          handleUpdateCurrentStatus(
+                            index,
+                            "isActive",
+                            e.target.checked
+                          )
                         }
                         className="w-4 h-4 text-blue-400 bg-gray-900 border-blue-500 rounded focus:ring-blue-400 focus:ring-2"
                       />
@@ -408,7 +508,13 @@ function PortfolioForm() {
                     {portfolioData.currentStatus.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveArrayItem("currentStatus", "currentStatus", index)}
+                        onClick={() =>
+                          handleRemoveArrayItem(
+                            "portfolioData",
+                            "currentStatus",
+                            index
+                          )
+                        }
                         className="p-2 bg-red-500/20 border border-red-500/50 rounded-lg hover:border-red-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)]"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
@@ -421,7 +527,13 @@ function PortfolioForm() {
               {portfolioData.currentStatus.length < 3 && (
                 <button
                   type="button"
-                  onClick={() => handleAddArrayItem("currentStatus", "currentStatus", { status: "", color: "purple", isActive: true })}
+                  onClick={() =>
+                    handleAddArrayItem("portfolioData", "currentStatus", {
+                      status: "",
+                      color: "purple",
+                      isActive: true,
+                    })
+                  }
                   className="flex items-center gap-2 px-3 py-2 bg-blue-500/20 border border-blue-500/50 rounded-lg hover:border-blue-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] mt-2"
                 >
                   <Plus className="w-4 h-4 text-blue-400" />
@@ -449,9 +561,13 @@ function PortfolioForm() {
                     </label>
                     <input
                       type="text"
-                      value={tech.technology}
+                      value={tech.technology || ""}
                       onChange={(e) =>
-                        handleUpdateTechHighlight(index, "technology", e.target.value)
+                        handleUpdateTechHighlight(
+                          index,
+                          "technology",
+                          e.target.value
+                        )
                       }
                       className="w-full bg-gray-900/50 border border-violet-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-violet-400 focus:outline-none focus:shadow-[0_0_10px_rgba(139,92,246,0.3)] transition-all duration-300"
                     />
@@ -472,9 +588,13 @@ function PortfolioForm() {
                     </label>
                     <input
                       type="text"
-                      value={tech.description}
+                      value={tech.description || ""}
                       onChange={(e) =>
-                        handleUpdateTechHighlight(index, "description", e.target.value)
+                        handleUpdateTechHighlight(
+                          index,
+                          "description",
+                          e.target.value
+                        )
                       }
                       className="w-full bg-gray-900/50 border border-violet-500/50 rounded-lg px-4 py-2 text-gray-300 focus:border-violet-400 focus:outline-none focus:shadow-[0_0_10px_rgba(139,92,246,0.3)] transition-all duration-300"
                     />
@@ -484,7 +604,13 @@ function PortfolioForm() {
                     {portfolioData.techHighlights.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveArrayItem("techHighlights", "techHighlights", index)}
+                        onClick={() =>
+                          handleRemoveArrayItem(
+                            "portfolioData",
+                            "techHighlights",
+                            index
+                          )
+                        }
                         className="p-2 bg-red-500/20 border border-red-500/50 rounded-lg hover:border-red-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)]"
                       >
                         <Trash2 className="w-4 h-4 text-red-400" />
@@ -497,11 +623,19 @@ function PortfolioForm() {
               {portfolioData.techHighlights.length < 4 && (
                 <button
                   type="button"
-                  onClick={() => handleAddArrayItem("techHighlights", "techHighlights", { technology: "", rating: 1, description: "" })}
+                  onClick={() =>
+                    handleAddArrayItem("portfolioData", "techHighlights", {
+                      technology: "",
+                      rating: 1,
+                      description: "",
+                    })
+                  }
                   className="flex items-center gap-2 px-3 py-2 bg-violet-500/20 border border-violet-500/50 rounded-lg hover:border-violet-400 transition-all duration-300 hover:shadow-[0_0_10px_rgba(139,92,246,0.3)] mt-2"
                 >
                   <Plus className="w-4 h-4 text-violet-400" />
-                  <span className="text-sm text-violet-400">Add Tech Highlight</span>
+                  <span className="text-sm text-violet-400">
+                    Add Tech Highlight
+                  </span>
                 </button>
               )}
             </div>
@@ -513,10 +647,22 @@ function PortfolioForm() {
                 className="flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-400 hover:to-cyan-400 rounded-xl text-white font-semibold text-base sm:text-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(147,51,234,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-5 h-5" />
-                {isSubmitting ? "Sending Verification..." : "Send Verification Code"}
+                {isSubmitting
+                  ? "Sending Verification..."
+                  : "Send Verification Code"}
               </button>
 
-              {submitMessage && <p className={submitMessage.includes("Error") ? "text-red-400" : "text-green-400"}>{submitMessage}</p>}
+              {submitMessage && (
+                <p
+                  className={
+                    submitMessage.includes("Error")
+                      ? "text-red-400"
+                      : "text-green-400"
+                  }
+                >
+                  {submitMessage}
+                </p>
+              )}
               {error && <p className="text-red-400">{error}</p>}
             </div>
           </form>

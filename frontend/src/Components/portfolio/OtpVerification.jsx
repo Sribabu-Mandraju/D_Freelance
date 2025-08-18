@@ -1,38 +1,43 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
 import { toast } from "react-hot-toast";
+import {
+  updateOtpDigit,
+  setEmail,
+  verifyOtp,
+  resendOtp,
+  resetOtp,
+} from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
 function OtpVerification() {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isResending, setIsResending] = useState(false);
-  const [message, setMessage] = useState("");
-  const [email, setEmail] = useState("");
-  const inputRefs = useRef([]);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { otp, isVerifying, isResending, verificationMessage, email } = useSelector(
+    (state) => state.portfolio
+  );
+  const inputRefs = useRef([]);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const emailParam = searchParams.get("email");
     if (emailParam) {
-      setEmail(decodeURIComponent(emailParam));
+      dispatch(setEmail(decodeURIComponent(emailParam)));
     } else {
-      setMessage("Error: Email not found in URL");
+      dispatch({ type: "portfolio/setVerificationMessage", payload: "Error: Email not found in URL" });
       toast.error("Email not found in URL");
     }
 
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
-  }, [searchParams]);
+  }, [searchParams, dispatch]);
 
   const handleInputChange = (index, value) => {
     if (value.length > 1) return;
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+    dispatch(updateOtpDigit({ index, value }));
     if (value && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -49,131 +54,45 @@ function OtpVerification() {
     const otpString = otp.join("");
 
     if (otpString.length !== 6) {
-      setMessage("Please enter all 6 digits");
+      dispatch({ type: "portfolio/setVerificationMessage", payload: "Please enter all 6 digits" });
       toast.error("Please enter all 6 digits");
       return;
     }
 
-    setIsVerifying(true);
-    setMessage("");
-    const toastId = toast.loading("Verifying OTP...");
-
     try {
-      const portfolioId = sessionStorage.getItem("portfolioId");
-      const authToken = localStorage.getItem("authToken");
-
-      if (!portfolioId) {
-        setMessage("Error: Portfolio ID is missing");
-        toast.error("Portfolio ID is missing", { id: toastId });
-        setIsVerifying(false);
-        return;
-      }
-
-      if (!authToken) {
-        setMessage("Error: Authentication token is missing");
-        toast.error("Authentication token is missing", { id: toastId });
-        setIsVerifying(false);
-        return;
-      }
-
-      const response = await fetch(
-        "http://localhost:3001/api/portfolio/otp/verify",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            email,
-            otp: otpString,
-            portfolioId,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        setMessage("Verification successful! Redirecting to your portfolio...");
+      const action = await dispatch(verifyOtp());
+      if (verifyOtp.fulfilled.match(action)) {
         toast.success("Verification successful! Redirecting...", {
-          id: toastId,
+          id: "verify-toast",
         });
         sessionStorage.removeItem("portfolioId");
         setTimeout(() => {
           navigate(`/portfolio/me`);
         }, 2000);
-      } else {
-        setMessage(`Error: ${result.message}`);
-        toast.error(`Error: ${result.message}`, { id: toastId });
-        setOtp(["", "", "", "", "", ""]);
-        inputRefs.current[0]?.focus();
       }
-    } catch (error) {
-      setMessage(`Error: ${error.message}`);
-      toast.error(`Error: ${error.message}`, { id: toastId });
-      setOtp(["", "", "", "", "", ""]);
-      inputRefs.current[0]?.focus();
-    } finally {
-      setIsVerifying(false);
+    } catch (err) {
+      console.error("[Client] Verify error details:", err);
     }
   };
 
   const handleResend = async () => {
     if (!email) {
-      setMessage("Email not found. Please go back and try again.");
+      dispatch({ type: "portfolio/setVerificationMessage", payload: "Email not found. Please go back and try again." });
       toast.error("Email not found. Please go back and try again.");
       return;
     }
 
-    const portfolioId = sessionStorage.getItem("portfolioId");
-    const authToken = localStorage.getItem("authToken");
-
-    if (!portfolioId) {
-      setMessage("Error: Portfolio ID is missing");
-      toast.error("Portfolio ID is missing");
-      return;
-    }
-
-    if (!authToken) {
-      setMessage("Error: Authentication token is missing");
-      toast.error("Authentication token is missing");
-      return;
-    }
-
-    setIsResending(true);
-    setMessage("");
-    const toastId = toast.loading("Resending OTP...");
-
     try {
-      const response = await fetch(
-        "http://localhost:3001/api/portfolio/otp/resend",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({ email, portfolioId }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        setMessage("New OTP sent to your email!");
-        toast.success("New OTP sent to your email!", { id: toastId });
-        setOtp(["", "", "", "", "", ""]);
+      const action = await dispatch(resendOtp());
+      if (resendOtp.fulfilled.match(action)) {
+        toast.success("New OTP sent to your email!", {
+          id: "resend-toast",
+        });
+        dispatch(resetOtp());
         inputRefs.current[0]?.focus();
-      } else {
-        setMessage(`Error: ${result.message}`);
-        toast.error(`Error: ${result.message}`, { id: toastId });
       }
-    } catch (error) {
-      setMessage(`Error: ${error.message}`);
-      toast.error(`Error: ${error.message}`, { id: toastId });
-    } finally {
-      setIsResending(false);
+    } catch (err) {
+      console.error("[Client] Resend error details:", err);
     }
   };
 
@@ -241,15 +160,15 @@ function OtpVerification() {
               <ArrowLeft className="w-4 h-4" />
               Back to Form
             </button>
-            {message && (
+            {verificationMessage && (
               <div
                 className={`p-4 rounded-lg border text-sm text-center ${
-                  message.includes("Error")
+                  verificationMessage.includes("Error")
                     ? "bg-red-500/10 border-red-500/50 text-red-400"
                     : "bg-green-500/10 border-green-500/50 text-green-400"
                 }`}
               >
-                {message}
+                {verificationMessage}
               </div>
             )}
           </form>

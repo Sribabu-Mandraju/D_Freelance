@@ -1,22 +1,24 @@
-
 "use client";
 
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Database, Edit, Save, X, Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import {
+  toggleEditingStatus,
+  updateCurrentStatus,
+  addNewStatus,
+  removeStatus,
+  saveCurrentStatus,
+  setIsSaving,
+  updatePortfolio,
+} from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
-function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
-  const [isEditingStatus, setIsEditingStatus] = useState(false);
-  const [editStatus, setEditStatus] = useState([]);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Static portfolio ID
-  
-
-  const handleEditStatus = () => {
-    setIsEditingStatus(true);
-    setEditStatus(currentStatus.map((s) => ({ ...s })));
-  };
+function CurrentStatus({ portfolioId }) {
+  const dispatch = useDispatch();
+  const { isEditingStatus, portfolioData, editStatus, isSaving, loading } = useSelector(
+    (state) => state.portfolio
+  );
+  const currentStatus = portfolioData?.currentStatus || [];
 
   const validateStatus = () => {
     const errors = [];
@@ -39,12 +41,12 @@ function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
 
   const handleSaveStatus = async () => {
     if (!validateStatus()) {
-      setIsSaving(false);
+      dispatch(setIsSaving(false));
       return;
     }
 
     const toastId = toast.loading("Saving current status...");
-    setIsSaving(true);
+    dispatch(setIsSaving(true));
 
     try {
       const statusObjects = editStatus.map((item) => ({
@@ -53,62 +55,38 @@ function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
         isActive: item.isActive,
       }));
 
-      const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ currentStatus: statusObjects }),
-      });
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Failed to update current status");
-      }
-
-      setCurrentStatus(
-        result.data.currentStatus.map((item, index) => ({
-          ...item,
-          _id: editStatus[index]._id || Date.now().toString() + index,
-        }))
+      const action = await dispatch(
+        updatePortfolio({ portfolioId, data: { currentStatus: statusObjects } })
       );
-      setIsEditingStatus(false);
-      toast.success("Current status updated successfully!", { id: toastId });
-      console.log("Updated current status:", result.data.currentStatus);
+      if (updatePortfolio.fulfilled.match(action)) {
+        dispatch(saveCurrentStatus());
+        toast.success("Current status updated successfully!", { id: toastId });
+        
+      }
     } catch (error) {
-      console.error("Error updating current status:", error.message);
+      
       toast.error(`Failed to save changes: ${error.message}`, { id: toastId });
     } finally {
-      setIsSaving(false);
+      dispatch(setIsSaving(false));
     }
   };
 
   const handleCancelStatus = () => {
-    setEditStatus(currentStatus.map((s) => ({ ...s })));
-    setIsEditingStatus(false);
+    dispatch(toggleEditingStatus());
     toast.dismiss(); // Dismiss all active toasts
   };
 
-  const updateStatus = (id, field, value) => {
-    setEditStatus((prev) => prev.map((status) => (status._id === id ? { ...status, [field]: value } : status)));
+  const updateStatus = (index, field, value) => {
+    dispatch(updateCurrentStatus({ index, field, value }));
   };
 
-  const addNewStatus = () => {
-    if (editStatus.length >= 3) {
-      toast.error("Maximum 3 status items allowed", { duration: 5000 });
-      return;
-    }
-
-    const newStatus = {
-      _id: Date.now().toString(),
-      status: "",
-      color: "blue",
-      isActive: true,
-    };
-    setEditStatus([...editStatus, newStatus]);
+  const handleEditStatus = () => {
+    dispatch(toggleEditingStatus());
   };
 
-  const removeStatus = (id) => {
-    setEditStatus((prev) => prev.filter((status) => status._id !== id));
-  };
+  // Prevent rendering if loading or data is not ready
+  if (loading) return <div className="p-4 text-cyan-300">Loading current status...</div>;
+  if (!currentStatus && !isEditingStatus) return <div className="p-4 text-gray-400">No status available.</div>;
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-purple-500/20 rounded-2xl p-4 sm:p-6 shadow-2xl shadow-purple-500/10 relative overflow-hidden">
@@ -132,7 +110,7 @@ function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
         ) : (
           <div className="flex items-center gap-1">
             <button
-              onClick={addNewStatus}
+              onClick={() => dispatch(addNewStatus())}
               disabled={isSaving || editStatus.length >= 3}
               className={`p-2 bg-gray-900/50 border rounded-lg transition-all disabled:opacity-50 ${
                 editStatus.length >= 3
@@ -166,11 +144,10 @@ function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
       </div>
 
       <div className="space-y-4 text-sm">
-        {(isEditingStatus ? editStatus : currentStatus).map((status) => (
+        {(isEditingStatus ? editStatus : currentStatus || []).map((status,index) => ( // Added fallback to empty array
           <div key={status._id} className="p-4 bg-gray-900/50 rounded-lg border border-gray-700/50 relative">
             <div className="flex items-start justify-between mb-3">
               <div className="flex flex-col items-start gap-3">
-                {/* Color indicator at the top */}
                 <div className="relative flex justify-start">
                   <div
                     className={`w-4 h-4 rounded-full ${
@@ -210,14 +187,13 @@ function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
                   )}
                 </div>
 
-                {/* Status text positioned directly below the color dot */}
                 <div className="w-full">
                   {isEditingStatus ? (
                     <div className="flex flex-col w-full">
                       <input
                         type="text"
                         value={status.status || ""}
-                        onChange={(e) => updateStatus(status._id, "status", e.target.value)}
+                        onChange={(e) => updateStatus(index, "status", e.target.value)}
                         disabled={isSaving}
                         className={`text-gray-300 font-medium bg-transparent border-none focus:outline-none text-base w-full ${
                           (status.status || "").length > 50 ? "text-red-400" : ""
@@ -238,10 +214,9 @@ function CurrentStatus({ currentStatus = [], setCurrentStatus,portfolioId}) {
                 </div>
               </div>
 
-              {/* Delete button on the right side */}
               {isEditingStatus && (
                 <button
-                  onClick={() => removeStatus(status._id)}
+                  onClick={() => dispatch(removeStatus({ id: status._id }))}
                   disabled={isSaving}
                   className="p-2 bg-red-500/20 border border-red-500/50 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50"
                 >

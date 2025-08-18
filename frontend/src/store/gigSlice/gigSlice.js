@@ -150,7 +150,7 @@ const gigSlice = createSlice({
   initialState,
   reducers: {
     setFormData: (state, action) => {
-      console.log("setFormData payload:", action.payload); // Debug
+     
       state.formData = { ...state.formData, ...action.payload };
     },
 
@@ -254,7 +254,7 @@ const gigSlice = createSlice({
         state.error = null;
         state.submissionStatus = "pending";
       })
-      .addCase(submitGig.fulfilled, (state) => {
+      .addCase(submitGig.fulfilled, (state,action) => {
         state.loading = false;
         state.submissionStatus = "succeeded";
         state.currentGigId = action.payload._id;

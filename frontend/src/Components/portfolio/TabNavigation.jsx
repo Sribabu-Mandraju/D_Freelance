@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 function TabNavigation({ tabs, activeTab, setActiveTab }) {
   return (
@@ -6,7 +6,7 @@ function TabNavigation({ tabs, activeTab, setActiveTab }) {
       <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
         <div className="flex flex-row gap-1 p-2 bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/10 min-w-max">
           {tabs.map((tab) => {
-            const IconComponent = tab.icon
+            const IconComponent = tab.icon;
             return (
               <button
                 key={tab.id}
@@ -25,12 +25,12 @@ function TabNavigation({ tabs, activeTab, setActiveTab }) {
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl blur-sm -z-10"></div>
                 )}
               </button>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default TabNavigation
+export default TabNavigation;

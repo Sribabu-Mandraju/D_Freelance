@@ -1,115 +1,90 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Code, Edit, Save, X, Plus, Trash2 } from "lucide-react"
-import toast from "react-hot-toast"
+import { useDispatch, useSelector } from "react-redux";
+import { Code, Edit, Save, X, Plus, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
+import {
+  toggleEditingTech,
+  updateTechHighlight,
+  addNewTechHighlight,
+  removeTechHighlight,
+  saveTechHighlights,
+  setTechSaving,
+  updatePortfolio,
+} from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 
-
-
-function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
-  const [isEditingTech, setIsEditingTech] = useState(false)
-  const [editTech, setEditTech] = useState([])
-  const [isSaving, setIsSaving] = useState(false)
+function TechHighlights({ techHighlights, portfolioId }) {
+  const dispatch = useDispatch();
+  const { isEditingTech, editTechHighlights, techSaving } = useSelector(
+    (state) => state.portfolio
+  );
 
   const handleEditTech = () => {
-    setIsEditingTech(true)
-    setEditTech(techHighlights.map((t) => ({ ...t })))
+    dispatch(toggleEditingTech());
     toast.success("Edit mode enabled", {
       icon: "✏️",
       duration: 2000,
-    })
-  }
+    });
+  };
 
   const handleSaveTech = async () => {
-    setIsSaving(true)
-
+    dispatch(setTechSaving(true));
     const loadingToast = toast.loading("Saving tech highlights...", {
       icon: "💾",
-    })
+    });
 
     try {
-      const response = await fetch(`http://localhost:3001/api/portfolio/${portfolioId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          techHighlights: editTech,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to save tech highlights")
+      const action = await dispatch(
+        updatePortfolio({ portfolioId, data: { techHighlights: editTechHighlights } })
+      );
+      if (updatePortfolio.fulfilled.match(action)) {
+        dispatch(saveTechHighlights());
+        toast.dismiss(loadingToast);
+        toast.success("Tech highlights saved successfully!", {
+          icon: "✅",
+          duration: 3000,
+        });
       }
-
-      const updatedPortfolio = await response.json()
-      setTechHighlights(editTech)
-      setIsEditingTech(false)
-
-      toast.dismiss(loadingToast)
-      toast.success("Tech highlights saved successfully!", {
-        icon: "✅",
-        duration: 3000,
-      })
     } catch (error) {
-      console.error("Error saving tech highlights:", error)
-
-      toast.dismiss(loadingToast)
+      
+      toast.dismiss(loadingToast);
       toast.error(error.message || "Failed to save changes. Please try again.", {
         icon: "❌",
         duration: 4000,
-      })
+      });
     } finally {
-      setIsSaving(false)
+      dispatch(setTechSaving(false));
     }
-  }
+  };
 
   const handleCancelTech = () => {
-    setEditTech(techHighlights.map((t) => ({ ...t })))
-    setIsEditingTech(false)
-
+    dispatch(toggleEditingTech());
     toast("Changes cancelled", {
       icon: "↩️",
       duration: 2000,
-    })
-  }
+    });
+  };
 
   const updateTech = (index, field, value) => {
-    setEditTech((prev) => prev.map((tech, i) => (i === index ? { ...tech, [field]: value } : tech)))
-  }
+    dispatch(updateTechHighlight({ index, field, value }));
+  };
 
   const addNewTech = () => {
-    if (editTech.length >= 4) {
-      toast.error("Maximum 4 tech highlights allowed", {
-        icon: "⚠️",
-        duration: 3000,
-      })
-      return
-    }
-
-    const newTech = {
-      technology: "",
-      rating: 3,
-      description: "",
-    }
-    setEditTech([...editTech, newTech])
-
+    dispatch(addNewTechHighlight());
     toast.success("New tech highlight added", {
       icon: "➕",
       duration: 2000,
-    })
-  }
+    });
+  };
 
   const removeTech = (index) => {
-    const techName = editTech[index].technology || "Tech highlight"
-    setEditTech((prev) => prev.filter((_, i) => i !== index))
-
+    const techName = editTechHighlights[index].technology || "Tech highlight";
+    dispatch(removeTechHighlight({ index }));
     toast.success(`${techName} removed`, {
       icon: "🗑️",
       duration: 2000,
-    })
-  }
+    });
+  };
 
   return (
     <div className="bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-4 sm:p-6 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
@@ -135,22 +110,30 @@ function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
           <div className="flex w-auto gap-1 ml-[-18px]">
             <button
               onClick={addNewTech}
-              disabled={isSaving || editTech.length >= 4}
+              disabled={techSaving || editTechHighlights.length >= 4}
               className={`flex sm:flex-none p-2 bg-gray-900/50 border rounded-lg transition-all duration-300 group disabled:opacity-50 ${
-                editTech.length >= 4
+                editTechHighlights.length >= 4
                   ? "border-gray-500/50 cursor-not-allowed"
                   : "border-blue-500/50 hover:border-blue-400 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)]"
               }`}
-              title={editTech.length >= 4 ? "Maximum 4 tech highlights allowed" : "Add new tech highlight"}
+              title={
+                editTechHighlights.length >= 4
+                  ? "Maximum 4 tech highlights allowed"
+                  : "Add new tech highlight"
+              }
             >
-              <Plus className={`w-4 h-4 sm:w-3 sm:h-3 ${editTech.length >= 4 ? "text-gray-500" : "text-blue-400"}`} />
+              <Plus
+                className={`w-4 h-4 sm:w-3 sm:h-3 ${
+                  editTechHighlights.length >= 4 ? "text-gray-500" : "text-blue-400"
+                }`}
+              />
             </button>
             <button
               onClick={handleSaveTech}
-              disabled={isSaving}
+              disabled={techSaving}
               className="flex sm:flex-none p-2 bg-gray-900/50 border border-green-500/50 hover:border-green-400 rounded-lg transition-all duration-300 hover:shadow-[0_0_10px_rgba(34,197,94,0.3)] group disabled:opacity-50"
             >
-              {isSaving ? (
+              {techSaving ? (
                 <div className="w-3 h-3 sm:w-3 sm:h-3 border-2 border-green-400 border-t-transparent rounded-full animate-spin" />
               ) : (
                 <Save className="w-4 h-4 sm:w-3 sm:h-3 text-green-400" />
@@ -158,7 +141,7 @@ function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
             </button>
             <button
               onClick={handleCancelTech}
-              disabled={isSaving}
+              disabled={techSaving}
               className="flex sm:flex-none p-2 bg-gray-900/50 border border-red-500/50 hover:border-red-400 rounded-lg transition-all duration-300 hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] group disabled:opacity-50"
             >
               <X className="w-4 h-4 sm:w-3 sm:h-3 text-red-400" />
@@ -168,7 +151,7 @@ function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
       </div>
 
       <div className="space-y-3">
-        {(isEditingTech ? editTech : techHighlights).map((tech, index) => (
+        {(isEditingTech ? editTechHighlights : techHighlights).map((tech, index) => (
           <div
             key={index}
             className="flex flex-row w-full items-center justify-between p-2 bg-gradient-to-r from-gray-800/30 to-gray-900/30 rounded-lg border border-gray-700/30 relative"
@@ -180,7 +163,7 @@ function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
                 onChange={(e) => updateTech(index, "technology", e.target.value)}
                 placeholder="Technology"
                 className="text-sm text-gray-300 bg-transparent border-none w-[50%] focus:outline-none placeholder-gray-500"
-                disabled={isSaving}
+                disabled={techSaving}
               />
             ) : (
               <span className="text-sm text-gray-300">{tech.technology}</span>
@@ -191,7 +174,7 @@ function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
                 <select
                   value={tech.rating}
                   onChange={(e) => updateTech(index, "rating", Number.parseInt(e.target.value))}
-                  disabled={isSaving}
+                  disabled={techSaving}
                   className="text-xs bg-gray-800/80 border border-gray-600/50 rounded px-2 py-1 text-gray-300 focus:outline-none focus:border-cyan-400 disabled:opacity-50"
                 >
                   <option value={1}>1 Star</option>
@@ -217,17 +200,17 @@ function TechHighlights({ techHighlights, setTechHighlights,portfolioId}) {
             {isEditingTech && (
               <button
                 onClick={() => removeTech(index)}
-                disabled={isSaving}
+                disabled={techSaving}
                 className="ml-[2px] p-1 bg-red-500/20 border border-red-500/50 rounded hover:bg-red-500/30 transition-colors duration-300 disabled:opacity-50"
               >
-                <Trash2 className=" w-3 h-3 text-red-400" />
+                <Trash2 className="w-3 h-3 text-red-400" />
               </button>
             )}
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-export default TechHighlights
+export default TechHighlights;
