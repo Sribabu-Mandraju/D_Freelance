@@ -28,6 +28,7 @@ import PortfolioForm from "./Components/portfolio/portfolioForm";
 import Gigs from "./Pages/gig/Gigs";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
+import JobDetails from "./Pages/JobDetails";
 import PayFirstMilestoneButton from "./Components/testingContracts/PayFirstMileStone";
 import PaySecondMilestoneButton from "./Components/testingContracts/PaySecondMileStone";
 import PayThirdMilestoneButton from "./Components/testingContracts/PayThirdMileStone";
@@ -69,6 +70,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/portfolio/me" element={<Portfolio />} />
             <Route path="/browse-jobs" element={<BrowseJobs />} />
+            <Route path="/job/:id" element={<JobDetails />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/proposal" element={<Proposal />} />
             <Route path="/freelancer/:id" element={<FreelancerProfile />} />
@@ -77,7 +79,7 @@ const App = () => {
             <Route path="/gigs" element={<Gigs />} />
             <Route path="/adminDashboard" element={<AdminDashboard />} />
 
-            <Route path="/jobDetails/:id" element={<ProposalDetails />} />
+            <Route path="/jobDetails/:id" element={<JobDetails />} />
             <Route
               path="/connect"
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
@@ -115,14 +117,40 @@ const App = () => {
               }
             />
             {/* <Route path="/acceptBid" element={<AcceptBid />} /> */}
-            <Route path="/depositBidAmount" element={<DepositBidAmountButton proposalId={34} onSuccess={handleSuccess} />} />
+            <Route
+              path="/depositBidAmount"
+              element={
+                <DepositBidAmountButton
+                  proposalId={34}
+                  onSuccess={handleSuccess}
+                />
+              }
+            />
             <Route path="/placeBid" element={<PlaceBid />} />
-            <Route path="/startWork" element={<StartWorkButton proposalId={34} />} />
-            <Route path="/payFirstMilestone" element={<PayFirstMilestoneButton proposalId={34} />} />
-            <Route path="/paySecondMilestone" element={<PaySecondMilestoneButton proposalId={34} />} />
-            <Route path="/payThirdMilestone" element={<PayThirdMilestoneButton proposalId={34} />} />
-            <Route path="/completeProposal" element={<CompleteProposalButton proposalId={34} />} />
-            <Route path="/cancelProposal" element={<CancelProposalButton proposalId={34} />} />
+            <Route
+              path="/startWork"
+              element={<StartWorkButton proposalId={34} />}
+            />
+            <Route
+              path="/payFirstMilestone"
+              element={<PayFirstMilestoneButton proposalId={34} />}
+            />
+            <Route
+              path="/paySecondMilestone"
+              element={<PaySecondMilestoneButton proposalId={34} />}
+            />
+            <Route
+              path="/payThirdMilestone"
+              element={<PayThirdMilestoneButton proposalId={34} />}
+            />
+            <Route
+              path="/completeProposal"
+              element={<CompleteProposalButton proposalId={34} />}
+            />
+            <Route
+              path="/cancelProposal"
+              element={<CancelProposalButton proposalId={34} />}
+            />
 
             <Route path="/portfolioForm" element={<PortfolioForm />} />
             <Route path="/otpverification" element={<OtpVerification />} />

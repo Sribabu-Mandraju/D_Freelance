@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // Initial state
 const initialState = {
@@ -12,12 +12,12 @@ const initialState = {
 
 // Async thunk to call /api/auth/verify
 export const verifyWalletAuth = createAsyncThunk(
-  'auth/verifyWalletAuth',
+  "auth/verifyWalletAuth",
   async ({ address, signature, nonce }, thunkAPI) => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:3001/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ address, signature, nonce }),
       });
 
@@ -28,11 +28,11 @@ export const verifyWalletAuth = createAsyncThunk(
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.message || 'Verification failed');
+        throw new Error(data.message || "Verification failed");
       }
 
       // Save token in localStorage (optional)
-      localStorage.setItem('authToken', data.token);
+      localStorage.setItem("authToken", data.token);
 
       return {
         token: data.token,
@@ -45,9 +45,39 @@ export const verifyWalletAuth = createAsyncThunk(
   }
 );
 
+// Async thunk to validate stored token
+export const validateStoredToken = createAsyncThunk(
+  "auth/validateStoredToken",
+  async (_, thunkAPI) => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const address = localStorage.getItem("authAddress");
+
+      if (!token || !address) {
+        throw new Error("No stored authentication data");
+      }
+
+      // You can add a token validation endpoint here if needed
+      // For now, we'll just restore the state
+      return {
+        token,
+        address,
+        // You might want to fetch user data here
+        user: null,
+        userExists: true, // Assume user exists if we have a token
+      };
+    } catch (error) {
+      // Clear invalid stored data
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("authAddress");
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 // Auth slice
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     logout: (state) => {
@@ -56,7 +86,7 @@ const authSlice = createSlice({
       state.userExists = false;
       state.isAuthenticated = false;
       state.error = null;
-      localStorage.removeItem('authToken');
+      localStorage.removeItem("authToken");
     },
   },
   extraReducers: (builder) => {
@@ -73,9 +103,27 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.error = null;
       })
-      .addCase(verifyWalletAuth.rejected, (state, action) => {
+      .addCase(verifyWalletAuth.rejected, (state) => {
         state.loading = false;
-        state.error = action.payload || 'Verification failed';
+        state.isAuthenticated = false;
+        state.error = action.payload || "Verification failed";
+      })
+      .addCase(validateStoredToken.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(validateStoredToken.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+        state.userExists = action.payload.userExists;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(validateStoredToken.rejected, (state) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });

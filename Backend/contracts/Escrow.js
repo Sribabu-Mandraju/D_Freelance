@@ -58,3 +58,31 @@ export const getEscrowConfig = async (req, res) => {
     });
   }
 };
+
+
+export const getProposalBalance = async (req, res) => {
+  try {
+    const { proposalId } = req.params;
+    
+    if (!proposalId) {
+      return res.status(400).json({
+        success: false,
+        error: "Proposal ID is required"
+      });
+    }
+
+    const balance = await Escrow_contract.getProposalBalance(proposalId);
+
+    return res.status(200).json({
+      success: true,
+      proposalId: proposalId,
+      lockedFunds: balance.toString()
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};

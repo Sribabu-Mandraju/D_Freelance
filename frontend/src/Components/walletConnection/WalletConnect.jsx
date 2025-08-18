@@ -1,8 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAccount, useSignMessage, useSwitchChain } from "wagmi";
 import { base, baseSepolia } from "wagmi/chains";
-import { verifyWalletAuth, logout } from "../../store/authSlice/authSlice";
-import { useDispatch } from "react-redux";
+import {
+  verifyWalletAuth,
+  logout,
+  validateStoredToken,
+} from "../../store/authSlice/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function WalletConnect({ onAuthSuccess }) {
   const { address, isConnected, chain, status } = useAccount();
@@ -10,7 +14,47 @@ function WalletConnect({ onAuthSuccess }) {
   const { switchChain } = useSwitchChain();
   const [authStatus, setAuthStatus] = useState(null);
   const [chainError, setChainError] = useState(null);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth);
+
+  // Use refs to track previous values and prevent unnecessary re-authentication
+  const prevAddressRef = useRef(null);
+  const prevChainRef = useRef(null);
+  const hasAuthenticatedRef = useRef(false);
+  const hasInitializedRef = useRef(false);
+
+  // Initialize authentication state on mount
+  useEffect(() => {
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      console.log("Initializing authentication state...");
+
+      // Try to restore authentication from stored data
+      const storedToken = localStorage.getItem("authToken");
+      const storedAddress = localStorage.getItem("authAddress");
+
+      if (storedToken && storedAddress) {
+        console.log("Found stored authentication data, validating...");
+        dispatch(validateStoredToken()).then((result) => {
+          if (result.meta.requestStatus === "fulfilled") {
+            console.log("Stored token validated successfully");
+            hasAuthenticatedRef.current = true;
+            // Call onAuthSuccess with stored data
+            onAuthSuccess(
+              result.payload.token,
+              result.payload.userExists,
+              result.payload.user
+            );
+          } else {
+            console.log(
+              "Stored token validation failed, will require re-authentication"
+            );
+          }
+        });
+      }
+    }
+  }, [dispatch, onAuthSuccess]);
 
   useEffect(() => {
     console.log("useEffect triggered", {
@@ -18,15 +62,52 @@ function WalletConnect({ onAuthSuccess }) {
       isConnected,
       address,
       chain: chain?.id,
+      authState: authState.isAuthenticated,
+      hasAuthenticated: hasAuthenticatedRef.current,
     });
+
     const authenticate = async () => {
-      console.log("Starting authentication process");
-      if (!isConnected || !address) {
-        console.log("Wallet not connected", { status, isConnected, address });
+      // Don't authenticate if already in process
+      if (isAuthenticating) {
+        console.log("Authentication already in progress, skipping...");
+        return;
+      }
+
+      // Don't authenticate if wallet is not connected
+      if (!isConnected || !address || status !== "connected") {
+        console.log("Wallet not connected or wrong status", {
+          status,
+          isConnected,
+          address,
+        });
         setAuthStatus("Please connect your wallet");
         return;
       }
 
+      // Check if we already have a valid token for this address
+      const existingToken = localStorage.getItem("authToken");
+      const existingAddress = localStorage.getItem("authAddress");
+
+      if (
+        existingToken &&
+        existingAddress === address &&
+        authState.isAuthenticated
+      ) {
+        console.log("Already authenticated with valid token for this address");
+        hasAuthenticatedRef.current = true;
+        return;
+      }
+
+      // Check if address or chain has actually changed
+      const addressChanged = prevAddressRef.current !== address;
+      const chainChanged = prevChainRef.current !== chain?.id;
+
+      if (!addressChanged && !chainChanged && hasAuthenticatedRef.current) {
+        console.log("No changes detected, skipping re-authentication");
+        return;
+      }
+
+      // Check chain compatibility
       if (chain && ![base.id, baseSepolia.id].includes(chain.id)) {
         console.log("Invalid chain detected", { chainId: chain?.id });
         setChainError("Please switch to Base Mainnet or Base Sepolia");
@@ -34,6 +115,8 @@ function WalletConnect({ onAuthSuccess }) {
           console.log("Attempting to switch to Base Sepolia");
           await switchChain({ chainId: baseSepolia.id });
           console.log("Switched to Base Sepolia");
+          // Wait a bit for chain switch to complete
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         } catch (error) {
           console.error("Chain switch error:", error);
           setChainError(`Failed to switch chain: ${error.message}`);
@@ -42,6 +125,7 @@ function WalletConnect({ onAuthSuccess }) {
       }
       setChainError(null);
 
+      setIsAuthenticating(true);
       try {
         console.log("Fetching nonce for address:", address);
         const nonceResponse = await fetch(
@@ -79,6 +163,12 @@ function WalletConnect({ onAuthSuccess }) {
         const verifyResult = resultAction.payload;
         if (verifyResult?.token) {
           setAuthStatus("Authentication successful");
+          hasAuthenticatedRef.current = true;
+
+          // Store authentication data
+          localStorage.setItem("authToken", verifyResult.token);
+          localStorage.setItem("authAddress", address);
+
           onAuthSuccess(
             verifyResult.token,
             verifyResult.userExists,
@@ -86,35 +176,39 @@ function WalletConnect({ onAuthSuccess }) {
           );
         } else {
           setAuthStatus("Authentication failed");
+          hasAuthenticatedRef.current = false;
         }
       } catch (error) {
-        //   const verifyResponse = await fetch('http://localhost:3001/api/auth/verify', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ address, signature, nonce }),
-        //   });
-        //   console.log('Verify response status:', verifyResponse.status, verifyResponse.statusText);
-        //   if (!verifyResponse.ok) {
-        //     throw new Error(`Verify request failed: ${verifyResponse.statusText}`);
-        //   }
-        //   const verifyResult = await verifyResponse.json();
-        //   console.log('Verify response data:', verifyResult);
-
-        //   if (verifyResult.success) {
-        //     console.log('Authentication successful, storing JWT');
-        //     setAuthStatus('Authentication successful');
-        //     localStorage.setItem('authToken', verifyResult.token); // Store JWT
-        //     onAuthSuccess(verifyResult.token, verifyResult.userExists, verifyResult.user);
-        //   } else {
-        //     setAuthStatus(verifyResult.message || 'Authentication failed');
-        //   }
-        // }
         console.error("Authentication error:", error);
         setAuthStatus(`Authentication failed: ${error.message}`);
+        hasAuthenticatedRef.current = false;
+      } finally {
+        setIsAuthenticating(false);
       }
     };
 
-    authenticate();
+    // Only authenticate if we have all required data
+    if (status === "connected" && isConnected && address) {
+      // Check if we're already authenticated with this wallet
+      const storedToken = localStorage.getItem("authToken");
+      const storedAddress = localStorage.getItem("authAddress");
+
+      if (
+        storedToken &&
+        storedAddress === address &&
+        authState.isAuthenticated
+      ) {
+        console.log("Already authenticated with this wallet, skipping...");
+        hasAuthenticatedRef.current = true;
+        return;
+      }
+
+      authenticate();
+    }
+
+    // Update refs after processing
+    prevAddressRef.current = address;
+    prevChainRef.current = chain?.id;
   }, [
     isConnected,
     address,
@@ -123,6 +217,8 @@ function WalletConnect({ onAuthSuccess }) {
     signMessageAsync,
     switchChain,
     onAuthSuccess,
+    authState.isAuthenticated,
+    isAuthenticating,
   ]);
 
   // Clear auth state when wallet disconnects
@@ -130,8 +226,22 @@ function WalletConnect({ onAuthSuccess }) {
     if (!isConnected) {
       dispatch(logout());
       setAuthStatus("Please connect your wallet");
+      hasAuthenticatedRef.current = false;
+      hasInitializedRef.current = false;
+      // Clear stored auth data
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("authAddress");
     }
   }, [isConnected, dispatch]);
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      // Reset refs on unmount
+      hasAuthenticatedRef.current = false;
+      hasInitializedRef.current = false;
+    };
+  }, []);
 
   return (
     <div>

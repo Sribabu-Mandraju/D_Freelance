@@ -133,7 +133,7 @@ export default function ProposalDetails({
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {jobDetails?.skills.map((skill, index) => (
+                  {jobDetails?.skills?.map((skill, index) => (
                     <span
                       key={index}
                       className="bg-gray-900/50 text-cyan-300 px-3 py-1 rounded-full text-sm border border-cyan-500/20 hover:border-cyan-400/40 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 hover:scale-105"
@@ -346,17 +346,17 @@ export default function ProposalDetails({
                 </h3>
                 <div className="flex items-center gap-3 mb-4">
                   <img
-                    src={jobDetails.client.avatar || "/placeholder.svg"}
-                    alt={jobDetails.client.name}
+                    src={jobDetails.client?.avatar || "/placeholder.svg"}
+                    alt={jobDetails.client?.name}
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-cyan-500/30"
                   />
                   <div>
                     <h4 className="text-purple-400 font-medium hover:text-purple-300 transition-colors text-sm sm:text-base">
-                      {jobDetails.client.name}
+                      {jobDetails?.client?.name}
                     </h4>
                     <div className="flex items-center gap-1 text-sm text-gray-400">
                       <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" />
-                      <span>{jobDetails.client.rating}</span>
+                      <span>{jobDetails?.client?.rating}</span>
                     </div>
                   </div>
                 </div>
@@ -366,7 +366,7 @@ export default function ProposalDetails({
                       jobs Posted
                     </span>
                     <span className="text-white text-sm sm:text-base">
-                      {jobDetails.client.jobsPosted}
+                      {jobDetails?.client?.jobsPosted}
                     </span>
                   </div>
                   <div className="flex justify-between p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
