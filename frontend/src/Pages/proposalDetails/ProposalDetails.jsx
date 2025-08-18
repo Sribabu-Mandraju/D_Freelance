@@ -3,18 +3,18 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import Navbar from "../../components/ProposalDetails/Navbar";
-import BackgroundEffects from "../../components/ProposalDetails/BackgroundEffects";
-import BackButton from "../../components/ProposalDetails/BackButton";
-import ProposalHeader from "../../components/ProposalDetails/ProposalHeader";
-import ProjectDescription from "../../components/ProposalDetails/ProjectDescription";
-import RequirementsDeliverables from "../../components/ProposalDetails/RequirementsDeliverables";
-import TabNavigation from "../../components/ProposalDetails/TabNavigation";
-import ProjectTimeline from "../../components/ProposalDetails/ProjectTimeline";
-import TabContent from "../../components/ProposalDetails/TabContent";
-import ProjectStats from "../../components/ProposalDetails/ProjectStats";
-import ClientInfo from "../../components/ProposalDetails/ClientInfo";
-import LocationMap from "../../components/ProposalDetails/LocationMap";
+import Navbar from "../../Components/ProposalDetails/Navbar";
+import BackgroundEffects from "../../Components/ProposalDetails/BackgroundEffects";
+import BackButton from "../../Components/ProposalDetails/BackButton";
+import ProposalHeader from "../../Components/ProposalDetails/ProposalHeader";
+import ProjectDescription from "../../Components/ProposalDetails/ProjectDescription";
+import RequirementsDeliverables from "../../Components/ProposalDetails/RequirementsDeliverables";
+import TabNavigation from "../../Components/ProposalDetails/TabNavigation";
+import ProjectTimeline from "../../Components/ProposalDetails/ProjectTimeline";
+import TabContent from "../../Components/ProposalDetails/TabContent";
+import ProjectStats from "../../Components/ProposalDetails/ProjectStats";
+import ClientInfo from "../../Components/ProposalDetails/ClientInfo";
+import LocationMap from "../../Components/ProposalDetails/LocationMap";
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -233,7 +233,7 @@ export default function ProposalDetails({ onBack }) {
 
               {activeTab === "details" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <ProjectTimeline timeline={timeline} />
+                  <ProjectTimeline timeline={timeline} proposalId={id} />
 
                   {isActionLoading && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
