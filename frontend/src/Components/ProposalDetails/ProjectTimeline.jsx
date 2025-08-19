@@ -27,7 +27,7 @@ export default function ProjectTimeline({
   proposalId,
   selectedBidder,
   selectedBidAmount,
-  currentState = 0,
+  currentState = null, // Changed default to null to check if state exists
   contractData = null,
   onStateChange = null,
 }) {
@@ -75,6 +75,9 @@ export default function ProjectTimeline({
   const isBidder =
     currentUserAddress.toLowerCase() === contractData?.bidder?.toLowerCase();
 
+  // Check if state exists in the API/database
+  const hasState = currentState !== null && currentState !== undefined;
+
   // Handle state changes
   const handleStateChange = (newState) => {
     console.log("State change requested:", newState);
@@ -92,6 +95,11 @@ export default function ProjectTimeline({
 
   // Check if a state transition is valid based on contract logic
   const isStateTransitionValid = (targetState) => {
+    // If no state exists, only Create Proposal is valid
+    if (!hasState) {
+      return targetState === ProposalState.Draft;
+    }
+
     // Can't modify final states
     if (
       currentState === ProposalState.Completed ||
@@ -104,6 +112,7 @@ export default function ProjectTimeline({
     // Client-only actions
     if (
       [
+        ProposalState.Open,
         ProposalState.Awarded,
         ProposalState.Funded,
         ProposalState.Cancelled,
@@ -146,6 +155,11 @@ export default function ProjectTimeline({
   // Get the next valid state based on current state
   const getNextValidState = () => {
     const validTransitions = [];
+
+    // If no state exists, only Create Proposal is valid
+    if (!hasState) {
+      return [ProposalState.Draft];
+    }
 
     // Add valid transitions based on current state and user role
     if (isClient) {
@@ -198,6 +212,26 @@ export default function ProjectTimeline({
   };
 
   const getStateConfig = (state) => {
+    // If no state exists, show Create Proposal
+    if (!hasState) {
+      return {
+        bg: "bg-gradient-to-br from-cyan-500 to-cyan-600",
+        border: "border-cyan-400",
+        shadow: "shadow-cyan-500/30",
+        text: "text-cyan-50",
+        icon: FileText,
+        description: "No proposal exists - create one to get started",
+        actionText: "Create Proposal",
+        isEnabled: true,
+        actionComponent: (
+          <CreateProposalButton
+            deadline={contractData?.endTime || "1758015222"}
+            budget={contractData?.budget || 1000000}
+          />
+        ),
+      };
+    }
+
     const isValidTransition = isStateTransitionValid(state);
     const isCurrent = state === currentState;
     const isCompleted = state < currentState;
@@ -236,10 +270,9 @@ export default function ProjectTimeline({
           description: "Proposal active and open for bids",
           actionText: "Open For Bids",
           isEnabled: isValidTransition && isCurrent,
-          actionComponent:
-            isValidTransition && isCurrent ? (
-              <OpenProposalToBidButton proposalId={effectiveProposalId} />
-            ) : null,
+          actionComponent: isCurrent ? (
+            <OpenProposalToBidButton proposalId={effectiveProposalId} />
+          ) : null,
         };
       case ProposalState.Awarded:
         return {
@@ -257,11 +290,8 @@ export default function ProjectTimeline({
             isValidTransition && isCurrent ? (
               <AcceptBidButton
                 proposalId={effectiveProposalId}
-                bidder={
-                  contractData?.bidder ||
-                  "0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"
-                }
-                bidAmount={contractData?.bidAmount || 100000}
+                bidder={"0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"}
+                bidAmount={100000}
               />
             ) : null,
         };
@@ -471,17 +501,57 @@ export default function ProjectTimeline({
     }
   };
 
+  // Helper: render the action component for a given target state
+  const getActionComponentForState = (targetState) => {
+    switch (targetState) {
+      case ProposalState.Draft:
+        return (
+          <CreateProposalButton
+            deadline={contractData?.endTime || "1758015222"}
+            budget={contractData?.budget || 1000000}
+          />
+        );
+      case ProposalState.Open:
+        return <OpenProposalToBidButton proposalId={effectiveProposalId} />;
+      case ProposalState.Awarded:
+        return (
+          <AcceptBidButton
+            proposalId={effectiveProposalId}
+            bidder={"0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"}
+            bidAmount={100000}
+          />
+        );
+      case ProposalState.Funded:
+        return <DepositBidAmountButton proposalId={effectiveProposalId} />;
+      case ProposalState.InProgress:
+        return <StartWorkButton proposalId={effectiveProposalId} />;
+      case ProposalState.MilestonePayout_ONE:
+        return <PayFirstMilestoneButton proposalId={effectiveProposalId} />;
+      case ProposalState.MilestonePayout_TWO:
+        return <PaySecondMilestoneButton proposalId={effectiveProposalId} />;
+      case ProposalState.MilestonePayout_THREE:
+        return <PayThirdMilestoneButton proposalId={effectiveProposalId} />;
+      case ProposalState.Completed:
+        return <CompleteProposalButton proposalId={effectiveProposalId} />;
+      default:
+        return null;
+    }
+  };
+
   const isStateEnabled = (state) => {
     return state === currentState;
   };
 
   const getProgressPercentage = () => {
+    if (!hasState) return 0;
     const totalStates = 9; // Draft to Completed
     const currentIndex = currentState;
     return ((currentIndex + 1) / totalStates) * 100;
   };
 
   const getNextState = () => {
+    if (!hasState) return ProposalState.Draft;
+
     switch (currentState) {
       case ProposalState.Draft:
         return ProposalState.Open;
@@ -507,11 +577,28 @@ export default function ProjectTimeline({
   const handleStateTransition = () => {
     const nextState = getNextState();
     if (nextState !== currentState) {
-      setCurrentState(nextState);
+      handleStateChange(nextState);
     }
   };
 
-  const currentConfig = getStateConfig(currentState);
+  // Get current state config - if no state exists, show Create Proposal
+  const currentConfig = getStateConfig(hasState ? currentState : null);
+  // Show the sequential next state as the primary next action (independent of role)
+  const sequentialNextState = hasState ? getNextState() : ProposalState.Draft;
+  // Client can cancel anytime except final states
+  const canCancel =
+    hasState &&
+    isClient &&
+    ![
+      ProposalState.Completed,
+      ProposalState.Cancelled,
+      ProposalState.Refunded,
+    ].includes(currentState);
+  // Client can complete when the last milestone is done
+  const canComplete =
+    hasState &&
+    isClient &&
+    currentState === ProposalState.MilestonePayout_THREE;
 
   return (
     <>
@@ -540,10 +627,14 @@ export default function ProjectTimeline({
                 </div>
                 <div>
                   <h4 className="text-white font-bold text-xl mb-1">
-                    Current State: {getStateName(currentState)}
+                    {!hasState
+                      ? "No Proposal Exists"
+                      : `Current State: ${getStateName(currentState)}`}
                   </h4>
                   <p className="text-gray-300 text-sm">
-                    State ID: {currentState} • {currentConfig.description}
+                    {!hasState
+                      ? "Create a new proposal to get started"
+                      : `State ID: ${currentState} • ${currentConfig.description}`}
                   </p>
                   <div className="flex items-center gap-4 mt-2 text-xs">
                     <span
@@ -586,26 +677,35 @@ export default function ProjectTimeline({
             {/* Current Action */}
             <div className="text-center">
               <h5 className="text-white font-semibold mb-3">
-                {currentConfig.isEnabled ? "Available Action:" : "Status:"}
+                {hasState ? "Next Action:" : "Available Action:"}
               </h5>
               <div className="inline-block">
-                {currentConfig.actionComponent || (
-                  <div className="text-center">
-                    {currentConfig.isEnabled ? (
-                      <button
-                        disabled
-                        className="bg-gray-600 text-gray-400 px-6 py-3 rounded-lg font-medium cursor-not-allowed"
-                      >
-                        No Action Available
-                      </button>
-                    ) : (
-                      <div className="text-gray-400">
-                        {currentConfig.actionText}
+                {!hasState
+                  ? getActionComponentForState(ProposalState.Draft)
+                  : getActionComponentForState(sequentialNextState) || (
+                      <div className="text-center">
+                        <button
+                          disabled
+                          className="bg-gray-600 text-gray-400 px-6 py-3 rounded-lg font-medium cursor-not-allowed"
+                        >
+                          No Action Available
+                        </button>
                       </div>
                     )}
-                  </div>
-                )}
               </div>
+
+              {/* Separate Cancel button (client only) */}
+              {canCancel && (
+                <div className="mt-3">
+                  <CancelProposalButton proposalId={effectiveProposalId} />
+                </div>
+              )}
+              {/* Separate Complete button (client only, after Milestone 3) */}
+              {canComplete && (
+                <div className="mt-3">
+                  <CompleteProposalButton proposalId={effectiveProposalId} />
+                </div>
+              )}
 
               {/* Show valid next states */}
               {currentConfig.isEnabled && (
@@ -639,7 +739,7 @@ export default function ProjectTimeline({
                 className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30"
               >
                 <Zap className="w-4 h-4 inline mr-2" />
-                Next State ({getNextValidState()[0]})
+                Next: {getStateName(sequentialNextState)}
               </button>
             ) : (
               <div className="text-gray-400 text-sm px-4 py-2">
@@ -672,20 +772,27 @@ export default function ProjectTimeline({
                 ProposalState.MilestonePayout_THREE,
                 ProposalState.Completed,
               ].map((state, index) => {
-                const isCurrent = state === currentState;
-                const isCompleted = state < currentState;
-                const isPending = state > currentState;
+                const isCurrent = hasState && state === currentState;
+                const isCompleted = hasState && state < currentState;
+                const isPending = hasState && state > currentState;
                 const stateConfig = getStateConfig(state);
                 const StateIcon = stateConfig.icon;
                 const isValidTransition = isStateTransitionValid(state);
-                const canInteract = stateConfig.isEnabled;
+                const canInteract =
+                  hasState &&
+                  ((state === ProposalState.InProgress &&
+                    currentState === ProposalState.Funded &&
+                    isStateTransitionValid(ProposalState.InProgress)) ||
+                    (state === currentState && stateConfig.isEnabled));
 
                 return (
                   <div key={state} className="flex flex-col items-center">
                     {/* State Node */}
                     <div
                       className={`w-16 h-16 rounded-full flex items-center justify-center border-4 transition-all duration-500 ${
-                        isCurrent
+                        !hasState
+                          ? "border-gray-600 bg-gray-700"
+                          : isCurrent
                           ? canInteract
                             ? "border-cyan-400 bg-cyan-500 shadow-2xl shadow-cyan-500/50 scale-110"
                             : "border-orange-400 bg-orange-500 shadow-2xl shadow-orange-500/50 scale-110"
@@ -696,7 +803,9 @@ export default function ProjectTimeline({
                           : "border-gray-600 bg-gray-700"
                       }`}
                     >
-                      {isCompleted ? (
+                      {!hasState ? (
+                        <StateIcon className="w-8 h-8 text-gray-400" />
+                      ) : isCompleted ? (
                         <CheckCircle className="w-8 h-8 text-white" />
                       ) : isCurrent ? (
                         <StateIcon className="w-8 h-8 text-white" />
@@ -711,7 +820,9 @@ export default function ProjectTimeline({
                     <div className="mt-2 text-center">
                       <div
                         className={`text-xs font-medium ${
-                          isCurrent
+                          !hasState
+                            ? "text-gray-400"
+                            : isCurrent
                             ? canInteract
                               ? "text-cyan-400"
                               : "text-orange-400"
@@ -725,18 +836,23 @@ export default function ProjectTimeline({
                         {getStateName(state)}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">{state}</div>
-                      {isCurrent && !canInteract && (
+                      {!hasState && (
+                        <div className="text-xs text-gray-400 mt-1">
+                          Not Created
+                        </div>
+                      )}
+                      {hasState && isCurrent && !canInteract && (
                         <div className="text-xs text-orange-400 mt-1">
                           Waiting
                         </div>
                       )}
-                      {isCurrent && canInteract && (
+                      {hasState && isCurrent && canInteract && (
                         <div className="text-xs text-cyan-400 mt-1">Active</div>
                       )}
                     </div>
 
                     {/* Active Indicator */}
-                    {isCurrent && (
+                    {hasState && isCurrent && (
                       <div className="mt-2">
                         <div
                           className={`w-3 h-3 rounded-full animate-ping ${
@@ -764,14 +880,19 @@ export default function ProjectTimeline({
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {/* Only show buttons that are valid for current state */}
-          {isStateTransitionValid(ProposalState.Draft) && (
+          {/* Show Create Proposal if no state exists */}
+          {!hasState && (
             <CreateProposalButton deadline={"1758015222"} budget={1000000} />
           )}
-          {isStateTransitionValid(ProposalState.Open) && (
+
+          {/* Only show buttons that are valid for current state */}
+          {hasState && isStateTransitionValid(ProposalState.Draft) && (
+            <CreateProposalButton deadline={"1758015222"} budget={1000000} />
+          )}
+          {hasState && isStateTransitionValid(ProposalState.Open) && (
             <OpenProposalToBidButton proposalId={effectiveProposalId} />
           )}
-          {isStateTransitionValid(ProposalState.Awarded) && (
+          {hasState && isStateTransitionValid(ProposalState.Awarded) && (
             <AcceptBidButton
               proposalId={effectiveProposalId}
               bidder={
@@ -781,25 +902,28 @@ export default function ProjectTimeline({
               bidAmount={contractData?.bidAmount || 100000}
             />
           )}
-          {isStateTransitionValid(ProposalState.Funded) && (
+          {hasState && isStateTransitionValid(ProposalState.Funded) && (
             <DepositBidAmountButton proposalId={effectiveProposalId} />
           )}
-          {isStateTransitionValid(ProposalState.InProgress) && (
+          {hasState && isStateTransitionValid(ProposalState.InProgress) && (
             <StartWorkButton proposalId={effectiveProposalId} />
           )}
-          {isStateTransitionValid(ProposalState.MilestonePayout_ONE) && (
-            <PayFirstMilestoneButton proposalId={effectiveProposalId} />
-          )}
-          {isStateTransitionValid(ProposalState.MilestonePayout_TWO) && (
-            <PaySecondMilestoneButton proposalId={effectiveProposalId} />
-          )}
-          {isStateTransitionValid(ProposalState.MilestonePayout_THREE) && (
-            <PayThirdMilestoneButton proposalId={effectiveProposalId} />
-          )}
-          {isStateTransitionValid(ProposalState.Completed) && (
+          {hasState &&
+            isStateTransitionValid(ProposalState.MilestonePayout_ONE) && (
+              <PayFirstMilestoneButton proposalId={effectiveProposalId} />
+            )}
+          {hasState &&
+            isStateTransitionValid(ProposalState.MilestonePayout_TWO) && (
+              <PaySecondMilestoneButton proposalId={effectiveProposalId} />
+            )}
+          {hasState &&
+            isStateTransitionValid(ProposalState.MilestonePayout_THREE) && (
+              <PayThirdMilestoneButton proposalId={effectiveProposalId} />
+            )}
+          {hasState && isStateTransitionValid(ProposalState.Completed) && (
             <CompleteProposalButton proposalId={effectiveProposalId} />
           )}
-          {isStateTransitionValid(ProposalState.Cancelled) && (
+          {hasState && isStateTransitionValid(ProposalState.Cancelled) && (
             <CancelProposalButton proposalId={effectiveProposalId} />
           )}
         </div>
@@ -808,13 +932,17 @@ export default function ProjectTimeline({
         {getNextValidState().length === 0 && (
           <div className="text-center mt-4 p-4 bg-gray-800/50 rounded-lg">
             <p className="text-gray-400 text-sm">
-              No actions available in current state. This could be because:
+              {!hasState
+                ? "Create a proposal to get started with the project flow."
+                : "No actions available in current state. This could be because:"}
             </p>
-            <ul className="text-gray-500 text-xs mt-2 space-y-1">
-              <li>• You don't have permission for this action</li>
-              <li>• The proposal is in a final state</li>
-              <li>• Waiting for another party's action</li>
-            </ul>
+            {hasState && (
+              <ul className="text-gray-500 text-xs mt-2 space-y-1">
+                <li>• You don't have permission for this action</li>
+                <li>• The proposal is in a final state</li>
+                <li>• Waiting for another party's action</li>
+              </ul>
+            )}
           </div>
         )}
       </div>

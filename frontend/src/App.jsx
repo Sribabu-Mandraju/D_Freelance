@@ -104,13 +104,13 @@ const App = () => {
             />
             <Route
               path="/openProposalToBid"
-              element={<OpenProposalToBidButton proposalId={34} />}
+              element={<OpenProposalToBidButton proposalId={25} />}
             />
             <Route
-              path="/acceptBid"
+              path="/acceptBid" 
               element={
                 <AcceptBidButton
-                  proposalId={34}
+                  proposalId={25}
                   bidder={"0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"}
                   bidAmount={100000}
                 />
@@ -121,7 +121,7 @@ const App = () => {
               path="/depositBidAmount"
               element={
                 <DepositBidAmountButton
-                  proposalId={34}
+                  proposalId={25}
                   onSuccess={handleSuccess}
                 />
               }
@@ -129,27 +129,27 @@ const App = () => {
             <Route path="/placeBid" element={<PlaceBid />} />
             <Route
               path="/startWork"
-              element={<StartWorkButton proposalId={34} />}
+              element={<StartWorkButton proposalId={25} />}
             />
             <Route
               path="/payFirstMilestone"
-              element={<PayFirstMilestoneButton proposalId={34} />}
+              element={<PayFirstMilestoneButton proposalId={25} />}
             />
             <Route
               path="/paySecondMilestone"
-              element={<PaySecondMilestoneButton proposalId={34} />}
+              element={<PaySecondMilestoneButton proposalId={25} />}
             />
             <Route
               path="/payThirdMilestone"
-              element={<PayThirdMilestoneButton proposalId={34} />}
+              element={<PayThirdMilestoneButton proposalId={25} />}
             />
             <Route
               path="/completeProposal"
-              element={<CompleteProposalButton proposalId={34} />}
+              element={<CompleteProposalButton proposalId={25} />}
             />
             <Route
               path="/cancelProposal"
-              element={<CancelProposalButton proposalId={34} />}
+              element={<CancelProposalButton proposalId={25} />}
             />
 
             <Route path="/portfolioForm" element={<PortfolioForm />} />

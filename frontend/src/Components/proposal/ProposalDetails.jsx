@@ -8,7 +8,7 @@ import {
   Heart,
   Share2,
   Bookmark,
-  AlertCircle,
+AlertCircle,
   Star,
   MessageCircle,
   CheckCircle,

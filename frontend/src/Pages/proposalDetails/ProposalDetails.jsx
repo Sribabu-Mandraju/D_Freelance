@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import Navbar from "../../Components/ProposalDetails/Navbar";
+import Navbar from "../../Components/Navbar";
 import BackgroundEffects from "../../Components/ProposalDetails/BackgroundEffects";
 import BackButton from "../../Components/ProposalDetails/BackButton";
 import ProposalHeader from "../../Components/ProposalDetails/ProposalHeader";
