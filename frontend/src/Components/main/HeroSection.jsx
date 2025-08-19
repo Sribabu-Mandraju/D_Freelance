@@ -142,7 +142,8 @@ const HeroSection = () => {
                 : "opacity-0 translate-y-30"
             }`}
           >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+            
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500 font-orbitron">
               Predict the Future, Trade with Confidence
             </h1>
             <p className="text-sm sm:text-base text-gray-300 mb-6 leading-relaxed">
@@ -270,7 +271,7 @@ const HeroSection = () => {
                 }}
               ></div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-8 text-purple-400 drop-shadow-lg shadow-purple-500/50">
+              <h2 className="text-2xl font-orbitron sm:text-3xl font-bold text-center mb-4 sm:mb-8 text-purple-400 drop-shadow-lg shadow-purple-500/50">
                 Buy <span className="text-cyan-400">$LYRA</span> Presale
               </h2>
 

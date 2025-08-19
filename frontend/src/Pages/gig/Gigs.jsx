@@ -45,7 +45,7 @@ const Gigs = () => {
     <div className="min-h-screen bg-gray-900">
       <Navbar />
       <div className="container mx-auto px-4 py-24">
-        <h1 className="text-3xl font-bold text-white mb-6">Available Gigs</h1>
+        <h1 className="text-3xl font-bold font-orbitron text-white mb-6">Available Gigs</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {gigs.map((gig) => (
             <MarketCard

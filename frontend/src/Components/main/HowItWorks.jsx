@@ -66,7 +66,7 @@ import { motion } from "framer-motion";
           <div className="inline-block mb-4 px-4 py-1 border border-cyan-500 text-cyan-400 rounded-full text-sm font-medium">
             HOW IT WORKS
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+          <h2 className="text-3xl font-orbitron md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
             Simple Steps to Start Freelancing
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -111,7 +111,7 @@ import { motion } from "framer-motion";
         <div className="mt-20 bg-gray-900/50 backdrop-blur-sm sm:border sm:border-gray-800 rounded-xl md:p-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
-              <h3 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+              <h3 className="text-2xl font-orbitron font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
                 Ready to Start Your Decentralized Journey?
               </h3>
               <p className="text-gray-400 mb-6 text-lg">
