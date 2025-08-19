@@ -163,7 +163,11 @@ export default function Navbar() {
                           key={idx}
                           to={subItem.link}
                           className={`block px-4 py-2 text-sm text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 ${
-                            idx === 0 ? "rounded-t-xl" : idx === item.subItems.length - 1 ? "rounded-b-xl" : ""
+                            idx === 0
+                              ? "rounded-t-xl"
+                              : idx === item.subItems.length - 1
+                              ? "rounded-b-xl"
+                              : ""
                           }`}
                         >
                           {subItem.name}
@@ -188,14 +192,13 @@ export default function Navbar() {
             Portfolio
           </Link> */}
 
-           <button
+          <button
             onClick={handlePortfolioClick}
             className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group"
           >
             <Portfolio className="w-4 h-4 mr-2  group-hover:text-cyan-400 transition-colors duration-300" />
             Portfolio
           </button>
-
 
           {/* Watchlist */}
           <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group">
@@ -252,7 +255,7 @@ export default function Navbar() {
             </div>
 
             {/* Log in Button with neon effect */}
-            <WalletConnect />
+            <WalletConnect onAuthSuccess={() => {}} />
             {/* Account / Settings dropdown (desktop only) */}
             <div
               className="relative ml-3 hidden md:block"
@@ -289,7 +292,9 @@ export default function Navbar() {
                       </div>
                       <div className="ml-3 flex items-start">
                         <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow">
-                          <span className="text-white text-xs font-semibold">♦</span>
+                          <span className="text-white text-xs font-semibold">
+                            ♦
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -430,7 +435,7 @@ export default function Navbar() {
       )}
 
       {/* Custom CSS for neon glow effects */}
-      <style jsx>{`
+      <style>{`
         .glow-text {
           text-shadow: 0 0 5px currentColor;
         }

@@ -18,39 +18,49 @@ import Footer from "./Components/Footer";
 import ClaimTokens from "./Components/testingContracts/ClaimTokens";
 import PurchaseTokens from "./Components/testingContracts/PurchaseTokens";
 import CreateProposalButton from "./Components/testingContracts/CreateProposal";
-import OpenProposalToBid from "./Components/testingContracts/OpenProposalToBid";
-import AcceptBid from "./Components/testingContracts/AcceptBid";
-import DepositBidAmount from "./Components/testingContracts/DepositBidAmount";
+import OpenProposalToBidButton from "./Components/testingContracts/OpenProposalToBid";
+import AcceptBidButton from "./Components/testingContracts/AcceptBid";
+import DepositBidAmountButton from "./Components/testingContracts/DepositBidAmount";
 import PlaceBid from "./Components/testingContracts/PlaceBid";
 import Proposal from "./Pages/proposal/Proposal";
-import StartWork from "./Components/testingContracts/StartWork";
+import StartWorkButton from "./Components/testingContracts/StartWork";
 import PortfolioForm from "./Components/portfolio/portfolioForm";
-import PayFirstMilestone from "./Components/testingContracts/PayFirstMileStone";
 import Gigs from "./Pages/gig/Gigs";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
-import PaySecondMilestone from "./Components/testingContracts/PaySecondMileStone";
-import PayThirdMilestone from "./Components/testingContracts/PayThirdMileStone";
-import CompleteProposal from "./Components/testingContracts/CompleteProposal";
-import CancelProposal from "./Components/testingContracts/CancelProposal";
+import JobDetails from "./Pages/JobDetails";
+import PayFirstMilestoneButton from "./Components/testingContracts/PayFirstMileStone";
+import PaySecondMilestoneButton from "./Components/testingContracts/PaySecondMileStone";
+import PayThirdMilestoneButton from "./Components/testingContracts/PayThirdMileStone";
+import CancelProposalButton from "./Components/testingContracts/CancelProposal";
+import CompleteProposalButton from "./Components/testingContracts/CompleteProposal";
 
-import AdminDashboard from "./Pages/admin/AdminDashboard"
+import AdminDashboard from "./Pages/admin/AdminDashboard";
 import About from "./Pages/About";
+
+import toast from "react-hot-toast";
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
 const App = () => {
-  const [authToken,setAuthToken] = useState("")
+  const [authToken, setAuthToken] = useState("");
   const handleAuthSuccess = () => {
     return;
   };
 
+  const handleSuccess = () => {
+    toast.success("Deposit completed!");
+    // Reset any local state/UI
+    // setProposalId("");
+    // Optionally refetch data here
+    // refetchBalance?.(); refetchProposal?.();
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken")
-    setAuthToken(token)
-    console.log(token)
-  },[])
+    const token = localStorage.getItem("authToken");
+    setAuthToken(token);
+    console.log(token);
+  }, []);
 
   return (
     <>
@@ -60,6 +70,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/portfolio/me" element={<Portfolio />} />
             <Route path="/browse-jobs" element={<BrowseJobs />} />
+            <Route path="/job/:id" element={<JobDetails />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/proposal" element={<Proposal />} />
             <Route path="/freelancer/:id" element={<FreelancerProfile />} />
@@ -68,7 +79,7 @@ const App = () => {
             <Route path="/gigs" element={<Gigs />} />
             <Route path="/adminDashboard" element={<AdminDashboard />} />
 
-            <Route path="/jobDetails/:id" element={<ProposalDetails />} />
+            <Route path="/jobDetails/:id" element={<JobDetails />} />
             <Route
               path="/connect"
               element={<WalletConnect onAuthSuccess={handleAuthSuccess} />}
@@ -82,26 +93,68 @@ const App = () => {
 
             <Route path="/claimTokens" element={<ClaimTokens />} />
             <Route path="/purchaseTokens" element={<PurchaseTokens />} />
-            <Route path="/createProposal" element={<CreateProposalButton deadline={"1758015222"}  budget={1000000} />} />
-            <Route path="/openProposalToBid" element={<OpenProposalToBid />} />
-            <Route path="/acceptBid" element={<AcceptBid />} />
-            <Route path="/depositBidAmount" element={<DepositBidAmount />} />
+            <Route
+              path="/createProposal"
+              element={
+                <CreateProposalButton
+                  deadline={"1758015222"}
+                  budget={1000000}
+                />
+              }
+            />
+            <Route
+              path="/openProposalToBid"
+              element={<OpenProposalToBidButton proposalId={34} />}
+            />
+            <Route
+              path="/acceptBid"
+              element={
+                <AcceptBidButton
+                  proposalId={34}
+                  bidder={"0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"}
+                  bidAmount={100000}
+                />
+              }
+            />
+            {/* <Route path="/acceptBid" element={<AcceptBid />} /> */}
+            <Route
+              path="/depositBidAmount"
+              element={
+                <DepositBidAmountButton
+                  proposalId={34}
+                  onSuccess={handleSuccess}
+                />
+              }
+            />
             <Route path="/placeBid" element={<PlaceBid />} />
-            <Route path="/startWork" element={<StartWork />} />
-            <Route path="/payFirstMileStone" element={<PayFirstMilestone />} />
-            <Route path="/paySecondMileStone" element={<PaySecondMilestone />} />
-            <Route path="/payThirdMileStone" element={<PayThirdMilestone />} />
-            <Route path="/completeProposal" element={<CompleteProposal />} />
-            <Route path="/cancelProposal" element={<CancelProposal />} />
-            
+            <Route
+              path="/startWork"
+              element={<StartWorkButton proposalId={34} />}
+            />
+            <Route
+              path="/payFirstMilestone"
+              element={<PayFirstMilestoneButton proposalId={34} />}
+            />
+            <Route
+              path="/paySecondMilestone"
+              element={<PaySecondMilestoneButton proposalId={34} />}
+            />
+            <Route
+              path="/payThirdMilestone"
+              element={<PayThirdMilestoneButton proposalId={34} />}
+            />
+            <Route
+              path="/completeProposal"
+              element={<CompleteProposalButton proposalId={34} />}
+            />
+            <Route
+              path="/cancelProposal"
+              element={<CancelProposalButton proposalId={34} />}
+            />
 
-
-
-            <Route path="/portfolioForm" element={<PortfolioForm/>}/>
-            <Route path="/otpverification" element={<OtpVerification/>}/>
-            <Route path="/about" element={<About/>}/>
-            
-            
+            <Route path="/portfolioForm" element={<PortfolioForm />} />
+            <Route path="/otpverification" element={<OtpVerification />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </Router>
         {/* Add Toaster for toast notifications */}

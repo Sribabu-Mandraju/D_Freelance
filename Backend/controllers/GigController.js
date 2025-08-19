@@ -1,10 +1,9 @@
-import Gig from '../models/GigModel.js';
+import Gig from "../models/GigModel.js";
 import Portfolio from "../models/PortfolioModel.js";
-
 
 const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 const hasPayload = (obj) =>
-  obj && typeof obj === 'object' && Object.keys(obj).length > 0;
+  obj && typeof obj === "object" && Object.keys(obj).length > 0;
 
 export const createGig = async (req, res) => {
   // console.log('CreateGig - content-type:', req.headers['content-type']);
@@ -37,18 +36,35 @@ export const createGig = async (req, res) => {
     } = req.body;
 
     // Required top-level fields
-    if (!username || !title || !description || !category || !deliveryTime || !price || !gigimage) {
-      return res.status(400).json({ message: 'Please enter all required fields' });
+    if (
+      !username ||
+      !title ||
+      !description ||
+      !category ||
+      !deliveryTime ||
+      !price ||
+      !gigimage
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Please enter all required fields" });
     }
 
     // New validation: all three packages (basic, standard, pro) are required
     if (!hasPayload(basic) || !hasPayload(standard) || !hasPayload(pro)) {
-      return res.status(400).json({ message: 'All three packages (basic, standard, and pro) are required.' });
+      return res
+        .status(400)
+        .json({
+          message:
+            "All three packages (basic, standard, and pro) are required.",
+        });
     }
 
     const walletAddress = req.user.address;
     if (!walletAddress) {
-      return res.status(400).json({ message: 'User wallet address is required' });
+      return res
+        .status(400)
+        .json({ message: "User wallet address is required" });
     }
 
     const payload = {
@@ -81,11 +97,12 @@ export const createGig = async (req, res) => {
       if (!Number.isNaN(p) && p >= 0) payload.projects = p;
     }
     if (status !== undefined) {
-      const allowed = ['Available', 'Unavailable'];
+      const allowed = ["Available", "Unavailable"];
       if (allowed.includes(status)) payload.status = status;
     }
     if (location !== undefined) payload.location = String(location).trim();
-    if (responseTime !== undefined) payload.responseTime = String(responseTime).trim();
+    if (responseTime !== undefined)
+      payload.responseTime = String(responseTime).trim();
     if (successRate !== undefined) {
       const s = Number(successRate);
       if (!Number.isNaN(s)) payload.successRate = Math.max(0, Math.min(100, s));
@@ -93,11 +110,13 @@ export const createGig = async (req, res) => {
     if (avatar !== undefined) payload.avatar = String(avatar).trim();
 
     const newGig = new Gig(payload);
-    
-    const savedGig = await newGig.save();
-    console.log('Gig created successfully:', savedGig.walletAddress);
 
-    const portfolio = await Portfolio.findOne({  "heroSection.walletAddress":walletAddress });
+    const savedGig = await newGig.save();
+    console.log("Gig created successfully:", savedGig.walletAddress);
+
+    const portfolio = await Portfolio.findOne({
+      "heroSection.walletAddress": walletAddress,
+    });
     if (!portfolio) {
       throw new Error("Portfolio not found");
     }
@@ -108,8 +127,8 @@ export const createGig = async (req, res) => {
     }
     return res.status(201).json(savedGig);
   } catch (error) {
-    console.error('❌ Create gig error:', error);
-    return res.status(500).json({ message:error.message });
+    console.error("❌ Create gig error:", error);
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -144,11 +163,13 @@ export const updateGig = async (req, res) => {
 
     const gig = await Gig.findById(req.params.id);
     if (!gig) {
-      return res.status(404).json({ message: 'Gig not found' });
+      return res.status(404).json({ message: "Gig not found" });
     }
 
     if (!req.user || !req.user.address == gig.walletAddress) {
-      return res.status(400).json({ message: 'User wallet address is required' });
+      return res
+        .status(400)
+        .json({ message: "User wallet address is required" });
     }
 
     if (title !== undefined) gig.title = title;
@@ -186,11 +207,12 @@ export const updateGig = async (req, res) => {
       if (!Number.isNaN(p) && p >= 0) gig.projects = p;
     }
     if (status !== undefined) {
-      const allowed = ['Available', 'Unavailable'];
+      const allowed = ["Available", "Unavailable"];
       if (allowed.includes(status)) gig.status = status;
     }
     if (location !== undefined) gig.location = String(location).trim();
-    if (responseTime !== undefined) gig.responseTime = String(responseTime).trim();
+    if (responseTime !== undefined)
+      gig.responseTime = String(responseTime).trim();
     if (successRate !== undefined) {
       const s = Number(successRate);
       if (!Number.isNaN(s)) {
@@ -202,34 +224,39 @@ export const updateGig = async (req, res) => {
     const updatedGig = await gig.save();
     return res.json(updatedGig);
   } catch (error) {
-    console.error('❌ Update gig error:', error);
-    return res.status(500).json({ message: 'Server error while updating gig' });
+    console.error("❌ Update gig error:", error);
+    return res.status(500).json({ message: "Server error while updating gig" });
   }
 };
 
 // Get gig by ID
 export const getGigById = async (req, res) => {
   try {
-    const gig = await Gig.findById(req.params.id).populate('walletAddress', 'name email'); // Corrected populate field
+    const gig = await Gig.findById(req.params.id).populate(
+      "walletAddress",
+      "name email"
+    ); // Corrected populate field
 
     if (!gig) {
-      return res.status(404).json({ message: 'Gig not found' });
+      return res.status(404).json({ message: "Gig not found" });
     }
 
     return res.json(gig);
   } catch (error) {
-    console.error('❌ Get gig by ID error:', error);
-    return res.status(500).json({ message: 'Server error while fetching gig' });
+    console.error("❌ Get gig by ID error:", error);
+    return res.status(500).json({ message: "Server error while fetching gig" });
   }
 };
 // Get all gigs
 export const getAllGigs = async (req, res) => {
   try {
-    const gigs = await Gig.find({}).populate('walletAddress', 'name email'); // Corrected populate field
+    const gigs = await Gig.find({}).populate("walletAddress", "name email"); // Corrected populate field
     return res.json(gigs);
   } catch (error) {
-    console.error('❌ Get all gigs error:', error);
-    return res.status(500).json({ message: 'Server error while fetching gigs' });
+    console.error("❌ Get all gigs error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching gigs" });
   }
 };
 
@@ -239,32 +266,21 @@ export const deleteGig = async (req, res) => {
     const gig = await Gig.findById(req.params.id);
 
     if (!gig) {
-      return res.status(404).json({ message: 'Gig not found' });
+      return res.status(404).json({ message: "Gig not found" });
     }
-    if(!req.user || req.user.address !== gig.walletAddress){
-      return res.status(400).json({ message: 'User wallet address is required' });
+    if (!req.user || req.user.address !== gig.walletAddress) {
+      return res
+        .status(400)
+        .json({ message: "User wallet address is required" });
     }
     // You have to fix the issue in the backend controller. I fixed the issue.
     await gig.deleteOne();
-    return res.json({ message: 'Gig removed' });
+    return res.json({ message: "Gig removed" });
   } catch (error) {
-    console.error('❌ Delete gig error:', error);
-    return res.status(500).json({ message: 'Server error while deleting gig' });
+    console.error("❌ Delete gig error:", error);
+    return res.status(500).json({ message: "Server error while deleting gig" });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Create a new gig
 // export const createGig = async (req, res) => {
@@ -275,10 +291,10 @@ export const deleteGig = async (req, res) => {
 //       userwalletAddress,
 //       title,
 //       description,
-//       images,      
+//       images,
 //       category,
 //       deliveryTime,
-//       faqs,        
+//       faqs,
 //       about,
 //       tags,
 //       skills,
@@ -286,7 +302,7 @@ export const deleteGig = async (req, res) => {
 //       standard,
 //       pro,
 //     } = req.body;
-    
+
 //     // Get the user ID from the authenticated request object
 //     // Assuming your token payload contains the user's ID as '_id'
 
@@ -385,7 +401,3 @@ export const deleteGig = async (req, res) => {
 //     return res.status(500).json({ message: 'Server error while updating gig' });
 //   }
 // };
-
-
-
-

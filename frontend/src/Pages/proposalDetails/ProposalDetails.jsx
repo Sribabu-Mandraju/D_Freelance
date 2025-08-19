@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import Navbar from "../../components/ProposalDetails/Navbar";
-import BackgroundEffects from "../../components/ProposalDetails/BackgroundEffects";
-import BackButton from "../../components/ProposalDetails/BackButton";
-import ProposalHeader from "../../components/ProposalDetails/ProposalHeader";
-import ProjectDescription from "../../components/ProposalDetails/ProjectDescription";
-import RequirementsDeliverables from "../../components/ProposalDetails/RequirementsDeliverables";
-import TabNavigation from "../../components/ProposalDetails/TabNavigation";
-import ProjectTimeline from "../../components/ProposalDetails/ProjectTimeline";
-import TabContent from "../../components/ProposalDetails/TabContent";
-import ProjectStats from "../../components/ProposalDetails/ProjectStats";
-import ClientInfo from "../../components/ProposalDetails/ClientInfo";
-import LocationMap from "../../components/ProposalDetails/LocationMap";
+import Navbar from "../../Components/ProposalDetails/Navbar";
+import BackgroundEffects from "../../Components/ProposalDetails/BackgroundEffects";
+import BackButton from "../../Components/ProposalDetails/BackButton";
+import ProposalHeader from "../../Components/ProposalDetails/ProposalHeader";
+import ProjectDescription from "../../Components/ProposalDetails/ProjectDescription";
+import RequirementsDeliverables from "../../Components/ProposalDetails/RequirementsDeliverables";
+import TabNavigation from "../../Components/ProposalDetails/TabNavigation";
+import ProjectTimeline from "../../Components/ProposalDetails/ProjectTimeline";
+import TabContent from "../../Components/ProposalDetails/TabContent";
+import ProjectStats from "../../Components/ProposalDetails/ProjectStats";
+import ClientInfo from "../../Components/ProposalDetails/ClientInfo";
+import LocationMap from "../../Components/ProposalDetails/LocationMap";
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -49,7 +49,7 @@ const ErrorDisplay = ({ error, onRetry }) => (
   </div>
 );
 
-export default function ProposalDetails({ onBack }) {
+export default function ProposalDetails({ job, onBack }) {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("details");
   const [jobDetails, setJobDetails] = useState(null);
@@ -58,30 +58,106 @@ export default function ProposalDetails({ onBack }) {
   const [proposalState, setProposalState] = useState(0);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
+  // Handle retry for error cases
+  const handleRetry = useCallback(() => {
+    setError(null);
+    if (job) {
+      processJobData(job);
+    } else if (id) {
+      fetchProposal();
+    }
+  }, [job, id]);
+
+  // Contract state mapping
+  const contractStates = {
+    0: "Draft",
+    1: "Open",
+    2: "Awarded",
+    3: "Funded",
+    4: "InProgress",
+    5: "MilestonePayout_ONE",
+    6: "MilestonePayout_TWO",
+    7: "MilestonePayout_THREE",
+    8: "Completed",
+    9: "Disputed",
+    10: "Cancelled",
+    11: "Refunded",
+  };
+
   const timeline = [
-    { phase: "Proposal Draft", status: "Draft", date: "2025-01-01" },
-    { phase: "Proposal Voting", status: "Active", date: "2025-01-10" },
-    { phase: "Award Confirmation", status: "Awarded", date: "2025-01-20" },
-    { phase: "Funding", status: "Funded", date: "2025-02-01" },
-    { phase: "Development", status: "InProgress", date: "2025-02-15" },
-    { phase: "Milestone 1", status: "MilestonePayout_ONE", date: "2025-03-01" },
-    { phase: "Milestone 2", status: "MilestonePayout_TWO", date: "2025-04-01" },
+    { phase: "Proposal Draft", status: "Draft", date: "2025-01-01", state: 0 },
+    { phase: "Proposal Open", status: "Open", date: "2025-01-10", state: 1 },
+    {
+      phase: "Award Confirmation",
+      status: "Awarded",
+      date: "2025-01-20",
+      state: 2,
+    },
+    { phase: "Funding", status: "Funded", date: "2025-02-01", state: 3 },
+    {
+      phase: "Development",
+      status: "InProgress",
+      date: "2025-02-15",
+      state: 4,
+    },
+    {
+      phase: "Milestone 1",
+      status: "MilestonePayout_ONE",
+      date: "2025-03-01",
+      state: 5,
+    },
+    {
+      phase: "Milestone 2",
+      status: "MilestonePayout_TWO",
+      date: "2025-04-01",
+      state: 6,
+    },
     {
       phase: "Milestone 3",
       status: "MilestonePayout_THREE",
       date: "2025-05-01",
+      state: 7,
     },
-    { phase: "Project Completion", status: "Completed", date: "2025-06-01" },
-    { phase: "Dispute Resolution", status: "Disputed", date: "2025-06-15" },
-    { phase: "Project Cancellation", status: "Cancelled", date: "2025-07-01" },
-    { phase: "Refund Processing", status: "Refunded", date: "2025-07-15" },
+    {
+      phase: "Project Completion",
+      status: "Completed",
+      date: "2025-06-01",
+      state: 8,
+    },
+    {
+      phase: "Dispute Resolution",
+      status: "Disputed",
+      date: "2025-06-15",
+      state: 9,
+    },
+    {
+      phase: "Project Cancellation",
+      status: "Cancelled",
+      date: "2025-07-01",
+      state: 10,
+    },
+    {
+      phase: "Refund Processing",
+      status: "Refunded",
+      date: "2025-07-15",
+      state: 11,
+    },
   ];
 
-  const fetchProposal = async () => {
+  const fetchProposal = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
+      // If we have job data passed as prop, use it directly
+      if (job) {
+        console.log("Using job data from props:", job);
+        processJobData(job);
+        setIsLoading(false);
+        return;
+      }
+
+      // Otherwise fetch from API
       const response = await fetch(`http://localhost:3001/api/proposals/${id}`);
 
       if (!response.ok) {
@@ -91,44 +167,8 @@ export default function ProposalDetails({ onBack }) {
       }
 
       const data = await response.json();
-
-      setProposalState(data.state || 0);
-
-      // Format the data to ensure compatibility with existing components
-      const formattedJob = {
-        ...data,
-        fullDescription:
-          data.description +
-          " This is an exciting opportunity to work with cutting-edge technologies and create something truly remarkable. The project involves innovative solutions and requires creative problem-solving skills.",
-        requirements: data.requirements || [
-          "3+ years of experience in relevant technologies",
-          "Strong portfolio of previous work",
-          "Excellent communication skills",
-          "Ability to work independently",
-          "Experience with agile development",
-        ],
-        deliverables: data.deliverables || [
-          "Complete project documentation",
-          "Source code with comments",
-          "Testing and deployment",
-          "Post-launch support for 30 days",
-        ],
-        client: data.client || {
-          name: "Client Name",
-          avatar: "/placeholder.svg?height=48&width=48",
-          rating: 4.8,
-          jobsPosted: 23,
-        },
-        skills: data.skills || [],
-        location: data.location || "Remote",
-        budget: data.budget || "Contact for pricing",
-        timeframe: data.timeframe || "To be discussed",
-        type: data.type || "Fixed Price",
-        proposals: data.proposals || 0,
-        postedTime: data.postedTime || "Recently posted",
-      };
-
-      setJobDetails(formattedJob);
+      console.log("Fetched proposal data from API:", data);
+      processJobData(data);
       toast.success("Proposal loaded successfully!");
     } catch (err) {
       console.error("Error fetching proposal:", err);
@@ -137,7 +177,108 @@ export default function ProposalDetails({ onBack }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id, job]);
+
+  const processJobData = useCallback((data) => {
+    console.log("Processing job data:", data);
+    console.log("Skills requirement:", data.skills_requirement);
+    console.log("Skills:", data.skills);
+    console.log("Tags:", data.tags);
+    console.log("Contract data:", data.contractData);
+
+    // Extract contract state from contractData if available
+    let currentState = 0;
+    if (data.contractData && data.contractData.state !== undefined) {
+      currentState = parseInt(data.contractData.state);
+    }
+
+    console.log(
+      "Contract state:",
+      currentState,
+      "State name:",
+      contractStates[currentState]
+    );
+    setProposalState(currentState);
+
+    // Get current user's wallet address from localStorage or context
+    const currentUserAddress =
+      localStorage.getItem("authAddress") ||
+      "0x0000000000000000000000000000000000000000";
+
+    // Format the data to ensure compatibility with existing components
+    const formattedJob = {
+      ...data,
+      // Use the actual description from API
+      fullDescription: data.description || "No description provided",
+
+      // Map requirements based on API data structure
+      requirements: Array.isArray(data.requirements)
+        ? data.requirements
+        : [
+            "3+ years of experience in relevant technologies",
+            "Strong portfolio of previous work",
+            "Excellent communication skills",
+            "Ability to work independently",
+            "Experience with agile development",
+          ],
+
+      // Map deliverables based on API data structure
+      deliverables: Array.isArray(data.deliverables)
+        ? data.deliverables
+        : [
+            "Complete project documentation",
+            "Source code with comments",
+            "Testing and deployment",
+            "Post-launch support for 30 days",
+          ],
+
+      // Map client information
+      client: data.client || {
+        name: "Client Name",
+        avatar: "/placeholder.svg?height=48&width=48",
+        rating: 4.8,
+        jobsPosted: 23,
+      },
+
+      // Map skills from API data
+      skills: Array.isArray(data.skills_requirement)
+        ? data.skills_requirement
+        : Array.isArray(data.skills)
+        ? data.skills
+        : [],
+
+      // Map location and other fields
+      location: data.location || "Remote",
+      budget: data.budget || "Contact for pricing",
+      timeframe: data.project_duration || data.timeframe || "To be discussed",
+      type: data.type || "Fixed Price",
+      proposals: data.bids?.length || data.proposals || 0,
+      postedTime:
+        data.postedTime || new Date(data.createdAt).toLocaleDateString(),
+
+      // Contract data from API with current user info
+      contractData: data.contractData
+        ? {
+            ...data.contractData,
+            currentUser: currentUserAddress,
+          }
+        : null,
+      proposalId: data.proposalId || data.id,
+      userWalletAddress: data.userWalletAddress,
+
+      // Tags from API data
+      tags: Array.isArray(data.tags) ? data.tags : [],
+      isEditable: data.isEditable || false,
+
+      // Additional fields that might be needed
+      image: data.image || null,
+      accepted_bidder: data.accepted_bidder || null,
+      bids: Array.isArray(data.bids) ? data.bids : [],
+    };
+
+    console.log("Formatted job data:", formattedJob);
+    setJobDetails(formattedJob);
+  }, []);
 
   const handleStateAction = async (action) => {
     try {
@@ -179,18 +320,26 @@ export default function ProposalDetails({ onBack }) {
     }
   };
 
-  useEffect(() => {
-    if (id) {
+  const fetchAndProcessJob = useCallback(async () => {
+    if (job) {
+      console.log("Job data provided via props, processing...");
+      setIsLoading(true);
+      // Small delay to ensure smooth loading experience
+      setTimeout(() => {
+        processJobData(job);
+        setIsLoading(false);
+      }, 100);
+    } else if (id) {
       fetchProposal();
     } else {
-      setError("No proposal ID provided");
+      setError("No proposal ID or job data provided");
       setIsLoading(false);
     }
-  }, [id]);
+  }, [id, job, fetchProposal, processJobData]);
 
-  const handleRetry = () => {
-    fetchProposal();
-  };
+  useEffect(() => {
+    fetchAndProcessJob();
+  }, [fetchAndProcessJob]);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -205,6 +354,54 @@ export default function ProposalDetails({ onBack }) {
       <ErrorDisplay error="No proposal data found" onRetry={handleRetry} />
     );
   }
+
+  // Safety check: ensure required arrays exist and component is ready to render
+  if (!jobDetails.skills || !Array.isArray(jobDetails.skills)) {
+    console.log("Skills not ready, showing loading...");
+    return <LoadingSpinner />;
+  }
+
+  // Additional safety check for other required arrays
+  if (
+    !Array.isArray(jobDetails.requirements) ||
+    !Array.isArray(jobDetails.deliverables)
+  ) {
+    console.log("Requirements or deliverables not ready, showing loading...");
+    return <LoadingSpinner />;
+  }
+
+  // Safety check: ensure required arrays exist
+  if (!Array.isArray(jobDetails.tags)) {
+    jobDetails.tags = [];
+  }
+  if (!Array.isArray(jobDetails.requirements)) {
+    jobDetails.requirements = [];
+  }
+  if (!Array.isArray(jobDetails.deliverables)) {
+    jobDetails.deliverables = [];
+  }
+  if (!Array.isArray(jobDetails.bids)) {
+    jobDetails.bids = [];
+  }
+
+  // Final validation: ensure all required fields are present
+  if (!jobDetails.title || !jobDetails.description) {
+    console.error("Missing required job details:", jobDetails);
+    return (
+      <ErrorDisplay
+        error="Job data is incomplete. Please try again."
+        onRetry={handleRetry}
+      />
+    );
+  }
+
+  console.log("Rendering ProposalDetails with:", {
+    jobDetails,
+    proposalState,
+    activeTab,
+    hasContractData: !!jobDetails.contractData,
+    contractState: jobDetails.contractData?.state,
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden">
@@ -233,7 +430,13 @@ export default function ProposalDetails({ onBack }) {
 
               {activeTab === "details" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <ProjectTimeline timeline={timeline} />
+                  <ProjectTimeline
+                    timeline={timeline}
+                    proposalId={id || jobDetails?.proposalId}
+                    currentState={proposalState}
+                    contractData={jobDetails?.contractData}
+                    onStateChange={setProposalState}
+                  />
 
                   {isActionLoading && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">

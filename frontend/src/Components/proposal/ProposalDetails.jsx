@@ -12,19 +12,26 @@ import {
   Star,
   MessageCircle,
   CheckCircle,
-  Target
+  Target,
 } from "lucide-react";
 import ChatComponent from "./ChatComponent";
-export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
+import ProjectTimeline from "../ProposalDetails/ProjectTimeline";
+export default function ProposalDetails({
+  job,
+  onBack,
+  setJobs,
+  setIsLoading,
+}) {
   const [activeTab, setActiveTab] = useState("details");
   const [jobDetails, setJobDetails] = useState(job);
 
-   useEffect(() => {
+  useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
       const formattedJob = {
         ...job,
-        fullDescription: job.description + " This is an exciting opportunity...",
+        fullDescription:
+          job.description + " This is an exciting opportunity...",
         requirements: [
           "3+ years of experience in relevant technologies",
           "Strong portfolio of previous work",
@@ -40,8 +47,16 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
         ],
         timeline: [
           { phase: "Project Kickoff", status: "completed", date: "2024-01-15" },
-          { phase: "Design & Planning", status: "completed", date: "2024-01-22" },
-          { phase: "Development Phase", status: "in-progress", date: "2024-02-01" },
+          {
+            phase: "Design & Planning",
+            status: "completed",
+            date: "2024-01-22",
+          },
+          {
+            phase: "Development Phase",
+            status: "in-progress",
+            date: "2024-02-01",
+          },
           { phase: "Testing & Review", status: "pending", date: "2024-02-15" },
           { phase: "Final Delivery", status: "pending", date: "2024-02-28" },
         ],
@@ -51,6 +66,20 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
       setIsLoading(false);
     }, 500);
   }, []);
+
+  // Static flow to demonstrate on-chain proposal lifecycle (numbered, no dates)
+  const flowTimeline = [
+    { step: 1, phase: "Launch Proposal", status: "Created" },
+    { step: 2, phase: "Open For Bids", status: "OpenForBids" },
+    { step: 3, phase: "Accept Bid", status: "SelectingBid" },
+    { step: 4, phase: "Deposit Funds", status: "Funded" },
+    { step: 5, phase: "Start Work", status: "InProgress" },
+    { step: 6, phase: "Pay First Payment", status: "Milestone1Paid" },
+    { step: 7, phase: "Pay Second Payment", status: "Milestone2Paid" },
+    { step: 8, phase: "Pay Third Payment", status: "Milestone3Paid" },
+    { step: 9, phase: "Complete", status: "Completed" },
+    { phase: "Cancel", status: "Cancelled" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden">
@@ -104,7 +133,7 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {jobDetails?.skills.map((skill, index) => (
+                  {jobDetails?.skills?.map((skill, index) => (
                     <span
                       key={index}
                       className="bg-gray-900/50 text-cyan-300 px-3 py-1 rounded-full text-sm border border-cyan-500/20 hover:border-cyan-400/40 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 hover:scale-105"
@@ -205,7 +234,7 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
               {/* Enhanced Tabs with neon effects */}
               <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-1 shadow-lg shadow-cyan-500/20 border border-cyan-500/20">
                 <div className="flex gap-1">
-                  {["details", "updates", "comments","chat"].map((tab) => (
+                  {["details", "updates", "comments", "chat"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -223,143 +252,10 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
 
               {activeTab === "details" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/30 transition-all duration-300">
-                    <div className="text-center mb-6 sm:mb-8">
-                      <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 mb-2">
-                        Project Timeline
-                      </h3>
-                      <p className="text-gray-400 text-sm sm:text-base">
-                        Track the progress of this exciting project
-                      </p>
-                    </div>
-
-                    <div className="relative">
-                      <div className="absolute left-4 sm:left-6 lg:left-8 top-0 bottom-0 w-0.5 sm:w-1 bg-gradient-to-b from-gray-700 to-gray-800 rounded-full"></div>
-                      <div
-                        className="absolute left-4 sm:left-6 lg:left-8 top-0 w-0.5 sm:w-1 bg-gradient-to-b from-cyan-400 via-blue-500 to-purple-500 rounded-full shadow-lg shadow-cyan-500/50"
-                        style={{ height: "40%" }}
-                      ></div>
-
-                      <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-                        {jobDetails?.timeline?.map((phase, index) => (
-                          <div
-                            key={index}
-                            className="relative flex items-start gap-3 sm:gap-4 lg:gap-6 group ml-[18px]"
-                          >
-                            <div className="relative z-10">
-                              <div
-                                className={`w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full border-2 sm:border-3 lg:border-4 flex items-center justify-center transition-all duration-300 ${
-                                  phase.status === "completed"
-                                    ? "bg-green-500 border-green-400 shadow-lg shadow-green-500/50"
-                                    : phase.status === "in-progress"
-                                    ? "bg-cyan-500 border-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulse"
-                                    : "bg-gray-700 border-gray-600"
-                                }`}
-                              >
-                                {phase.status === "completed" && (
-                                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-                                )}
-                                {phase.status === "in-progress" && (
-                                  <div className="w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full animate-ping"></div>
-                                )}
-                              </div>
-                              {/* Glowing ring effect for active phase */}
-                              {phase.status === "in-progress" && (
-                                <div className="absolute inset-0 w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full border-2 border-cyan-400 animate-ping opacity-75"></div>
-                              )}
-                            </div>
-
-                            <div className="flex-1 pb-4 sm:pb-6 lg:pb-8">
-                              <div
-                                className={`bg-black/60 backdrop-blur-xl rounded-xl p-3 sm:p-4 lg:p-6 border transition-all duration-300 group-hover:scale-105 ${
-                                  phase.status === "completed"
-                                    ? "border-green-500/30 shadow-lg shadow-green-500/10"
-                                    : phase.status === "in-progress"
-                                    ? "border-cyan-500/30 shadow-lg shadow-cyan-500/20"
-                                    : "border-gray-700/30"
-                                }`}
-                              >
-                                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 mb-3">
-                                  <h4
-                                    className={`text-lg sm:text-xl font-bold ${
-                                      phase.status === "completed"
-                                        ? "text-green-400"
-                                        : phase.status === "in-progress"
-                                        ? "bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500"
-                                        : "text-gray-400"
-                                    }`}
-                                  >
-                                    {phase.phase}
-                                  </h4>
-                                  <span
-                                    className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium self-start ${
-                                      phase.status === "completed"
-                                        ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                                        : phase.status === "in-progress"
-                                        ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 animate-pulse"
-                                        : "bg-gray-700/20 text-gray-400 border border-gray-700/30"
-                                    }`}
-                                  >
-                                    {phase.status
-                                      .replace("-", " ")
-                                      .toUpperCase()}
-                                  </span>
-                                </div>
-
-                                <p className="text-gray-300 mb-3 text-sm sm:text-base">
-                                  {phase.status === "completed" &&
-                                    "✅ Successfully completed all deliverables for this phase"}
-                                  {phase.status === "in-progress" &&
-                                    "🚀 Currently working on this exciting phase"}
-                                  {phase.status === "pending" &&
-                                    "⏳ Scheduled to begin after previous phases complete"}
-                                </p>
-
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                                  <span className="text-xs sm:text-sm text-gray-400 flex items-center gap-2">
-                                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    {phase.date}
-                                  </span>
-
-                                  {phase.status === "completed" && (
-                                    <div className="flex items-center gap-2 text-green-400 text-xs sm:text-sm">
-                                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                      Completed
-                                    </div>
-                                  )}
-
-                                  {phase.status === "in-progress" && (
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                                      <span className="text-cyan-400 text-xs sm:text-sm font-medium">
-                                        In Progress
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Progress bar for in-progress phase */}
-                                {phase.status === "in-progress" && (
-                                  <div className="mt-4">
-                                    <div className="flex justify-between text-xs text-gray-400 mb-2">
-                                      <span>Progress</span>
-                                      <span>65%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
-                                      <div
-                                        className="bg-gradient-to-r from-cyan-500 to-blue-500 h-1.5 sm:h-2 rounded-full shadow-lg shadow-cyan-500/50"
-                                        style={{ width: "65%" }}
-                                      ></div>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <ProjectTimeline
+                    timeline={flowTimeline}
+                    proposalId={jobDetails?._id || "34"}
+                  />
                 </div>
               )}
 
@@ -384,14 +280,20 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
                   </p>
                 </div>
               )}
-                {activeTab === "chat" && (
-                  <ChatComponent
-                    currentUser={jobDetails?.client || { username: "Client", userWallet: "" }}
-                    recipient={jobDetails?.freelancer || { username: "Freelancer", userWallet: "" }}
-                    proposalId={jobDetails?._id || ""}
-                  />
-                )}
-             
+              {activeTab === "chat" && (
+                <ChatComponent
+                  currentUser={
+                    jobDetails?.client || { username: "Client", userWallet: "" }
+                  }
+                  recipient={
+                    jobDetails?.freelancer || {
+                      username: "Freelancer",
+                      userWallet: "",
+                    }
+                  }
+                  proposalId={jobDetails?._id || ""}
+                />
+              )}
             </div>
 
             {/* Enhanced Sidebar with more neon effects */}
@@ -444,17 +346,17 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
                 </h3>
                 <div className="flex items-center gap-3 mb-4">
                   <img
-                    src={jobDetails.client.avatar || "/placeholder.svg"}
-                    alt={jobDetails.client.name}
+                    src={jobDetails.client?.avatar || "/placeholder.svg"}
+                    alt={jobDetails.client?.name}
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-cyan-500/30"
                   />
                   <div>
                     <h4 className="text-purple-400 font-medium hover:text-purple-300 transition-colors text-sm sm:text-base">
-                      {jobDetails.client.name}
+                      {jobDetails?.client?.name}
                     </h4>
                     <div className="flex items-center gap-1 text-sm text-gray-400">
                       <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" />
-                      <span>{jobDetails.client.rating}</span>
+                      <span>{jobDetails?.client?.rating}</span>
                     </div>
                   </div>
                 </div>
@@ -464,7 +366,7 @@ export default function ProposalDetails({ job, onBack,setJobs,setIsLoading }) {
                       jobs Posted
                     </span>
                     <span className="text-white text-sm sm:text-base">
-                      {jobDetails.client.jobsPosted}
+                      {jobDetails?.client?.jobsPosted}
                     </span>
                   </div>
                   <div className="flex justify-between p-2 rounded-lg hover:bg-gray-800/30 transition-colors">
