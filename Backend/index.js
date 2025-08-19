@@ -83,18 +83,18 @@ const server = http.createServer(app);
 // Middleware to parse JSON and enable CORS
 app.use(express.json());
 
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:5173",
-//       "http://localhost:5174",
-//       "http://localhost:3001",
-//       "http://localhost:3000",
-//     ],
-//     credentials: true, // if you want to allow cookies/auth headers
-//   })
-// );
-app.use(cors())
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:3001",
+      "http://localhost:3000",
+    ],
+    credentials: true, // if you want to allow cookies/auth headers
+  })
+);
+// app.use(cors());
 // All your existing routes
 app.use("/api/proposals", ProposalRoutes);
 app.use("/api/bids", BidRoutes);
@@ -111,6 +111,43 @@ app.use("/api/admin", AdminRoutes);
 // Default route
 app.get("/", (req, res) => {
   res.send("API is running...");
+});
+
+app.post("/api/chat", async (req, res) => {
+  try {
+    const userMessage = req.body.message;
+    if (!userMessage) {
+      return res.status(400).json({ error: "Message field is required" });
+    }
+
+    console.log("Proxying message to Flask API:", userMessage);
+
+    const flaskApiUrl = "http://127.0.0.1:5000/chat";
+
+    const flaskResponse = await fetch(flaskApiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: userMessage }),
+    }).catch((err) => {
+      throw new Error(`Fetch failed: ${err.message}`);
+    });
+
+    console.log("Flask API response status:", flaskResponse.status);
+
+    if (!flaskResponse.ok) {
+      const errorData = await flaskResponse.json().catch(() => ({}));
+      console.error("Flask API error response:", errorData);
+      return res.status(flaskResponse.status).json(errorData);
+    }
+
+    const responseData = await flaskResponse.json();
+    res.json(responseData);
+  } catch (error) {
+    console.error("Detailed error proxying to Flask API:", error);
+    res.status(500).json({ error: "Internal server error", details: error.message });
+  }
 });
 
 // MongoDB connection

@@ -28,3 +28,26 @@ body {
 .chat-scrollbar::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, #7e22ce, #2563eb); /* darker on hover */
 }
+
+/* styles.css */
+.markdown-content a {
+  color: #93c5fd; /* Light blue for dark theme */
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.markdown-content a:hover {
+  color: #60a5fa; /* Slightly darker blue on hover */
+}
+
+.prose-invert {
+  --tw-prose-body: #d1d5db; /* Light gray for text */
+  --tw-prose-headings: #e5e7eb; /* Lighter gray for headings */
+  --tw-prose-links: #93c5fd; /* Blue for links (overridden by .markdown-content a) */
+  --tw-prose-bold: #f9fafb; /* White for bold text */
+  --tw-prose-counters: #9ca3af; /* Gray for counters */
+  --tw-prose-bullets: #6b7280; /* Darker gray for bullets */
+  --tw-prose-hr: #4b5563; /* Dark hr */
+  --tw-prose-quotes: #e5e7eb; /* Light gray for quotes */
+  --tw-prose-quote-borders: #4b5563; /* Dark quote borders */
+}
