@@ -380,6 +380,7 @@ export const createPortfolio = async (req, res) => {
       heroSection: {
         walletAddress, // Explicitly set from authMiddleware
         name: heroSection.name,
+        profile:heroSection.profile,
         domains: heroSection.domains || [],
         thoughtLine: heroSection.thoughtLine || "",
         aboutMe: heroSection.aboutMe || "",

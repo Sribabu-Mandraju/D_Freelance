@@ -13,7 +13,7 @@ const GigHeader = ({ title, avatar, username, rating, about, badges }) => {
       {/* Main Content Row */}
       <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
         {/* Left Side: User Info */}
-        <div className="flex items-center space-x-4 bg-gray-900/50 border border-cyan-500/20 rounded-lg p-4 flex-1">
+        <div className="flex space-x-4 bg-gray-900/50 border border-cyan-500/20 rounded-lg p-4 flex-1">
           <img
             src={avatar}
             alt={username}

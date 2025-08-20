@@ -4,7 +4,7 @@ import ProposalDetails from "./proposalDetails/ProposalDetails";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { toast } from "react-hot-toast";
-
+import Loader from "../Components/Loader";
 const JobDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -60,16 +60,9 @@ const JobDetails = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <Navbar />
-        <div className="pt-24 pb-12 px-4">
-          <div className="container mx-auto max-w-6xl">
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center">
-                <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-300 text-lg">Loading job details...</p>
-              </div>
-            </div>
-          </div>
-        </div>
+      
+         <Loader caption="Job Details"/>
+      
         <Footer />
       </div>
     );

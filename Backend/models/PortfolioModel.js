@@ -15,6 +15,11 @@ const portfolioSchema = new mongoose.Schema({
       trim: true,
       maxlength: 100
     },
+    profile:{
+      type:String,
+      required:true,
+      trim:true,
+    },
     domains: [{
       type: String,
       required: true,

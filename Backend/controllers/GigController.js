@@ -250,7 +250,67 @@ export const getGigById = async (req, res) => {
 // Get all gigs
 export const getAllGigs = async (req, res) => {
   try {
-    const gigs = await Gig.find({}).populate("walletAddress", "name email"); // Corrected populate field
+    const query = {};
+    const { search, category, minPrice, maxPrice, minRating, maxDeliveryTime, status, location, minSuccessRate, tags, skills } = req.query;
+
+    // Search by title or description
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    // Filter by category
+    if (category) {
+      query.category = category;
+    }
+
+    // Filter by price range
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // Filter by delivery time
+    if (maxDeliveryTime) {
+      query.deliveryTime = { $lte: Number(maxDeliveryTime) };
+    }
+
+    // Filter by rating
+    if (minRating) {
+      query.rating = { $gte: Number(minRating) };
+    }
+
+    // Filter by status
+    if (status) {
+      query.status = status;
+    }
+
+    // Filter by location
+    if (location) {
+      query.location = { $regex: location, $options: 'i' };
+    }
+
+    // Filter by success rate
+    if (minSuccessRate) {
+      query.successRate = { $gte: Number(minSuccessRate) };
+    }
+
+    // Filter by tags (partial match for any tag in the array)
+    if (tags) {
+      const tagsArray = tags.split(',').map(tag => tag.trim());
+      query.tags = { $in: tagsArray.map(tag => new RegExp(tag, 'i')) };
+    }
+
+    // Filter by skills (partial match for any skill in the array)
+    if (skills) {
+      const skillsArray = skills.split(',').map(skill => skill.trim());
+      query.skills = { $in: skillsArray.map(skill => new RegExp(skill, 'i')) };
+    }
+
+    const gigs = await Gig.find(query).populate("walletAddress", "name email").sort({createdAt:-1})
     return res.json(gigs);
   } catch (error) {
     console.error("❌ Get all gigs error:", error);

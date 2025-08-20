@@ -15,19 +15,9 @@ import TabContent from "../../Components/ProposalDetails/TabContent";
 import ProjectStats from "../../Components/ProposalDetails/ProjectStats";
 import ClientInfo from "../../Components/ProposalDetails/ClientInfo";
 import LocationMap from "../../Components/ProposalDetails/LocationMap";
-
+import Loader from "../../Components/Loader";
 // Loading Spinner Component
-const LoadingSpinner = () => (
-  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden flex items-center justify-center">
-    <BackgroundEffects />
-    <div className="relative z-10 text-center">
-      <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-cyan-400 border-r-purple-500 mb-4"></div>
-      <div className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 text-xl font-semibold">
-        Loading proposal details...
-      </div>
-    </div>
-  </div>
-);
+
 
 // Error Component
 const ErrorDisplay = ({ error, onRetry }) => (
@@ -342,7 +332,7 @@ export default function ProposalDetails({ job, onBack }) {
   }, [fetchAndProcessJob]);
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   if (error) {
@@ -358,7 +348,7 @@ export default function ProposalDetails({ job, onBack }) {
   // Safety check: ensure required arrays exist and component is ready to render
   if (!jobDetails.skills || !Array.isArray(jobDetails.skills)) {
     console.log("Skills not ready, showing loading...");
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   // Additional safety check for other required arrays
@@ -367,7 +357,7 @@ export default function ProposalDetails({ job, onBack }) {
     !Array.isArray(jobDetails.deliverables)
   ) {
     console.log("Requirements or deliverables not ready, showing loading...");
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   // Safety check: ensure required arrays exist

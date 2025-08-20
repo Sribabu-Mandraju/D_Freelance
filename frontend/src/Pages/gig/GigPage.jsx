@@ -8,29 +8,33 @@ import ProjectSteps from "../../Components/gig/ProjectSteps";
 import AboutSection from "../../Components/gig/AboutSection";
 import ServiceSidebar from "../../Components/gig/ServiceSidebar";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../../Components/Navbar";
 import { fetchGig } from "../../store/gigSlice/gigSlice"; // Adjust path
-
+import Loader from "../../Components/Loader";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 const GigPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { formData, packageData, loading, error } = useSelector((state) => state.gig);
-
+  const { formData, packageData, loading, error } = useSelector(
+    (state) => state.gig
+  );
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchGig(id));
   }, [id, dispatch]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white text-xl">
-        Loading gig data...
-      </div>
-    );
+    return <Loader caption="Gig Details"/>;
   }
 
-  if (error || !formData.title) { // Check if formData is populated
+  const handleBack = () => {
+    navigate("/gigs");
+  };
+  if (error || !formData.title) {
+    // Check if formData is populated
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center text-red-500 text-xl">
         Error loading gig: {error || "No gig data available"}
@@ -60,15 +64,24 @@ const GigPage = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen w-screen pb-12 bg-gradient-to-br relative overflow-hidden">
+      <div className="min-h-screen pb-12 bg-gradient-to-br relative overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
-
-        <div className="max-w-7xl mt-[100px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+        <div className="max-w-7xl mt-[100px] mx-auto px-4 sm:px-6  relative z-10">
+            <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 mb-6 transition-colors duration-200 hover:shadow-lg hover:shadow-cyan-500/20 p-2 rounded-lg group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-2px] transition-transform duration-200" />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:from-cyan-300 group-hover:to-blue-300">
+            Back to Gigs
+          </span>
+        </button>
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Content */}
             <div className="flex-1">

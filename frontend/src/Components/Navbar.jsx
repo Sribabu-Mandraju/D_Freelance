@@ -26,9 +26,12 @@ import {
   BookOpen,
   Award,
   Target,
+  ShieldCheck
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { fetchPortfolio } from "../store/portfolioSlice/portfolioSlice";
 import { useAccount } from "wagmi";
+import { useSelector } from "react-redux";
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -36,7 +39,9 @@ export default function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedTheme, setTheme] = useState("Dark");
   const { address, isConnected, chain } = useAccount();
-
+ const { portfolioData} = useSelector(
+    (state) => state.portfolio
+  );
   const navigationItems = [
     {
       name: "Find talent",
@@ -56,6 +61,11 @@ export default function Navbar() {
         { name: "How to Use", link: "/help" },
         { name: "About", link: "/about" },
       ],
+    },
+    {
+      name: "Admin Dashboard",
+      navlink: "/adminDashboard",
+      icon: ShieldCheck,
     },
   ];
   const navigate = useNavigate();
@@ -109,7 +119,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gray-950 text-white z-40">
+    <header className="fixed top-0 left-0 w-full bg-gray-950 text-white z-50">
       {/* Neon glow background effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 opacity-50"></div>
 
@@ -207,7 +217,7 @@ export default function Navbar() {
           </button>
           <div className="flex flex-row gap-1 items-center">
             {/* Search Bar with neon effect */}
-            <div className="relative hidden md:block">
+           {/* <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
                 type="text"
@@ -219,10 +229,10 @@ export default function Navbar() {
               <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs bg-gray-800 px-1 rounded">
                 /
               </span>
-            </div>
+            </div>*/}
 
             {/* Language Selector */}
-            <div
+            {/* <div
               className="relative"
               onMouseEnter={() => handleMouseEnter("language")}
               onMouseLeave={handleMouseLeave}
@@ -252,7 +262,7 @@ export default function Navbar() {
                   </a>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Log in Button with neon effect */}
             <WalletConnect onAuthSuccess={() => {}} />
@@ -268,7 +278,7 @@ export default function Navbar() {
               >
                 <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
                   <img
-                    src="https://i.pravatar.cc/150?img=47"
+                    src={portfolioData.heroSection.profile}
                     alt=""
                     className="rounded-full w-full h-full"
                   />

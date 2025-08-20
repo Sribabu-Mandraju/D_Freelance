@@ -154,9 +154,9 @@ export default function MarketCard({
         scale: 1,
         boxShadow: "0 0 40px rgba(34, 211, 238, 0.1)",
       }}
-      className="bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-xl p-3 
+      className="bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-md p-3 
                  hover:border-cyan-400/50 transition-all duration-300 cursor-pointer
-                 shadow-lg hover:shadow-cyan-500/20 relative overflow-hidden group scale-[0.8]"
+                 shadow-lg hover:shadow-cyan-500/20 relative overflow-hidden group scale-[0.8] h-[400px] z-20"
     >
       {/* Neon glow effect */}
       <div
@@ -165,18 +165,10 @@ export default function MarketCard({
       />
 
       {/* Header with title and bookmark */}
-      <img src={gigimage} alt="" className="mb-3"/>
-      <div className="flex items-start justify-between mb-4 relative z-10">
-        <h3
-          className="text-lg font-semibold text-white group-hover:text-cyan-300 
-                       transition-colors duration-300 leading-tight"
-        >
-          {username}
-        </h3>
-        <button
+  <button
           onClick={() => setBookmarked(!bookmarked)}
           className="text-gray-400 hover:text-cyan-400 transition-colors duration-300
-                     hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"
+                     hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] absolute right-4 top-4 z-50"
         >
           <Bookmark
             className={`w-5 h-5 ${
@@ -184,13 +176,22 @@ export default function MarketCard({
             }`}
           />
         </button>
+      <img src={gigimage} alt="" className="mb-3 h-[150px] w-full"/>
+      <div className="flex items-start justify-between mb-4 relative z-10">
+        {/* <h3
+          className="text-lg font-semibold text-white group-hover:text-cyan-300 
+                       transition-colors duration-300 leading-tight"
+        >
+          {username}
+        </h3> */}
+      
       </div>
 
       {/* Description */}
       <p className="text-gray-300 text-sm mb-4 leading-relaxed line-clamp-2">
         {description}
       </p>
-<div className="flex gap-2">
+{/* <div className="flex gap-2">
    <div className="flex flex-wrap gap-2 mb-4">
         {tags.map((tech, idx) => (
           <span
@@ -202,9 +203,7 @@ export default function MarketCard({
             {tech}
           </span>
         ))}
-      </div>
-       <div className="flex flex-wrap gap-2 mb-4">
-        {skills.map((tech, idx) => (
+         {skills.map((tech, idx) => (
           <span
             key={idx}
             className="px-3 py-1 bg-cyan-500/20 text-cyan-300 text-xs rounded-full
@@ -215,8 +214,7 @@ export default function MarketCard({
           </span>
         ))}
       </div>
-
-</div>
+</div> */}
       {/* Tech Tags */}
      
       {/* Budget */}
@@ -236,15 +234,15 @@ export default function MarketCard({
 
       {/* Job Details */}
       <div className="flex items-center gap-4 mb-2 text-sm text-gray-400">
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col items-center  gap-1">
           <Clock className="w-4 h-4" />
           <span>{deliveryTime} weeks</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-col items-center gap-1">
           <MapPin className="w-4 h-4" />
           <span>{location}</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex  flex-col items-center gap-1">
           <Users className="w-4 h-4" />
           <span>{projects} Projects</span>
         </div>

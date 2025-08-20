@@ -65,7 +65,7 @@ router.post('/otp/verify', authMiddleware, verifyOTP);
 router.post('/', authMiddleware, createPortfolio);
 router.get('/', getAllPortfolios);
 router.get('/me', authMiddleware, getPortfolioByWallet);
-router.put('/', authMiddleware, updatePortfolio);
+router.put('/:id', authMiddleware, updatePortfolio);
 router.delete('/', authMiddleware, deletePortfolio);
 
 // Proposal and Gig Routes
