@@ -69,7 +69,7 @@ export default function ActiveFreelancers() {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white flex items-center justify-center gap-3">
             <Star className="w-6 h-6 text-cyan-400 drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]" />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
+            <span className="font-orbitron bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300">
               Meet Our Top Active Freelancers
             </span>
           </h2>

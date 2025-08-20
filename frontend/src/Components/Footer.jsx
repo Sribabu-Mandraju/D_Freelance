@@ -10,7 +10,7 @@ const Footer = () => {
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-cyan-500 rounded-full p-2">
                 <Briefcase className="w-full h-full text-white" />
               </div>
-              <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500">
+              <span className="text-2xl font-orbitron font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500">
                 CryptoLance
               </span>
             </div>
@@ -69,7 +69,7 @@ const Footer = () => {
             <div className="text-center md:text-left mb-4 md:mb-0">
               <p className="text-gray-500">
                 &copy; {new Date().getFullYear()}{" "}
-                <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500">
+                <span className="font-bold font-orbitron bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-cyan-400 to-blue-500">
                   CryptoLance
                 </span>{" "}
                 All rights reserved.

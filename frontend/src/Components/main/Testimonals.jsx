@@ -73,7 +73,7 @@ const TestimonialsSection = () => {
           <div className="inline-block mb-4 px-4 py-1 border border-yellow-500 text-yellow-400 rounded-full text-sm font-medium">
             TESTIMONIALS
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+          <h2 className="text-3xl font-orbitron md:text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
             What Our Community Says About Us
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
@@ -134,7 +134,7 @@ const TestimonialsSection = () => {
         </div>
 
         <div className="bg-gradient-to-r from-purple-900/20 to-cyan-900/20 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 md:p-12 text-center">
-          <h3 className="text-3xl font-bold mb-6">Join Our Thriving Community</h3>
+          <h3 className="text-3xl font-bold mb-6 font-orbitron">Join Our Thriving Community</h3>
           <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
             Connect with other freelancers and clients, share insights, and stay updated on the latest in decentralized
             work.

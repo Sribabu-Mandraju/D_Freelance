@@ -80,7 +80,7 @@ function MarketSection() {
   return (
     <div className="text-white w-full max-w-7xl   mx-auto" id="trending">
       <div className="mb-8 text-center mt-4">
-        <h2 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+        <h2 className="text-2xl font-orbitron sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
           Kickstart Your Freelance Journey
         </h2>
         <p className="text-gray-400 mt-2">

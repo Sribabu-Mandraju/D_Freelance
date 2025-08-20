@@ -51,3 +51,8 @@ body {
   --tw-prose-quotes: #e5e7eb; /* Light gray for quotes */
   --tw-prose-quote-borders: #4b5563; /* Dark quote borders */
 }
+.font-orbitron {
+  font-family: "Orbitron", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
