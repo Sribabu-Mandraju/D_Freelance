@@ -34,6 +34,7 @@ export default function PostCryptoProject() {
   const [newSkill, setNewSkill] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [authToken, setAuthToken] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
 
   // Get auth token from localStorage on component mount
   useEffect(() => {
@@ -46,6 +47,29 @@ export default function PostCryptoProject() {
       // Redirect to home or wallet connection page
     }
   }, []);
+
+  const handleImageUpload = async (file) => {
+    const data = new FormData();
+    data.append("file", selectedFile);
+    data.append("upload_preset", "Freelance_Website"); // Replace with your Cloudinary upload preset
+    data.append("cloud_name", "dd33ovgv1"); // Replace with your Cloudinary cloud name
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/dd33ovgv1/image/upload`, // Replace with your Cloudinary cloud name
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+      const result = await response.json();
+      return result.secure_url; // Returns the Cloudinary URL
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      toast.error("Failed to upload image. Please try again.");
+      return null;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,6 +87,17 @@ export default function PostCryptoProject() {
     setIsLoading(true);
 
     try {
+      // Handle image upload if a file is selected
+      let imageUrl = formData.image;
+      if (selectedFile) {
+        imageUrl = await handleImageUpload(selectedFile);
+        if (!imageUrl) {
+          setIsLoading(false);
+          return;
+        }
+        setFormData((prev) => ({ ...prev, image: imageUrl }));
+      }
+      console.log("Image URL after upload:", imageUrl);
       const submissionData = {
         ...formData,
         budget: Number(formData.budget),
@@ -423,18 +458,15 @@ export default function PostCryptoProject() {
 
                     <div className="md:col-span-2">
                       <label className="block text-lg font-semibold text-white mb-3">
-                        Project Image URL
+                        Project Image
                       </label>
                       <div className="relative">
                         <ImageIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-400 w-5 h-5" />
                         <input
-                          type="url"
-                          value={formData.image}
-                          onChange={(e) =>
-                            setFormData({ ...formData, image: e.target.value })
-                          }
-                          placeholder="https://example.com/project-image.jpg"
-                          className="w-full pl-12 pr-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-base transition-all duration-200 hover:border-slate-500/50"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setSelectedFile(e.target.files[0])}
+                          className="w-full pl-12 pr-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-base transition-all duration-200 hover:border-slate-500/50"
                         />
                       </div>
                     </div>
