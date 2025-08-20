@@ -104,7 +104,7 @@ const App = () => {
             />
             <Route
               path="/openProposalToBid"
-              element={<OpenProposalToBidButton proposalId={25} />}
+              element={<OpenProposalToBidButton proposalId={"37"} />}
             />
             <Route
               path="/acceptBid" 

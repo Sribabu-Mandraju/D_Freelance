@@ -16,6 +16,18 @@ import Navbar from "../Components/Navbar";
 
 const API_BASE_URL = "http://localhost:3001/api/proposals";
 
+// USDC uses 6 decimals; values from backend may be in micro-USDC
+const USDC_DECIMALS = 6;
+function formatUsdcFromMicro(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "$0";
+  const usd = numeric / 10 ** USDC_DECIMALS;
+  return `$${usd.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
 const BrowseJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,7 +69,11 @@ const BrowseJobs = () => {
           id: p._id,
           title: p.title,
           description: p.description,
-          budget: `$${p.budget}`,
+          // Convert micro-USDC (1e6) to human-readable USD
+          budget: formatUsdcFromMicro(p.budget),
+          budgetMicro: Number(p.budget ?? 0),
+          budgetUsd:
+            p.budget != null ? Number(p.budget) / 10 ** USDC_DECIMALS : null,
           timeframe: p.project_duration,
           skills: p.skills_requirement || [],
           client: {
@@ -152,7 +168,7 @@ const BrowseJobs = () => {
       {/* Navbar */}
       <Navbar />
 
-      <div className=" pt-8 pb-6 px-4 sm:px-6  lg:px-8 relative z-10">
+      <div className=" pt-8 pb-6 px-4 sm:px-6 mt-[63px] lg:px-8 relative z-10">
         <div className="container mx-auto">
           {/* Header */}
           <div className="text-center mb-6">
@@ -412,8 +428,8 @@ function JobCard({ job, isSaved, onToggleSave, onClick }) {
 
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-400">{job.postedTime}</span>
-          <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all duration-300 text-xs shadow-lg">
-            Submit Proposal
+          <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-black px-3 py-1.5 rounded-lg font-semibold transition-all duration-300 text-xs shadow-lg">
+            View
           </button>
         </div>
       </div>

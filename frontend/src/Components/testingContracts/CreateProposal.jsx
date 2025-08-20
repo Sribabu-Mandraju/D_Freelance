@@ -4,7 +4,7 @@ import { useCreateProposal } from "../../interactions/ProposalManager_interactio
 import { baseSepolia } from "wagmi/chains";
 import toast from "react-hot-toast";
 
-function CreateProposalButton({ deadline, budget }) {
+function CreateProposalButton({ deadline, budget, dbId, onCreated }) {
   const { address, isConnected, chain } = useAccount();
   const {
     createProposal,
@@ -44,7 +44,9 @@ function CreateProposalButton({ deadline, budget }) {
       return;
     }
     if (!deadline || deadlineTimestamp <= Math.floor(Date.now() / 1000)) {
-      toast.error("Please provide a valid deadline in the future (Unix timestamp).");
+      toast.error(
+        "Please provide a valid deadline in the future (Unix timestamp)."
+      );
       return;
     }
     if (!budget || budgetValue <= 0) {
@@ -53,7 +55,10 @@ function CreateProposalButton({ deadline, budget }) {
     }
 
     try {
-      console.log("Calling createProposal with:", { deadline: deadlineTimestamp, budget: budgetValue });
+      console.log("Calling createProposal with:", {
+        deadline: deadlineTimestamp,
+        budget: budgetValue,
+      });
       await createProposal(BigInt(deadlineTimestamp), BigInt(budgetValue));
     } catch (err) {
       console.error("Create proposal error:", err);
@@ -74,14 +79,49 @@ function CreateProposalButton({ deadline, budget }) {
       toastIdRef.current = toast.loading("Confirming proposal creation...");
     } else if (isConfirmed && proposalEvent) {
       toastIdRef.current = toast.success(
-        `Proposal created successfully! Proposal ID: ${Number(proposalEvent.proposalId)}`
+        `Proposal created successfully! Proposal ID: ${Number(
+          proposalEvent.proposalId
+        )}`
       );
+      // After success, PATCH proposalId to backend
+      (async () => {
+        try {
+          if (!dbId) return;
+          const token = localStorage.getItem("authToken");
+          const res = await fetch(
+            `http://localhost:3001/api/proposals/${dbId}/proposalId`,
+            {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              body: JSON.stringify({
+                proposalId: Number(proposalEvent.proposalId),
+              }),
+            }
+          );
+          if (!res.ok) {
+            const msg = await res.text();
+            console.error("Failed to update proposalId:", msg);
+            toast.error("Failed to sync proposalId to backend");
+          }
+        } catch (e) {
+          console.error("Error updating proposalId:", e);
+          toast.error("Error syncing proposalId to backend");
+        } finally {
+          if (typeof onCreated === "function") {
+            onCreated(Number(proposalEvent.proposalId));
+          }
+        }
+      })();
     } else if (isConfirmed && !proposalEvent) {
       toastIdRef.current = toast.error(
         `Proposal created, but failed to fetch Proposal ID. Transaction hash: ${hash}. Check Base Sepolia explorer at https://sepolia.basescan.org/tx/${hash}.`
       );
     } else if (error) {
-      const isCancelled = error.code === 4001 || /rejected|denied|cancelled/i.test(error.message);
+      const isCancelled =
+        error.code === 4001 || /rejected|denied|cancelled/i.test(error.message);
       toastIdRef.current = toast.error(
         isCancelled ? "Transaction cancelled" : `Error: ${error.message}`
       );

@@ -1,6 +1,18 @@
-import { MapPin, Clock, Users, Heart, Share2, Bookmark } from "lucide-react"
+import {
+  MapPin,
+  Clock,
+  Users,
+  Heart,
+  Share2,
+  Bookmark,
+  DollarSign,
+} from "lucide-react";
 
 export default function ProposalHeader({ jobDetails }) {
+  const budgetUsdc =
+    jobDetails?.contractData?.budget != null
+      ? Number(jobDetails.contractData.budget) / 1_000_000
+      : null;
   return (
     <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 mb-6 shadow-2xl shadow-cyan-500/20 border border-cyan-500/20 hover:border-cyan-400/30 transition-all duration-300">
       <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
@@ -35,6 +47,19 @@ export default function ProposalHeader({ jobDetails }) {
                 {jobDetails.proposals} proposals
               </span>
             </span>
+            {budgetUsdc !== null && (
+              <span className="flex items-center gap-1 hover:text-cyan-400 transition-colors cursor-pointer">
+                <DollarSign className="w-4 h-4" />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-400 to-cyan-400 hover:from-cyan-400 hover:to-blue-400">
+                  On-chain Budget: $
+                  {budgetUsdc.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  USDC
+                </span>
+              </span>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -71,5 +96,5 @@ export default function ProposalHeader({ jobDetails }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

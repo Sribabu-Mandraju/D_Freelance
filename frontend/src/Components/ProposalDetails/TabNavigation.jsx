@@ -1,11 +1,20 @@
-"use client"
+"use client";
 
 export default function TabNavigation({ activeTab, setActiveTab }) {
   const tabs = [
     { id: "details", label: "Details", gradient: "from-cyan-500 to-blue-500" },
-    { id: "updates", label: "Updates", gradient: "from-purple-500 to-pink-500" },
-    { id: "comments", label: "Comments", gradient: "from-green-500 to-teal-500" },
-  ]
+    { id: "bids", label: "Bids", gradient: "from-orange-500 to-red-500" },
+    {
+      id: "updates",
+      label: "Updates",
+      gradient: "from-purple-500 to-pink-500",
+    },
+    {
+      id: "comments",
+      label: "Comments",
+      gradient: "from-green-500 to-teal-500",
+    },
+  ];
 
   return (
     <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-1 shadow-lg shadow-cyan-500/20 border border-cyan-500/20">
@@ -30,5 +39,5 @@ export default function TabNavigation({ activeTab, setActiveTab }) {
         ))}
       </div>
     </div>
-  )
+  );
 }

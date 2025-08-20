@@ -18,6 +18,14 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { toast } from "react-hot-toast";
 
+// USDC uses 6 decimals; 1 USD = 1_000_000 micro-USDC
+const USDC_DECIMALS = 6;
+function scaleToUsdcMicro(usdValue) {
+  const numeric = Number(usdValue);
+  if (!Number.isFinite(numeric) || numeric <= 0) return null;
+  return Math.round(numeric * 10 ** USDC_DECIMALS);
+}
+
 export default function PostCryptoProject() {
   const [formData, setFormData] = useState({
     title: "",
@@ -60,12 +68,19 @@ export default function PostCryptoProject() {
       return;
     }
 
+    const scaledBudget = scaleToUsdcMicro(formData.budget);
+    if (scaledBudget === null) {
+      toast.error("Please enter a valid budget amount in USD");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const submissionData = {
         ...formData,
-        budget: Number(formData.budget),
+        // Send scaled budget in micro-USDC (6 decimals)
+        budget: scaledBudget,
       };
 
       console.log("Submitting proposal with data:", submissionData);

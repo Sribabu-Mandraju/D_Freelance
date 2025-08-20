@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ProposalDetails from "./proposalDetails/ProposalDetails";
 import Navbar from "../Components/Navbar";
@@ -11,50 +11,70 @@ const JobDetails = () => {
   const [jobData, setJobData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [needsRefresh, setNeedsRefresh] = useState(false);
+
+  const fetchJobDetails = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch(`http://localhost:3001/api/proposals/${id}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Fetched job data:", data);
+      console.log("Data structure check:", {
+        hasSkills: !!data.skills_requirement,
+        skillsType: typeof data.skills_requirement,
+        skillsIsArray: Array.isArray(data.skills_requirement),
+        hasTags: !!data.tags,
+        tagsType: typeof data.tags,
+        tagsIsArray: Array.isArray(data.tags),
+        hasContractData: !!data.contractData,
+      });
+      setJobData(data);
+    } catch (err) {
+      console.error("Error fetching job details:", err);
+      setError(err.message);
+      toast.error("Failed to load job details");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    const fetchJobDetails = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const response = await fetch(
-          `http://localhost:3001/api/proposals/${id}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Fetched job data:", data);
-        console.log("Data structure check:", {
-          hasSkills: !!data.skills_requirement,
-          skillsType: typeof data.skills_requirement,
-          skillsIsArray: Array.isArray(data.skills_requirement),
-          hasTags: !!data.tags,
-          tagsType: typeof data.tags,
-          tagsIsArray: Array.isArray(data.tags),
-          hasContractData: !!data.contractData,
-        });
-        setJobData(data);
-      } catch (err) {
-        console.error("Error fetching job details:", err);
-        setError(err.message);
-        toast.error("Failed to load job details");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (id) {
       fetchJobDetails();
     }
-  }, [id]);
+  }, [id, fetchJobDetails]);
 
   const handleBackToJobs = () => {
     navigate("/browse-jobs");
   };
+
+  const handleChainSuccess = useCallback(() => {
+    toast.success(
+      "New on-chain updates available. Click Refresh to see changes.",
+      {
+        id: "chain-success-toast",
+        duration: 5000,
+      }
+    );
+    setNeedsRefresh(true);
+  }, []);
+
+  const handleManualRefresh = useCallback(() => {
+    fetchJobDetails();
+    setNeedsRefresh(false);
+    toast.dismiss("chain-success-toast");
+  }, [fetchJobDetails]);
+
+  const handleHardReload = useCallback(() => {
+    window.location.reload();
+  }, []);
 
   if (isLoading) {
     return (
@@ -173,12 +193,43 @@ const JobDetails = () => {
   });
 
   return (
-    <ProposalDetails
-      job={jobData}
-      onBack={handleBackToJobs}
-      setJobs={() => {}} // Not needed for this page
-      setIsLoading={() => {}} // Not needed for this page
-    />
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <Navbar />
+      <div className="pt-24 pb-12 px-4">
+        <div className="container mx-auto max-w-6xl">
+          {true && (
+            <div className="bg-blue-500/20 border border-blue-400/50 rounded-lg p-3 text-center flex items-center justify-between mb-4">
+              <span className="text-blue-300 font-medium text-sm">
+                New on‑chain updates available.
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleManualRefresh}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-semibold transition-colors"
+                >
+                  Refresh
+                </button>
+                <button
+                  onClick={handleHardReload}
+                  className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm font-semibold transition-colors"
+                  title="Reload page"
+                >
+                  Reload
+                </button>
+              </div>
+            </div>
+          )}
+          <ProposalDetails
+            job={jobData}
+            onBack={handleBackToJobs}
+            setJobs={() => {}} // Not needed for this page
+            setIsLoading={() => {}} // Not needed for this page
+            onChainSuccess={handleChainSuccess}
+          />
+        </div>
+      </div>
+      <Footer />
+    </div>
   );
 };
 

@@ -10,11 +10,17 @@ import ProposalHeader from "../../Components/ProposalDetails/ProposalHeader";
 import ProjectDescription from "../../Components/ProposalDetails/ProjectDescription";
 import RequirementsDeliverables from "../../Components/ProposalDetails/RequirementsDeliverables";
 import TabNavigation from "../../Components/ProposalDetails/TabNavigation";
-import ProjectTimeline from "../../Components/ProposalDetails/ProjectTimeline";
 import TabContent from "../../Components/ProposalDetails/TabContent";
 import ProjectStats from "../../Components/ProposalDetails/ProjectStats";
 import ClientInfo from "../../Components/ProposalDetails/ClientInfo";
 import LocationMap from "../../Components/ProposalDetails/LocationMap";
+// New efficient proposal flow components
+import StateBadge from "../../Components/ProposalComponents/StateBadge";
+import ContractSummary from "../../Components/ProposalComponents/ContractSummary";
+import CreateProposalCard from "../../Components/ProposalComponents/CreateProposalCard";
+import ActionBar from "../../Components/ProposalComponents/ActionBar";
+import FundingCard from "../../Components/ProposalComponents/FundingCard";
+import BiddingPanel from "../../Components/ProposalComponents/BiddingPanel";
 
 // Loading Spinner Component
 const LoadingSpinner = () => (
@@ -56,7 +62,7 @@ export default function ProposalDetails({ job, onBack }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [proposalState, setProposalState] = useState(0);
-  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [needsRefresh, setNeedsRefresh] = useState(false);
 
   // Handle retry for error cases
   const handleRetry = useCallback(() => {
@@ -83,66 +89,6 @@ export default function ProposalDetails({ job, onBack }) {
     10: "Cancelled",
     11: "Refunded",
   };
-
-  const timeline = [
-    { phase: "Proposal Draft", status: "Draft", date: "2025-01-01", state: 0 },
-    { phase: "Proposal Open", status: "Open", date: "2025-01-10", state: 1 },
-    {
-      phase: "Award Confirmation",
-      status: "Awarded",
-      date: "2025-01-20",
-      state: 2,
-    },
-    { phase: "Funding", status: "Funded", date: "2025-02-01", state: 3 },
-    {
-      phase: "Development",
-      status: "InProgress",
-      date: "2025-02-15",
-      state: 4,
-    },
-    {
-      phase: "Milestone 1",
-      status: "MilestonePayout_ONE",
-      date: "2025-03-01",
-      state: 5,
-    },
-    {
-      phase: "Milestone 2",
-      status: "MilestonePayout_TWO",
-      date: "2025-04-01",
-      state: 6,
-    },
-    {
-      phase: "Milestone 3",
-      status: "MilestonePayout_THREE",
-      date: "2025-05-01",
-      state: 7,
-    },
-    {
-      phase: "Project Completion",
-      status: "Completed",
-      date: "2025-06-01",
-      state: 8,
-    },
-    {
-      phase: "Dispute Resolution",
-      status: "Disputed",
-      date: "2025-06-15",
-      state: 9,
-    },
-    {
-      phase: "Project Cancellation",
-      status: "Cancelled",
-      date: "2025-07-01",
-      state: 10,
-    },
-    {
-      phase: "Refund Processing",
-      status: "Refunded",
-      date: "2025-07-15",
-      state: 11,
-    },
-  ];
 
   const fetchProposal = useCallback(async () => {
     try {
@@ -186,10 +132,16 @@ export default function ProposalDetails({ job, onBack }) {
     console.log("Tags:", data.tags);
     console.log("Contract data:", data.contractData);
 
-    // Extract contract state from contractData if available
-    let currentState = 0;
-    if (data.contractData && data.contractData.state !== undefined) {
-      currentState = parseInt(data.contractData.state);
+    // Determine current state:
+    // - If no proposalId in DB, no on-chain state exists yet -> null (shows Create Proposal)
+    // - If proposalId exists: use contractData.state if present, else default to 0 (Draft)
+    let currentState = null;
+    if (data.proposalId) {
+      if (data.contractData && data.contractData.state !== undefined) {
+        currentState = parseInt(data.contractData.state);
+      } else {
+        currentState = 0;
+      }
     }
 
     console.log(
@@ -206,6 +158,10 @@ export default function ProposalDetails({ job, onBack }) {
       "0x0000000000000000000000000000000000000000";
 
     // Format the data to ensure compatibility with existing components
+    // Normalize budget: backend stores micro‑USDC (6 decimals). Create readable USD and retain micro value
+    const budgetMicro = data?.budget != null ? Number(data.budget) : null;
+    const budgetUsd = budgetMicro != null ? budgetMicro / 1_000_000 : null;
+
     const formattedJob = {
       ...data,
       // Use the actual description from API
@@ -249,7 +205,8 @@ export default function ProposalDetails({ job, onBack }) {
 
       // Map location and other fields
       location: data.location || "Remote",
-      budget: data.budget || "Contact for pricing",
+      budgetMicro,
+      budgetUsd,
       timeframe: data.project_duration || data.timeframe || "To be discussed",
       type: data.type || "Fixed Price",
       proposals: data.bids?.length || data.proposals || 0,
@@ -280,46 +237,6 @@ export default function ProposalDetails({ job, onBack }) {
     setJobDetails(formattedJob);
   }, []);
 
-  const handleStateAction = async (action) => {
-    try {
-      setIsActionLoading(true);
-
-      const response = await fetch(
-        `http://localhost:3001/api/proposals/${id}/actions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ action }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to execute action: ${response.status} ${response.statusText}`
-        );
-      }
-
-      const result = await response.json();
-
-      // Update the proposal state if returned from API
-      if (result.newState !== undefined) {
-        setProposalState(result.newState);
-      }
-
-      // Refresh proposal data to get latest information
-      await fetchProposal();
-
-      return result;
-    } catch (err) {
-      console.error("Error executing action:", err);
-      throw err;
-    } finally {
-      setIsActionLoading(false);
-    }
-  };
-
   const fetchAndProcessJob = useCallback(async () => {
     if (job) {
       console.log("Job data provided via props, processing...");
@@ -336,6 +253,21 @@ export default function ProposalDetails({ job, onBack }) {
       setIsLoading(false);
     }
   }, [id, job, fetchProposal, processJobData]);
+
+  // After any chain action completes, show a refresh option to refetch data
+  const handleChainSuccess = useCallback(() => {
+    // Give backend a brief moment to persist, then enable refresh CTA
+    setTimeout(() => {
+      setNeedsRefresh(true);
+      toast.success("On‑chain change detected. Click Refresh to update.");
+    }, 800);
+  }, []);
+
+  const handleManualRefresh = useCallback(async () => {
+    await fetchProposal();
+    setNeedsRefresh(false);
+    toast.success("Data refreshed");
+  }, [fetchProposal]);
 
   useEffect(() => {
     fetchAndProcessJob();
@@ -415,6 +347,20 @@ export default function ProposalDetails({ job, onBack }) {
 
           <ProposalHeader jobDetails={jobDetails} />
 
+          {needsRefresh && (
+            <div className="mt-4 mb-2 p-3 rounded-xl border border-cyan-500/30 bg-black/40 backdrop-blur-sm flex items-center justify-between">
+              <div className="text-sm text-cyan-200">
+                New on‑chain updates available.
+              </div>
+              <button
+                onClick={handleManualRefresh}
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold"
+              >
+                Refresh
+              </button>
+            </div>
+          )}
+
           <div className="space-y-6 mb-6">
             <ProjectDescription jobDetails={jobDetails} />
             <RequirementsDeliverables jobDetails={jobDetails} />
@@ -430,37 +376,79 @@ export default function ProposalDetails({ job, onBack }) {
 
               {activeTab === "details" && (
                 <div className="space-y-4 sm:space-y-6">
-                  <ProjectTimeline
-                    timeline={timeline}
-                    proposalId={id || jobDetails?.proposalId}
-                    currentState={proposalState}
-                    contractData={jobDetails?.contractData}
-                    onStateChange={setProposalState}
-                  />
+                  {/* Contract summary + state badge */}
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+                      On‑chain Proposal
+                    </h2>
+                    <StateBadge state={proposalState} />
+                  </div>
 
-                  {isActionLoading && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-                      <div className="bg-black/80 backdrop-blur-xl rounded-2xl p-6 border border-cyan-500/20">
-                        <div className="flex items-center gap-4">
-                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-transparent border-t-cyan-400"></div>
-                          <span className="text-cyan-400 font-medium">
-                            Processing action...
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                  {jobDetails?.contractData ? (
+                    <ContractSummary contractData={jobDetails.contractData} />
+                  ) : (
+                    <CreateProposalCard
+                      dbId={jobDetails?._id}
+                      budget={jobDetails?.budgetUsd}
+                      projectDuration={jobDetails?.project_duration}
+                      onCreated={() => toast.success("Proposal created")}
+                      onChainSuccess={handleChainSuccess}
+                    />
                   )}
+
+                  {proposalState !== null && (
+                    <ActionBar
+                      dbId={jobDetails?._id}
+                      proposalId={
+                        jobDetails?.contractData?.contractProposalId ||
+                        jobDetails?.proposalId
+                      }
+                      state={proposalState}
+                      onChainSuccess={handleChainSuccess}
+                    />
+                  )}
+
+                  {proposalState === 2 && (
+                    <FundingCard
+                      proposalId={
+                        jobDetails?.contractData?.contractProposalId ||
+                        jobDetails?.proposalId
+                      }
+                      bidAmount={jobDetails?.contractData?.bidAmount}
+                      onChainSuccess={handleChainSuccess}
+                    />
+                  )}
+
+                  {/* Bids: create and list */}
+                  <BiddingPanel
+                    proposalDbId={jobDetails?._id}
+                    currentState={proposalState}
+                    contractProposalId={
+                      jobDetails?.contractData?.contractProposalId ||
+                      jobDetails?.proposalId
+                    }
+                    clientAddress={
+                      jobDetails?.contractData?.client ||
+                      jobDetails?.userWalletAddress
+                    }
+                    onChainSuccess={handleChainSuccess}
+                  />
                 </div>
               )}
 
-              <TabContent activeTab={activeTab} />
+              <TabContent
+                activeTab={activeTab}
+                proposalId={id || jobDetails?._id}
+                proposalState={proposalState}
+                proposalData={jobDetails}
+              />
             </div>
 
             {/* Sidebar */}
             <div className="space-y-4 sm:space-y-6">
               <ProjectStats jobDetails={jobDetails} />
               <ClientInfo client={jobDetails.client} />
-              <LocationMap location={jobDetails.location} />
+              {/* <LocationMap location={jobDetails.location} /> */}
             </div>
           </div>
         </div>

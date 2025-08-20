@@ -8,7 +8,7 @@ import {
   Heart,
   Share2,
   Bookmark,
-AlertCircle,
+  AlertCircle,
   Star,
   MessageCircle,
   CheckCircle,
@@ -309,7 +309,12 @@ export default function ProposalDetails({
                       Budget
                     </span>
                     <span className="text-cyan-400 font-bold text-sm sm:text-base">
-                      {jobDetails.budget}
+                      {typeof jobDetails?.budgetUsd === "number"
+                        ? `$${jobDetails.budgetUsd.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}`
+                        : jobDetails.budget || "—"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center p-2 rounded-lg hover:bg-gray-800/30 transition-colors">

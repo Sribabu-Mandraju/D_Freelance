@@ -19,7 +19,7 @@ import PaySecondMilestoneButton from "../testingContracts/PaySecondMileStone";
 import PayThirdMilestoneButton from "../testingContracts/PayThirdMileStone";
 import CompleteProposalButton from "../testingContracts/CompleteProposal";
 import CancelProposalButton from "../testingContracts/CancelProposal";
-import AcceptBidButton from "../testingContracts/AcceptBid";
+
 import DepositBidAmountButton from "../testingContracts/DepositBidAmount";
 
 export default function ProjectTimeline({
@@ -31,6 +31,8 @@ export default function ProjectTimeline({
   contractData = null,
   onStateChange = null,
 }) {
+  const [isReloading, setIsReloading] = useState(false);
+
   const [isProcessing, setIsProcessing] = useState(null);
   const scrollContainerRef = useRef(null);
 
@@ -78,12 +80,24 @@ export default function ProjectTimeline({
   // Check if state exists in the API/database
   const hasState = currentState !== null && currentState !== undefined;
 
+  // Page reload function after button actions
+  const reloadPage = () => {
+    console.log("Reloading page after state change...");
+    setIsReloading(true);
+    // Add a small delay to ensure the blockchain transaction is processed
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000); // 2 second delay
+  };
+
   // Handle state changes
   const handleStateChange = (newState) => {
     console.log("State change requested:", newState);
     if (onStateChange) {
       onStateChange(newState);
     }
+    // Reload page after state change
+    reloadPage();
   };
 
   // Update local state when prop changes
@@ -227,6 +241,11 @@ export default function ProjectTimeline({
           <CreateProposalButton
             deadline={contractData?.endTime || "1758015222"}
             budget={contractData?.budget || 1000000}
+            dbId={contractData?._id}
+            onCreated={(pid) => {
+              if (onStateChange) onStateChange(0); // Move to Draft/Open flow after creation
+              reloadPage(); // Reload page after creation
+            }}
           />
         ),
       };
@@ -255,6 +274,10 @@ export default function ProjectTimeline({
               <CreateProposalButton
                 deadline={contractData?.endTime || "1758015222"}
                 budget={contractData?.budget || 1000000}
+                dbId={contractData?._id}
+                onCreated={(pid) => {
+                  if (onStateChange) onStateChange(0);
+                }}
               />
             ) : null,
         };
@@ -271,7 +294,10 @@ export default function ProjectTimeline({
           actionText: "Open For Bids",
           isEnabled: isValidTransition && isCurrent,
           actionComponent: isCurrent ? (
-            <OpenProposalToBidButton proposalId={effectiveProposalId} />
+            <OpenProposalToBidButton
+              proposalId={effectiveProposalId}
+              onSuccess={() => reloadPage()} // Reload page after opening for bids
+            />
           ) : null,
         };
       case ProposalState.Awarded:
@@ -290,8 +316,8 @@ export default function ProjectTimeline({
             isValidTransition && isCurrent ? (
               <AcceptBidButton
                 proposalId={effectiveProposalId}
-                bidder={"0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"}
-                bidAmount={100000}
+                proposalState={currentState}
+                onBidAccepted={() => reloadPage()} // Reload page after accepting bid
               />
             ) : null,
         };
@@ -309,7 +335,10 @@ export default function ProjectTimeline({
           isEnabled: isValidTransition && isCurrent,
           actionComponent:
             isValidTransition && isCurrent ? (
-              <DepositBidAmountButton proposalId={effectiveProposalId} />
+              <DepositBidAmountButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after depositing funds
+              />
             ) : null,
         };
       case ProposalState.InProgress:
@@ -326,7 +355,10 @@ export default function ProjectTimeline({
           isEnabled: isValidTransition && isCurrent,
           actionComponent:
             isValidTransition && isCurrent ? (
-              <StartWorkButton proposalId={effectiveProposalId} />
+              <StartWorkButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after starting work
+              />
             ) : null,
         };
       case ProposalState.MilestonePayout_ONE:
@@ -343,7 +375,10 @@ export default function ProjectTimeline({
           isEnabled: isValidTransition && isCurrent,
           actionComponent:
             isValidTransition && isCurrent ? (
-              <PayFirstMilestoneButton proposalId={effectiveProposalId} />
+              <PayFirstMilestoneButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after first milestone payment
+              />
             ) : null,
         };
       case ProposalState.MilestonePayout_TWO:
@@ -360,7 +395,10 @@ export default function ProjectTimeline({
           isEnabled: isValidTransition && isCurrent,
           actionComponent:
             isValidTransition && isCurrent ? (
-              <PaySecondMilestoneButton proposalId={effectiveProposalId} />
+              <PaySecondMilestoneButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after second milestone payment
+              />
             ) : null,
         };
       case ProposalState.MilestonePayout_THREE:
@@ -377,7 +415,10 @@ export default function ProjectTimeline({
           isEnabled: isValidTransition && isCurrent,
           actionComponent:
             isValidTransition && isCurrent ? (
-              <PayThirdMilestoneButton proposalId={effectiveProposalId} />
+              <PayThirdMilestoneButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after third milestone payment
+              />
             ) : null,
         };
       case ProposalState.Completed:
@@ -509,30 +550,70 @@ export default function ProjectTimeline({
           <CreateProposalButton
             deadline={contractData?.endTime || "1758015222"}
             budget={contractData?.budget || 1000000}
+            dbId={contractData?._id}
+            onCreated={(pid) => {
+              if (onStateChange) onStateChange(0);
+              reloadPage(); // Reload page after creation
+            }}
           />
         );
       case ProposalState.Open:
-        return <OpenProposalToBidButton proposalId={effectiveProposalId} />;
-      case ProposalState.Awarded:
         return (
-          <AcceptBidButton
+          <OpenProposalToBidButton
             proposalId={effectiveProposalId}
-            bidder={"0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"}
-            bidAmount={100000}
+            onSuccess={() => reloadPage()} // Reload page after opening for bids
           />
         );
+      case ProposalState.Awarded:
+        return (
+          <div className="text-center p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+            <p className="text-blue-400 text-sm">
+              Proposal awarded. Check the Bids tab to accept a specific bid.
+            </p>
+          </div>
+        );
       case ProposalState.Funded:
-        return <DepositBidAmountButton proposalId={effectiveProposalId} />;
+        return (
+          <DepositBidAmountButton
+            proposalId={effectiveProposalId}
+            onSuccess={() => reloadPage()} // Reload page after depositing funds
+          />
+        );
       case ProposalState.InProgress:
-        return <StartWorkButton proposalId={effectiveProposalId} />;
+        return (
+          <StartWorkButton
+            proposalId={effectiveProposalId}
+            onSuccess={() => reloadPage()} // Reload page after starting work
+          />
+        );
       case ProposalState.MilestonePayout_ONE:
-        return <PayFirstMilestoneButton proposalId={effectiveProposalId} />;
+        return (
+          <PayFirstMilestoneButton
+            proposalId={effectiveProposalId}
+            onSuccess={() => reloadPage()} // Reload page after first milestone payment
+          />
+        );
       case ProposalState.MilestonePayout_TWO:
-        return <PaySecondMilestoneButton proposalId={effectiveProposalId} />;
+        return (
+          <PaySecondMilestoneButton
+            proposalId={effectiveProposalId}
+            onSuccess={() => reloadPage()} // Reload page after second milestone payment
+          />
+        );
       case ProposalState.MilestonePayout_THREE:
-        return <PayThirdMilestoneButton proposalId={effectiveProposalId} />;
+        return (
+          <PayThirdMilestoneButton
+            proposalId={effectiveProposalId}
+            onSuccess={() => reloadPage()} // Reload page after third milestone payment
+          />
+        );
       case ProposalState.Completed:
-        return <CompleteProposalButton proposalId={effectiveProposalId} />;
+        return (
+          <CompleteProposalButton
+            proposalId={effectiveProposalId}
+            onSuccess={() => reloadPage()} // Reload page after completion
+          />
+        );
       default:
         return null;
     }
@@ -611,12 +692,28 @@ export default function ProjectTimeline({
             </span>
           </h3>
           <p className="text-gray-400 text-sm">
-            Follow the on-chain proposal lifecycle with state-based actions
+            Follow the on-chain proposal lifecycle with state-based actions.
+            <span className="text-cyan-400 font-medium">
+              {" "}
+              Page will automatically reload after each action.
+            </span>
           </p>
         </div>
 
         {/* Current State Display */}
         <div className="mb-8">
+          {/* Reload Indicator */}
+          {isReloading && (
+            <div className="mb-4 bg-cyan-500/20 border border-cyan-400/50 rounded-lg p-4 text-center">
+              <div className="flex items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-400"></div>
+                <span className="text-cyan-300 font-medium">
+                  Transaction completed! Reloading page in 2 seconds...
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="bg-black/60 backdrop-blur-xl rounded-xl p-6 border border-cyan-500/30">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
@@ -876,55 +973,95 @@ export default function ProjectTimeline({
         </h4>
         <p className="text-sm text-gray-300 mb-4">
           Test the complete project flow with these interactive buttons (only
-          valid actions shown)
+          valid actions shown).{" "}
+          <span className="text-cyan-400 font-medium">
+            Each action will reload the page after completion.
+          </span>
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {/* Show Create Proposal if no state exists */}
           {!hasState && (
-            <CreateProposalButton deadline={"1758015222"} budget={1000000} />
+            <CreateProposalButton
+              deadline={"1758015222"}
+              budget={1000000}
+              dbId={contractData?._id}
+              onCreated={(pid) => {
+                if (onStateChange) onStateChange(0);
+                reloadPage(); // Reload page after creation
+              }}
+            />
           )}
 
           {/* Only show buttons that are valid for current state */}
           {hasState && isStateTransitionValid(ProposalState.Draft) && (
-            <CreateProposalButton deadline={"1758015222"} budget={1000000} />
-          )}
-          {hasState && isStateTransitionValid(ProposalState.Open) && (
-            <OpenProposalToBidButton proposalId={effectiveProposalId} />
-          )}
-          {hasState && isStateTransitionValid(ProposalState.Awarded) && (
-            <AcceptBidButton
-              proposalId={effectiveProposalId}
-              bidder={
-                contractData?.bidder ||
-                "0xc90cA2179a4b52C8Dd556C9287340fc2A7784BB5"
-              }
-              bidAmount={contractData?.bidAmount || 100000}
+            <CreateProposalButton
+              deadline={"1758015222"}
+              budget={1000000}
+              dbId={contractData?._id}
+              onCreated={(pid) => {
+                if (onStateChange) onStateChange(0);
+                reloadPage(); // Reload page after creation
+              }}
             />
           )}
+          {hasState && isStateTransitionValid(ProposalState.Open) && (
+            <OpenProposalToBidButton
+              proposalId={effectiveProposalId}
+              onSuccess={() => reloadPage()} // Reload page after opening for bids
+            />
+          )}
+          {hasState && isStateTransitionValid(ProposalState.Awarded) && (
+            <div className="text-center p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <p className="text-blue-400 text-sm">
+                Proposal awarded. Check the Bids tab to accept a specific bid.
+              </p>
+            </div>
+          )}
           {hasState && isStateTransitionValid(ProposalState.Funded) && (
-            <DepositBidAmountButton proposalId={effectiveProposalId} />
+            <DepositBidAmountButton
+              proposalId={effectiveProposalId}
+              onSuccess={() => reloadPage()} // Reload page after depositing funds
+            />
           )}
           {hasState && isStateTransitionValid(ProposalState.InProgress) && (
-            <StartWorkButton proposalId={effectiveProposalId} />
+            <StartWorkButton
+              proposalId={effectiveProposalId}
+              onSuccess={() => reloadPage()} // Reload page after starting work
+            />
           )}
           {hasState &&
             isStateTransitionValid(ProposalState.MilestonePayout_ONE) && (
-              <PayFirstMilestoneButton proposalId={effectiveProposalId} />
+              <PayFirstMilestoneButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after first milestone payment
+              />
             )}
           {hasState &&
             isStateTransitionValid(ProposalState.MilestonePayout_TWO) && (
-              <PaySecondMilestoneButton proposalId={effectiveProposalId} />
+              <PaySecondMilestoneButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after second milestone payment
+              />
             )}
           {hasState &&
             isStateTransitionValid(ProposalState.MilestonePayout_THREE) && (
-              <PayThirdMilestoneButton proposalId={effectiveProposalId} />
+              <PayThirdMilestoneButton
+                proposalId={effectiveProposalId}
+                onSuccess={() => reloadPage()} // Reload page after third milestone payment
+              />
             )}
           {hasState && isStateTransitionValid(ProposalState.Completed) && (
-            <CompleteProposalButton proposalId={effectiveProposalId} />
+            <CompleteProposalButton
+              proposalId={effectiveProposalId}
+              onSuccess={() => reloadPage()} // Reload page after completion
+            />
           )}
           {hasState && isStateTransitionValid(ProposalState.Cancelled) && (
-            <CancelProposalButton proposalId={effectiveProposalId} />
+            <CancelProposalButton
+              proposalId={effectiveProposalId}
+              onSuccess={() => reloadPage()} // Reload page after cancellation
+            />
           )}
         </div>
 

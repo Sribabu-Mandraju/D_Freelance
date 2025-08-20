@@ -7,7 +7,8 @@ import toast from "react-hot-toast";
 function PlaceBid() {
   const { address, isConnected, chain } = useAccount();
   const [proposalId, setProposalId] = useState("");
-  const [amount, setAmount] = useState("10"); // Default 10 HFT
+  // Fixed requirement: user must spend exactly 25 HFT to place a bid
+  const [amount, setAmount] = useState("25");
   const {
     approveHFT,
     placeBid,
@@ -50,7 +51,9 @@ function PlaceBid() {
       return;
     }
     if (!hasEnoughHFT) {
-      toast.error(`Insufficient HFT balance (need ${Number(hftAmount) / 10 ** 18} HFT).`);
+      toast.error(
+        `Insufficient HFT balance (need ${Number(hftAmount) / 10 ** 18} HFT).`
+      );
       return;
     }
     if (allowanceError) {
@@ -61,10 +64,7 @@ function PlaceBid() {
       toast.error("Error checking HFT balance: " + hftBalanceError.message);
       return;
     }
-    if (!amount || Number(amount) <= 0) {
-      toast.error("Please enter a valid HFT amount.");
-      return;
-    }
+    // Amount is fixed to 25 HFT
 
     try {
       console.log("Calling approveHFT with amount:", hftAmount.toString());
@@ -90,11 +90,13 @@ function PlaceBid() {
       return;
     }
     if (!hasEnoughHFT) {
-      toast.error(`Insufficient HFT balance (need ${Number(hftAmount) / 10 ** 18} HFT).`);
+      toast.error(
+        `Insufficient HFT balance (need ${Number(hftAmount) / 10 ** 18} HFT).`
+      );
       return;
     }
     if (!hasEnoughAllowance) {
-      toast.error("Please approve HFT first.");
+      toast.error("Please approve 25 HFT first.");
       return;
     }
     if (allowanceError) {
@@ -123,7 +125,9 @@ function PlaceBid() {
   useEffect(() => {
     let toastId;
     if (isApprovePending) {
-      toastId = toast.loading(`Approving ${Number(hftAmount) / 10 ** 18} HFT...`);
+      toastId = toast.loading(
+        `Approving ${Number(hftAmount) / 10 ** 18} HFT...`
+      );
     } else if (isBidPending) {
       toastId = toast.loading("Placing bid...");
     } else if (isApproveConfirming) {
@@ -131,15 +135,27 @@ function PlaceBid() {
     } else if (isBidConfirming) {
       toastId = toast.loading("Confirming bid placement...");
     } else if (isApproveConfirmed) {
-      toastId = toast.success(`HFT approval for ${Number(hftAmount) / 10 ** 18} HFT successful!`);
+      toastId = toast.success(
+        `HFT approval for ${Number(hftAmount) / 10 ** 18} HFT successful!`
+      );
     } else if (isBidConfirmed) {
       toastId = toast.success("Bid placed successfully!");
     } else if (approveError) {
-      const isCancelled = approveError.code === 4001 || /rejected|denied|cancelled/i.test(approveError.message);
-      toastId = toast.error(isCancelled ? "Transaction cancelled" : `Approval error: ${approveError.message}`);
+      const isCancelled =
+        approveError.code === 4001 ||
+        /rejected|denied|cancelled/i.test(approveError.message);
+      toastId = toast.error(
+        isCancelled
+          ? "Transaction cancelled"
+          : `Approval error: ${approveError.message}`
+      );
     } else if (bidError) {
-      const isCancelled = bidError.code === 4001 || /rejected|denied|cancelled/i.test(bidError.message);
-      toastId = toast.error(isCancelled ? "Transaction cancelled" : `Bid error: ${bidError.message}`);
+      const isCancelled =
+        bidError.code === 4001 ||
+        /rejected|denied|cancelled/i.test(bidError.message);
+      toastId = toast.error(
+        isCancelled ? "Transaction cancelled" : `Bid error: ${bidError.message}`
+      );
     }
     return () => {
       if (toastId) toast.dismiss(toastId);
@@ -158,7 +174,10 @@ function PlaceBid() {
 
   return (
     <div className="p-5 max-w-md mx-auto bg-gray-800 rounded-lg">
-      <h3 className="text-xl font-semibold mb-4 text-gray-100">Place Bid</h3>
+      <h3 className="text-xl font-semibold mb-1 text-gray-100">Place Bid</h3>
+      <p className="text-xs text-gray-400 mb-4">
+        Placing a bid requires staking 25 HFT (refunded if not selected).
+      </p>
       <div className="mb-4">
         <label className="block text-gray-200 mb-2">Proposal ID</label>
         <input
@@ -170,20 +189,27 @@ function PlaceBid() {
         />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-200 mb-2">HFT Amount to Approve</label>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full p-2 rounded-md bg-gray-700 text-gray-200"
-          placeholder="Enter HFT amount"
-        />
+        <label className="block text-gray-200 mb-2">
+          HFT Amount to Approve
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={amount}
+            readOnly
+            className="w-full p-2 rounded-md bg-gray-800 text-gray-400 cursor-not-allowed"
+          />
+          <span className="text-gray-400 text-sm">HFT</span>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">Fixed at 25 HFT per bid.</p>
       </div>
       <p className="text-gray-200 mb-2">
-        Amount to Approve: {hftAmount > 0 ? Number(hftAmount) / 10 ** 18 : "N/A"} HFT
+        Amount to Approve:{" "}
+        {hftAmount > 0 ? Number(hftAmount) / 10 ** 18 : "N/A"} HFT
       </p>
       <p className="text-gray-200 mb-2">
-        Your HFT Balance: {hftBalance > 0 ? Number(hftBalance) / 10 ** 18 : "N/A"} HFT
+        Your HFT Balance:{" "}
+        {hftBalance > 0 ? Number(hftBalance) / 10 ** 18 : "N/A"} HFT
       </p>
       {!hasEnoughAllowance ? (
         <button
@@ -215,7 +241,11 @@ function PlaceBid() {
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {isApprovePending || isApproveConfirming ? "Processing Approval..." : `Approve ${hftAmount > 0 ? Number(hftAmount) / 10 ** 18 : "N/A"} HFT`}
+          {isApprovePending || isApproveConfirming
+            ? "Processing Approval..."
+            : `Approve ${
+                hftAmount > 0 ? Number(hftAmount) / 10 ** 18 : "N/A"
+              } HFT`}
         </button>
       ) : (
         <button
