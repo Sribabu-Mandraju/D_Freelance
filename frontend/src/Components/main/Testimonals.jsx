@@ -62,7 +62,7 @@ const TestimonialsSection = () => {
   }, [testimonials.length])
 
   return (
-    <section id="testimonials" className="py-20 px-4 relative overflow-hidden">
+    <section id="testimonials" className="py-0 sm:py-20 px-4 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 right-1/3 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl"></div>
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-cyan-600/10 rounded-full filter blur-3xl"></div>
@@ -93,7 +93,7 @@ const TestimonialsSection = () => {
                 ))}
               </div>
 
-              <blockquote className="text-2xl md:text-3xl font-medium text-white mb-8 leading-relaxed">
+              <blockquote className="text-md md:text-3xl font-medium text-white mb-8 leading-relaxed">
                 "{testimonials[activeTestimonial].content}"
               </blockquote>
 
@@ -104,8 +104,8 @@ const TestimonialsSection = () => {
                   className="w-16 h-16 rounded-full border-2 border-purple-500/50"
                 />
                 <div className="text-left">
-                  <h4 className="text-xl font-bold text-white">{testimonials[activeTestimonial].name}</h4>
-                  <p className="text-gray-400">
+                  <h4 className="text-sm md:text-xl font-bold text-white">{testimonials[activeTestimonial].name}</h4>
+                  <p className="text-sm md:text-xl text-gray-400">
                     {testimonials[activeTestimonial].role} at {testimonials[activeTestimonial].company}
                   </p>
                   <p className="text-purple-400 text-sm font-medium">{testimonials[activeTestimonial].project}</p>

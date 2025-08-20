@@ -6,24 +6,23 @@ import {
   updateBid,
   deleteBid,
 } from "../controllers/BidController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-
-router.post("/", createBid);
+// Public routes (no authentication required)
 router.get("/", getAllBids);
+router.get("/:id", getBidById);
 
 // Define specific routes before dynamic ones
-router.get('/hello/:id', (req, res) => {
+router.get("/hello/:id", (req, res) => {
   const id = req.params.id;
   res.send(`Hello from /bids/hello/${id}`);
-
 });
 
-
-// Define dynamic ones last
-router.get("/:id", getBidById);
-router.put("/:id", updateBid);
-router.delete("/:id", deleteBid);
+// Protected routes (authentication required)
+router.post("/", authMiddleware, createBid);
+router.put("/:id", authMiddleware, updateBid);
+router.delete("/:id", authMiddleware, deleteBid);
 
 export default router;
