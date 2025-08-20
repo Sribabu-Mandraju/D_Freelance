@@ -316,14 +316,14 @@ export default function PostCryptoProject() {
       <div className="pt-24 pb-12 px-4">
         <div className="container mx-auto max-w-5xl">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-6">
+          <div className="text-center mb-8 md:mb-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full mb-2 md:mb-6">
               <FileText className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-6xl font-bold mb-2 md:mb-4 bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
               Post Your Project
             </h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-md md:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Submit a detailed proposal for your blockchain project and connect
               with top-tier developers
             </p>
@@ -442,7 +442,7 @@ export default function PostCryptoProject() {
                               project_duration: e.target.value,
                             })
                           }
-                          className="w-full pl-12 pr-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-base appearance-none transition-all duration-200 hover:border-slate-500/50 cursor-pointer"
+                          className="w-[100%] pl-12 pr-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-base appearance-none transition-all duration-200 hover:border-slate-500/50 cursor-pointer"
                           required
                         >
                           <option value="">Select duration</option>
@@ -510,13 +510,13 @@ export default function PostCryptoProject() {
                       <label className="block text-lg font-semibold text-white mb-3">
                         Required Skills *
                       </label>
-                      <div className="flex gap-3 mb-4">
+                      <div className="flex  gap-3 mb-4">
                         <input
                           type="text"
                           value={newSkill}
                           onChange={(e) => setNewSkill(e.target.value)}
                           placeholder="e.g., Solidity, React, Web3.js"
-                          className="flex-1 px-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-base transition-all duration-200 hover:border-slate-500/50"
+                          className="flex-1 w-[70%] sm:w-full px-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-base transition-all duration-200 hover:border-slate-500/50"
                           onKeyPress={(e) =>
                             e.key === "Enter" &&
                             (e.preventDefault(), addSkill())
@@ -525,7 +525,7 @@ export default function PostCryptoProject() {
                         <button
                           type="button"
                           onClick={addSkill}
-                          className="px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center gap-2 font-semibold"
+                          className="px-6 py-4  bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center gap-2 font-semibold"
                         >
                           <Plus className="w-5 h-5" />
                           <span className="hidden sm:inline">Add</span>
@@ -570,7 +570,7 @@ export default function PostCryptoProject() {
                           value={newTag}
                           onChange={(e) => setNewTag(e.target.value)}
                           placeholder="e.g., DeFi, NFT, DAO"
-                          className="flex-1 px-4 py-4 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-base transition-all duration-200 hover:border-slate-500/50"
+                          className="flex-1 px-4 py-4 w-[70%] sm:w-full bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 text-base transition-all duration-200 hover:border-slate-500/50"
                           onKeyPress={(e) =>
                             e.key === "Enter" && (e.preventDefault(), addTag())
                           }
@@ -817,8 +817,8 @@ export default function PostCryptoProject() {
                         </>
                       ) : (
                         <>
-                          <CheckCircle className="w-4 h-4" />
-                          Submit Proposal
+                          <CheckCircle className="w-4 h-4 " />
+                          <span >Submit</span>
                         </>
                       )}
                     </button>

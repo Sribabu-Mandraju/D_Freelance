@@ -123,7 +123,7 @@ export default function Navbar() {
               <div className="relative overflow-hidden rounded-full w-8 h-8 bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
                 <Briefcase className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold font-orbitron  sm-block text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+              <span className="font-bold font-orbitron hidden sm-block text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
                 CryptoLance
               </span>
             </Link>
@@ -221,38 +221,7 @@ export default function Navbar() {
               </span>
             </div>
 
-            {/* Language Selector */}
-            <div
-              className="relative"
-              onMouseEnter={() => handleMouseEnter("language")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
-                <Globe className="w-4 h-4" />
-              </button>
-              {activeDropdown === "language" && (
-                <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
-                  >
-                    English
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
-                  >
-                    Español
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
-                  >
-                    Français
-                  </a>
-                </div>
-              )}
-            </div>
+            
 
             {/* Log in Button with neon effect */}
             <WalletConnect onAuthSuccess={() => {}} />
@@ -349,7 +318,40 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
           </div>
+          {/* Language Selector */}
+            <div
+              className="relative"
+              onMouseEnter={() => handleMouseEnter("language")}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
+                <Globe className="w-4 h-4" />
+              </button>
+              {activeDropdown === "language" && (
+                <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
+                  >
+                    English
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
+                  >
+                    Español
+                  </a>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
+                  >
+                    Français
+                  </a>
+                </div>
+              )}
+            </div>
 
           {/* Mobile Menu */}
           <button
@@ -418,7 +420,7 @@ export default function Navbar() {
 
             <div>
               <Link
-                to="/portfolio"
+                to="/portfolio/me"
                 className="flex text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group"
               >
                 <Portfolio className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
