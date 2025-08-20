@@ -25,7 +25,7 @@ import BiddingPanel from "../../Components/ProposalComponents/BiddingPanel";
 // Loading Spinner Component
 const LoadingSpinner = () => (
   <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden flex items-center justify-center">
-    <BackgroundEffects />
+    {/* <BackgroundEffects /> */}
     <div className="relative z-10 text-center">
       <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-transparent border-t-cyan-400 border-r-purple-500 mb-4"></div>
       <div className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 text-xl font-semibold">
@@ -38,7 +38,7 @@ const LoadingSpinner = () => (
 // Error Component
 const ErrorDisplay = ({ error, onRetry }) => (
   <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden flex items-center justify-center">
-    <BackgroundEffects />
+    {/* <BackgroundEffects /> */}
     <div className="relative z-10 text-center max-w-md mx-auto px-4">
       <div className="text-red-400 text-6xl mb-4">⚠️</div>
       <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-pink-500 text-2xl font-bold mb-4">
@@ -337,7 +337,7 @@ export default function ProposalDetails({ job, onBack }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden">
-      <BackgroundEffects />
+      {/* <BackgroundEffects /> */}
 
       <Navbar />
 
@@ -446,7 +446,7 @@ export default function ProposalDetails({ job, onBack }) {
 
             {/* Sidebar */}
             <div className="space-y-4 sm:space-y-6">
-              <ProjectStats jobDetails={jobDetails} />
+              {/* <ProjectStats jobDetails={jobDetails} /> */}
               <ClientInfo client={jobDetails.client} />
               {/* <LocationMap location={jobDetails.location} /> */}
             </div>

@@ -3,7 +3,7 @@ import { Star, MessageCircle } from 'lucide-react';
 
 export default function ClientInfo({ client }) {
   return (
-    <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-4 sm:p-6 shadow-lg shadow-cyan-500/10 border border-cyan-500/20 hover:border-cyan-400/30 transition-all duration-300">
+    <div className="bg-black/40 backdrop-blur-xl sticky rounded-2xl p-4 sm:p-6 shadow-lg shadow-cyan-500/10 border border-cyan-500/20 hover:border-cyan-400/30 transition-all duration-300">
       <h3 className="text-lg sm:text-xl font-bold mb-4">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">
           About the Client

@@ -193,11 +193,11 @@ const JobDetails = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen">
       <Navbar />
-      <div className="pt-24 pb-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          {true && (
+      <div className="pt-2 pb-12 px-4">
+        <div className="container mx-auto">
+          {/* {true && (
             <div className="bg-blue-500/20 border border-blue-400/50 rounded-lg p-3 text-center flex items-center justify-between mb-4">
               <span className="text-blue-300 font-medium text-sm">
                 New on‑chain updates available.
@@ -218,7 +218,7 @@ const JobDetails = () => {
                 </button>
               </div>
             </div>
-          )}
+          )} */}
           <ProposalDetails
             job={jobData}
             onBack={handleBackToJobs}

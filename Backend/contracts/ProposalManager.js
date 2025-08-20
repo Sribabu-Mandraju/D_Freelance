@@ -10,7 +10,7 @@ const ProposalManager_contract = new ethers.Contract(
   provider
 );
 
-// Constants getters
+// Constants getters  
 export const getContractConstants = async (req, res) => {
   try {
     const [
