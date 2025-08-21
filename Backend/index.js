@@ -18,6 +18,7 @@ import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js";
 import PortfolioRoutes from "./routes/PortfolioRoutes.js";
 import gigRoutes from "./routes/GigRoutes.js";
 import messageRoutes from "./routes/chatRoutes.js"
+import ActiveFreelancersRoutes from "./routes/ActiveFreelancersRoutes.js"
 // Import the WebSocket configuration
 import {app,server} from "./socket.js";
 // Load environment variables
@@ -52,6 +53,7 @@ app.use("/api/portfolio", PortfolioRoutes);
 app.use("/api/gigs", gigRoutes);
 app.use("/api/admin", AdminRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/activeFreelancers",ActiveFreelancersRoutes)
 // Default route
 app.get("/", (req, res) => {
   res.send("API is running...");
