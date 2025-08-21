@@ -96,24 +96,26 @@ export const subscribeToMessages = createAsyncThunk(
     const socket = state.auth?.socket; // assumes auth slice contains socket
     if (!socket) return thunkAPI.rejectWithValue('No socket available');
 
-    // create handler that captures dispatch + getState
     const handler = (newMessage) => {
       const stateNow = thunkAPI.getState();
       const { selectedUser } = stateNow.chatApp;
-      // same check you had: only append if message comes from selected user
-      const isMessageSentFromSelectedUser = !!selectedUser && (newMessage.senderId === selectedUser._id);
-      if (!isMessageSentFromSelectedUser) return;
+      const authUser = stateNow.auth?.user;
+      if (!authUser || !selectedUser) return;
+
+      const me = String(authUser._id || '').toLowerCase();
+      const peer = String(selectedUser._id || selectedUser.address || '').toLowerCase();
+      const sender = String(newMessage.senderId || '').toLowerCase();
+      const receiver = String(newMessage.recieverId || newMessage.receiverId || '').toLowerCase();
+
+      const involvesMeAndPeer = (sender === me && receiver === peer) || (sender === peer && receiver === me);
+      if (!involvesMeAndPeer) return;
+
       thunkAPI.dispatch(appendMessage(newMessage));
     };
 
-    // attach and save handler reference on socket so we can remove later
     socket.on('newMessage', handler);
     socket._chatMessageHandler = handler;
-
-    // set subscribed flag
     thunkAPI.dispatch(setSubscribed(true));
-
-    // resolve with success (no payload needed)
     return true;
   }
 );
@@ -156,8 +158,8 @@ const chatSlice = createSlice({
   reducers: {
     setSelectedUser(state, action) {
       state.selectedUser = action.payload;
-      // optionally clear messages when selecting another user:
-      // state.messages = [];
+      // clear previous conversation messages when switching peers
+      state.messages = [];
     },
     appendMessage(state, action) {
       state.messages.push(action.payload);
@@ -204,21 +206,17 @@ const chatSlice = createSlice({
 
       // sendMessage
       .addCase(sendMessage.fulfilled, (state, action) => {
-        console.log("sendMessage fulfilled - payload:", action.payload);
         state.messages.push(action.payload);
       })
       .addCase(sendMessage.rejected, (state, action) => {
-        console.error("sendMessage rejected - error:", action.payload);
         state.error = action.payload ?? action.error.message;
       })
 
       // subscribe/unsubscribe success flags are handled by reducers already
       .addCase(subscribeToMessages.rejected, (state, action) => {
-        console.error("subscribeToMessages rejected - error:", action.payload);
         state.error = action.payload ?? action.error.message;
       })
       .addCase(unsubscribeFromMessages.rejected, (state, action) => {
-        console.error("unsubscribeFromMessages rejected - error:", action.payload);
         state.error = action.payload ?? action.error.message;
       });
   }

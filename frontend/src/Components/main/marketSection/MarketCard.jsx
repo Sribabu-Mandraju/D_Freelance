@@ -141,7 +141,6 @@ export default function MarketCard({
             pro,
           },
         })
-       
       }
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
@@ -165,18 +164,18 @@ export default function MarketCard({
       />
 
       {/* Header with title and bookmark */}
-  <button
-          onClick={() => setBookmarked(!bookmarked)}
-          className="text-gray-400 hover:text-cyan-400 transition-colors duration-300
+      <button
+        onClick={() => setBookmarked(!bookmarked)}
+        className="text-gray-400 hover:text-cyan-400 transition-colors duration-300
                      hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] absolute right-4 top-4 z-50"
-        >
-          <Bookmark
-            className={`w-5 h-5 ${
-              bookmarked ? "fill-cyan-400 text-cyan-400" : ""
-            }`}
-          />
-        </button>
-      <img src={gigimage} alt="" className="mb-3 h-[150px] w-full"/>
+      >
+        <Bookmark
+          className={`w-5 h-5 ${
+            bookmarked ? "fill-cyan-400 text-cyan-400" : ""
+          }`}
+        />
+      </button>
+      <img src={gigimage} alt="" className="mb-3 h-[150px] w-full" />
       <div className="flex items-start justify-between mb-4 relative z-10">
         {/* <h3
           className="text-lg font-semibold text-white group-hover:text-cyan-300 
@@ -184,14 +183,13 @@ export default function MarketCard({
         >
           {username}
         </h3> */}
-      
       </div>
 
       {/* Description */}
       <p className="text-gray-300 text-sm mb-4 leading-relaxed line-clamp-2">
         {description}
       </p>
-{/* <div className="flex gap-2">
+      {/* <div className="flex gap-2">
    <div className="flex flex-wrap gap-2 mb-4">
         {tags.map((tech, idx) => (
           <span
@@ -216,21 +214,22 @@ export default function MarketCard({
       </div>
 </div> */}
       {/* Tech Tags */}
-     
+
       {/* Budget */}
       <div className="flex gap-6 items-center">
         <div className="mb-2">
-        <span className="text-2xl font-bold text-green-400 drop-shadow-[0_0_2px_rgba(34,197,94,0.4)]">
-         ₹ {price}
-        </span>
-      </div>
-    
-      <div className="mb-2">
-        <span className="text-sm text-gray-400">
-      Created on : {createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}
-        </span>
-      </div>
+          <span className="text-2xl font-bold text-green-400 drop-shadow-[0_0_2px_rgba(34,197,94,0.4)]">
+            ₹ {price}
+          </span>
         </div>
+
+        <div className="mb-2">
+          <span className="text-sm text-gray-400">
+            Created on :{" "}
+            {createdAt ? new Date(createdAt).toLocaleDateString() : "N/A"}
+          </span>
+        </div>
+      </div>
 
       {/* Job Details */}
       <div className="flex items-center gap-4 mb-2 text-sm text-gray-400">
@@ -273,7 +272,6 @@ export default function MarketCard({
       {/* Footer with date and button */}
       <div className="flex items-center justify-between">
         {/* <span className="text-xs text-gray-500">{jobData.postedDate}</span> */}
-        
       </div>
     </motion.div>
   );

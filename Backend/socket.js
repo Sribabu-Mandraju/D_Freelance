@@ -8,17 +8,24 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:3000",
+      "http://localhost:3001",
+    ],
     credentials: true,
   },
 });
-export const getRecieverSocketId=(userId)=>{
-    return userSocketMap[userId]
-}
-const userSocketMap={};
+export const getRecieverSocketId = (userId) => {
+  const normalizedUserId = (userId || "").toLowerCase();
+  return userSocketMap[normalizedUserId];
+};
+const userSocketMap = {};
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
-  const userId = socket.handshake.query.userId;
+  const rawUserId = socket.handshake.query.userId;
+  const userId = (rawUserId || "").toLowerCase();
   if (userId) {
     userSocketMap[userId] = socket.id;
     console.log(`User ${userId} connected. Socket ID: ${socket.id}`);
@@ -27,8 +34,11 @@ io.on("connection", (socket) => {
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
   socket.on("disconnect", () => {
     console.log("A user diconnected", socket.id);
-    delete userSocketMap[userId];
-    console.log("Emitting online users after disconnect:", Object.keys(userSocketMap));
+    if (userId) delete userSocketMap[userId];
+    console.log(
+      "Emitting online users after disconnect:",
+      Object.keys(userSocketMap)
+    );
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
