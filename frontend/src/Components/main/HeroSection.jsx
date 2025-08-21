@@ -1,67 +1,151 @@
-import { useEffect, useState } from "react";
-import { useCountdown } from "../../hooks/useCountdown";
-import { DollarSign, Gem, Wallet, Zap, Copy } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  DollarSign,
+  Gem,
+  TrendingUp,
+  Users,
+  Star,
+  Shield,
+  Globe,
+  Zap,
+  ArrowRight,
+  Sparkles,
+  Bitcoin,
+  Coins,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Play,
+  Pause,
+  ArrowUpRight,
+  ArrowDownRight,
+} from "lucide-react";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeMarket, setActiveMarket] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const walletAddress = "F9ax9qQrFx.....QrVh2HDedW";
-  const targetDate = new Date(
-    Date.now() + 30 * 24 * 60 * 60 * 1000
-  ).toISOString();
-  const timeLeft = useCountdown(targetDate);
-  const [solAmount, setSolAmount] = useState("");
-  const [lyraAmount, setLyraAmount] = useState("");
+  const [typewriterIndex, setTypewriterIndex] = useState(0);
+  const [typewriterText, setTypewriterText] = useState("");
+  const [showSlideshow, setShowSlideshow] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const touchStartXRef = useRef(null);
+  const slideStartRef = useRef(Date.now());
 
-  const exchangeRate = 0.0001; // 1 LYRA = 0.0001 SOL
+  const typewriterWords = [
+    "Decentralized",
+    "Innovative",
+    "Secure",
+    "Transparent",
+  ];
 
-  const handleSolChange = (e) => {
-    const value = e.target.value;
-    setSolAmount(value);
-    if (value) {
-      setLyraAmount((parseFloat(value) / exchangeRate).toFixed(4));
-    } else {
-      setLyraAmount("");
-    }
-  };
-
-  const handleLyraChange = (e) => {
-    const value = e.target.value;
-    setLyraAmount(value);
-    if (value) {
-      setSolAmount((parseFloat(value) * exchangeRate).toFixed(4));
-    } else {
-      setSolAmount("");
-    }
-  };
-
-  const markets = [
+  // Slideshow data with screenshots and explanations
+  const slideshowData = [
     {
-      name: "Will Bitcoin's price decline to $73,000 by the end of this month, marking a significant market correction?",
-      probability: 68,
-      change: 2.4,
-      volume: "1.2K ",
+      id: 1,
+      title: "Welcome to the Future",
+      description:
+        "Blockchain-powered freelancing platform with instant payments.",
+      image: "/src/assets/image1.jpg",
+      features: ["Instant Payments", "Smart Contracts", "Global Access"],
+      color: "from-purple-500 to-blue-600",
     },
     {
-      name: "  Will the Royal Challengers Bengaluru, win their opening match on March 22?",
-      probability: 42,
-      change: -1.8,
-      volume: "3.4k",
+      id: 2,
+      title: "Create Your Profile",
+      description: "Set up skills, portfolio, and blockchain wallet.",
+      image: "/src/assets/image2.jpg",
+      features: [
+        "Skill Verification",
+        "Portfolio Showcase",
+        "Blockchain Identity",
+      ],
+      color: "from-green-500 to-emerald-600",
     },
     {
-      name: "Will Trump's call with Putin lead to progress in Ukraine peace talks?",
-      probability: 73,
-      change: 5.2,
-      volume: "1.4K",
+      id: 3,
+      title: "Browse & Apply",
+      description: "Find projects that match your expertise.",
+      image: "/src/assets/image3.jpg",
+      features: ["Smart Matching", "Budget Filters", "Project Categories"],
+      color: "from-cyan-500 to-blue-600",
     },
     {
-      name: "SpaceX Mars Landing",
-      probability: 31,
-      change: -0.7,
-      volume: "2.1k",
+      id: 4,
+      title: "Secure Smart Contracts",
+      description: "Automated milestone payments and dispute resolution.",
+      image: "/src/assets/image4.jpg",
+      features: ["Auto Payments", "Milestone Tracking", "Dispute Resolution"],
+      color: "from-orange-500 to-red-600",
+    },
+    {
+      id: 5,
+      title: "Get Paid Instantly",
+      description: "Direct crypto payments with zero fees.",
+      image: "/src/assets/image4.jpg",
+      features: ["Crypto Payments", "Zero Fees", "Global Access"],
+      color: "from-purple-500 to-pink-600",
     },
   ];
+
+  // Auto-advance slideshow and progress bar
+  useEffect(() => {
+    if (!showSlideshow) return;
+
+    let rafId;
+    let intervalId;
+
+    const tick = () => {
+      if (!isPlaying) return;
+      const elapsed = Date.now() - slideStartRef.current;
+      const ratio = Math.min(1, elapsed / 4000);
+      setProgress(ratio);
+      if (ratio >= 1) {
+        slideStartRef.current = Date.now();
+        setProgress(0);
+        setCurrentSlide((prev) => (prev + 1) % slideshowData.length);
+      } else {
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    // Kick off animation frame and backup interval for robustness
+    slideStartRef.current = Date.now();
+    setProgress(0);
+    rafId = requestAnimationFrame(tick);
+    intervalId = setInterval(tick, 200);
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [showSlideshow, isPlaying, currentSlide, slideshowData.length]);
+
+  // Typewriter effect
+  useEffect(() => {
+    const typewriterInterval = setInterval(() => {
+      setTypewriterIndex((prev) => (prev + 1) % typewriterWords.length);
+    }, 2000);
+
+    return () => clearInterval(typewriterInterval);
+  }, []);
+
+  useEffect(() => {
+    const currentWord = typewriterWords[typewriterIndex];
+    let charIndex = 0;
+
+    const charInterval = setInterval(() => {
+      if (charIndex <= currentWord.length) {
+        setTypewriterText(currentWord.slice(0, charIndex));
+        charIndex++;
+      } else {
+        clearInterval(charInterval);
+      }
+    }, 100);
+
+    return () => clearInterval(charInterval);
+  }, [typewriterIndex]);
 
   useEffect(() => {
     setIsVisible(true);
@@ -70,335 +154,314 @@ const HeroSection = () => {
       setCurrentTime(new Date());
     }, 1000);
 
-    const marketRotation = setInterval(() => {
-      setActiveMarket((prev) => (prev + 1) % markets.length);
-    }, 3000);
-
     return () => {
       clearInterval(timer);
-      clearInterval(marketRotation);
     };
   }, []);
 
+  const handleGetStarted = () => {
+    setShowSlideshow(true);
+    setCurrentSlide(0);
+    setIsPlaying(true);
+    slideStartRef.current = Date.now();
+    setProgress(0);
+  };
+
+  const closeSlideshow = () => {
+    setShowSlideshow(false);
+    setIsPlaying(false);
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slideshowData.length);
+    slideStartRef.current = Date.now();
+    setProgress(0);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + slideshowData.length) % slideshowData.length
+    );
+    slideStartRef.current = Date.now();
+    setProgress(0);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+    slideStartRef.current = Date.now();
+    setProgress(0);
+  };
+
+  const togglePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current == null) return;
+    const diff = e.changedTouches[0].clientX - touchStartXRef.current;
+    const threshold = 40; // px
+    if (diff > threshold) prevSlide();
+    else if (diff < -threshold) nextSlide();
+    touchStartXRef.current = null;
+  };
+
   return (
-    <div className=" border-red-600 sm:pb-20 pb-10 px-4 mt-[80px] relative overflow-hidden bg-gray-900">
-      {/* Background gradients */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-purple-600/20 rounded-full filter blur-3xl animate-pulse"></div>
-        <div
-          className="absolute bottom-1/4 right-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-cyan-600/20 rounded-full filter blur-3xl animate-pulse"
-          style={{ animationDelay: "1s" }}
-        ></div>
-        <div
-          className="absolute top-3/4 left-2/3 w-32 sm:w-48 md:w-64 h-32 sm:h-48 md:h-64 bg-blue-600/10 rounded-full filter blur-3xl animate-pulse"
-          style={{ animationDelay: "2s" }}
-        ></div>
-      </div>
+    <>
+      <div className="min-h-[100svh] flex items-center justify-center px-3 sm:px-4 pt-16 sm:pt-20 relative overflow-hidden bg-gradient-to-br from-black via-gray-950 to-gray-900">
+        {/* Enhanced background elements */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          {/* Animated gradient orbs */}
+          <div className="absolute top-24 left-4 sm:left-20 w-56 h-56 sm:w-64 sm:h-64 bg-purple-600/10 rounded-full filter blur-3xl animate-pulse"></div>
+          <div
+            className="absolute bottom-24 right-4 sm:right-20 w-64 h-64 sm:w-80 sm:h-80 bg-cyan-600/10 rounded-full filter blur-3xl animate-pulse"
+            style={{ animationDelay: "1s" }}
+          ></div>
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-96 sm:h-96 bg-blue-600/5 rounded-full filter blur-3xl animate-pulse"
+            style={{ animationDelay: "2s" }}
+          ></div>
 
-      {/* Grid overlay */}
-      <div className="absolute  inset-0 bg-grid-pattern opacity-10"></div>
+          {/* Subtle grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] sm:bg-[size:60px_60px] opacity-20"></div>
+        </div>
 
-      <div className=" relative z-10">
-        {/* Top stats bar */}
-        <div className="bg-gray-800/60 backdrop-blur-md rounded-lg p-2 mb-4 mt-2  sm:mb-4 border border-gray-700/50 shadow-lg">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs sm:text-sm overflow-x-auto">
-            <div className="px-4 py-1 flex items-center mb-2 sm:mb-0">
-              <div className="w-2 h-2 rounded-full bg-green-400 mr-2 animate-pulse"></div>
-              <span className="text-gray-400">Live</span>
-              <span className="ml-2 text-gray-300">
-                {currentTime.toLocaleTimeString()}
-              </span>
+        <div className="max-w-7xl mx-auto relative z-10 w-full">
+          {/* Top stats bar - enhanced crypto theme */}
+          <div className="bg-gradient-to-r from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-md rounded-2xl p-2 sm:p-4 mb-6 sm:mb-8 border border-purple-500/20 shadow-2xl shadow-purple-500/10">
+            {/* Mobile: horizontal scrollable pills */}
+            <div className="md:hidden -mx-2 px-2">
+              <div className="flex items-center gap-2 overflow-x-auto py-1">
+                <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[10px] text-gray-400">Live</span>
+                  <span className="text-[10px] font-mono text-gray-300">
+                    {currentTime.toLocaleTimeString()}
+                  </span>
+                </div>
+                <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
+                  <Bitcoin className="w-3.5 h-3.5 text-yellow-500" />
+                  <span className="text-[11px] text-gray-300">BTC</span>
+                  <span className="text-[11px] font-semibold text-gray-100">
+                    $84,571.66
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
+                    <ArrowUpRight className="w-3 h-3" /> 2.4%
+                  </span>
+                </div>
+                <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
+                  <Coins className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-[11px] text-gray-300">ETH</span>
+                  <span className="text-[11px] font-semibold text-gray-100">
+                    $1,946.28
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] text-red-400 bg-red-400/10 px-2 py-0.5 rounded-full">
+                    <ArrowDownRight className="w-3 h-3" /> 0.8%
+                  </span>
+                </div>
+                <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
+                  <span className="text-[11px] text-gray-400">24h Vol</span>
+                  <span className="text-[11px] font-semibold text-gray-100">
+                    $24.3M
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-4 sm:gap-6 px-4 sm:px-0">
-              <div className="flex items-center">
-                <span className="text-gray-400 mr-2">BTC</span>
-                <span className="text-gray-200">$84,571.66</span>
-                <span className="text-green-400 ml-1">+2.4%</span>
+
+            {/* Desktop: refined layout */}
+            <div className="hidden md:flex flex-wrap justify-between items-center text-[12px] gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                <span className="text-gray-400">Live</span>
+                <span className="text-gray-300 font-mono">
+                  {currentTime.toLocaleTimeString()}
+                </span>
               </div>
-              <div className="flex items-center">
-                <span className="text-gray-400 mr-2">ETH</span>
-                <span className="text-gray-200">$1,946.28</span>
-                <span className="text-red-400 ml-1">-0.8%</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-400 mr-2">Active Traders</span>
-                <span className="text-gray-200">12,845</span>
-              </div>
-              <div className="flex items-center">
-                <span className="text-gray-400 mr-2">24h Volume</span>
-                <span className="text-gray-200">$24.3M</span>
+              <div className="flex flex-wrap gap-6">
+                <div className="flex items-center gap-2">
+                  <Bitcoin className="w-4 h-4 text-yellow-500" />
+                  <span className="text-gray-400">BTC</span>
+                  <span className="text-gray-200 font-semibold">
+                    $84,571.66
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">
+                    <ArrowUpRight className="w-3.5 h-3.5" /> 2.4%
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Coins className="w-4 h-4 text-blue-500" />
+                  <span className="text-gray-400">ETH</span>
+                  <span className="text-gray-200 font-semibold">$1,946.28</span>
+                  <span className="inline-flex items-center gap-1 text-red-400 text-xs bg-red-400/10 px-2 py-1 rounded-full">
+                    <ArrowDownRight className="w-3.5 h-3.5" /> 0.8%
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">24h Vol</span>
+                  <span className="text-gray-200 font-semibold">$24.3M</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Hero content */}
-        <div className="flex w-full mx-auto flex-col lg:flex-row md:mt-[-70px] gap-8 sm:gap-12 items-center">
-          {/* Left side - Main content */}
-          <div
-            className={`w-full lg:w-1/2 md:scale-[0.7]  transition-all duration-800 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-30"
-            }`}
-          >
-            
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500 font-orbitron">
-              Predict the Future, Trade with Confidence
+          {/* Main hero content - centered layout with responsive headings */}
+          <div className="text-center">
+            {/* Enhanced Badge - crypto themed */}
+            <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-4 py-2 sm:px-8 sm:py-4 border border-purple-500/40 text-purple-300 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-sm hover:border-purple-400/60 hover:from-purple-500/30 hover:to-cyan-500/30 transition-all duration-300 shadow-lg shadow-purple-500/20">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-300" />
+              The Future of Freelancing
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-300" />
+            </div>
+
+            {/* Enhanced Main heading with typewriter effect */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl 2xl:text-8xl font-bold mb-6 sm:mb-8 leading-tight px-2 sm:px-4 tracking-tight">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-600 font-orbitron drop-shadow-2xl">
+                {typewriterText}
+                <span className="animate-pulse text-purple-300">|</span>
+              </span>
+              <br />
+              <span className="text-white font-orbitron text-2xl sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl drop-shadow-2xl">
+                Freelance Platform
+              </span>
             </h1>
-            <p className="text-sm sm:text-base text-gray-300 mb-6 leading-relaxed">
-              The next generation prediction market platform where you can trade
-              on future events with real-time data, AI-powered insights, and
-              unmatched liquidity.
+
+            {/* Enhanced Description - responsive */}
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-10 leading-relaxed max-w-3xl sm:max-w-4xl mx-auto px-2 sm:px-4">
+              Connect, collaborate, and get paid instantly with cryptocurrency.
+              No intermediaries, no delays, just pure blockchain-powered
+              freelancing.
             </p>
 
-            {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-8">
-              <a
-                href="#trending"
-                className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white text-base sm:text-lg py-3 px-6 rounded-md flex items-center justify-center shadow-lg shadow-purple-500/20 transition-all hover:shadow-purple-500/40"
+            {/* Enhanced CTA Buttons - responsive */}
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 sm:mb-10 justify-center">
+              <button
+                onClick={handleGetStarted}
+                className="group flex items-center gap-2 sm:gap-3 px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 hover:from-purple-500 hover:via-purple-400 hover:to-blue-500 text-white font-semibold md:font-bold text-base md:text-lg rounded-xl md:rounded-2xl shadow-2xl shadow-purple-500/30 transition-all duration-300 hover:scale-105 md:hover:scale-110 hover:shadow-3xl border border-purple-400/30"
               >
-                Start Trading
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="ml-2 h-5 w-5"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </a>
-              <a
-                href="markets"
-                className="border border-gray-700 hover:bg-gray-800 text-gray-200 text-base sm:text-lg py-3 px-6 rounded-md transition-all"
-              >
-                Explore Markets
-              </a>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 mb-6">
-              <div className="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50">
-                <p className="text-gray-400 text-xs sm:text-sm">
-                  Total Markets
-                </p>
-                <p className="text-lg sm:text-xl font-bold text-white">
-                  1,200+
-                </p>
-              </div>
-              <div className="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50">
-                <p className="text-gray-400 text-xs sm:text-sm">Total Volume</p>
-                <p className="text-lg sm:text-xl font-bold text-white">$120M</p>
-              </div>
-              <div className="bg-gray-800/60 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50">
-                <p className="text-gray-400 text-xs sm:text-sm">Avg. Return</p>
-                <p className="text-lg sm:text-xl font-bold text-green-400">
-                  +18.4%
-                </p>
-              </div>
-            </div>
-
-            {/* Trust badges */}
-            <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-gray-400">
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 mr-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="text-sm">Secure</span>
-              </div>
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 mr-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="text-sm">Regulated</span>
-              </div>
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 mr-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-                <span className="text-sm">24/7 Support</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right side - Market preview */}
-          <div
-            className={`w-full lg:w-1/2 md:scale-[0.7] transition-all duration-800 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-20"
-            }`}
-            style={{ transitionDelay: "200ms" }}
-          >
-            <div className="relative w-full  bg-gradient-to-br from-gray-900/70 to-black/70 backdrop-blur-xl rounded-xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl border border-purple-500/30  shadow-purple-500/20  overflow-hidden">
-              <div
-                className="absolute inset-0 rounded-xl sm:rounded-3xl pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(45deg, rgba(139, 92, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(232, 121, 249, 0.3) 100%)",
-                  mask: "linear-gradient(black, black) content-box, linear-gradient(black, black)",
-                  maskComposite: "exclude",
-                  WebkitMaskComposite: "exclude",
-                  padding: "1px",
-                }}
-              ></div>
-
-              <h2 className="text-2xl font-orbitron sm:text-3xl font-bold text-center mb-4 sm:mb-8 text-purple-400 drop-shadow-lg shadow-purple-500/50">
-                Buy <span className="text-cyan-400">$LYRA</span> Presale
-              </h2>
-
-              {/* Countdown */}
-              <div className="grid grid-cols-4 gap-2 mb-4 sm:mb-8 text-center">
-                {Object.entries(timeLeft).map(([unit, value]) => (
-                  <div key={unit} className="flex flex-col items-center">
-                    <span className="text-gray-400 text-xs sm:text-sm uppercase mb-1">
-                      {unit}
-                    </span>
-                    <span className="text-3xl sm:text-5xl font-extrabold text-purple-300 drop-shadow-lg shadow-purple-500/50">
-                      {String(value).padStart(2, "0")}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 rounded-lg mb-6 font-semibold text-sm shadow-lg shadow-purple-500/30">
-                PRESALE ENDS IN
-              </div>
-
-              <div className="text-center text-gray-300 mb-6 text-lg">
-                1 $LYRA ={" "}
-                <span className="font-semibold text-cyan-300">0.0001 SOL</span>
-                <div className="w-24 h-0.5 bg-gray-700 mx-auto mt-2 rounded-full"></div>
-              </div>
-
-              {/* SOL Selector */}
-              <button className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-gray-800 to-gray-900 text-white py-2 sm:py-4 rounded-xl mb-6 text-lg font-semibold border border-gray-700 hover:border-cyan-500/50 transition-all duration-300 shadow-lg shadow-gray-900/50 hover:shadow-cyan-500/20">
-                <DollarSign className="w-6 h-6 text-cyan-400" />
-                SOL
+                Get Started Now
+                <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform duration-300" />
               </button>
 
-              {/* Input Fields */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div>
-                  <label
-                    htmlFor="sol-input"
-                    className="block text-gray-400 text-xs sm:text-sm mb-2"
-                  >
-                    SOL you pay (<span className="text-gray-500">$0.00</span>):
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="sol-input"
-                      type="number"
-                      value={solAmount}
-                      onChange={handleSolChange}
-                      placeholder="0"
-                      className="w-full bg-gray-800 text-white py-2 sm:py-3 pl-12 pr-4 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all duration-300 shadow-inner shadow-black/30"
-                    />
-                    <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400" />
-                  </div>
-                </div>
-                <div>
-                  <label
-                    htmlFor="lyra-input"
-                    className="block text-gray-400 text-xs sm:text-sm mb-2"
-                  >
-                    $LYRA You receive:
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="lyra-input"
-                      type="number"
-                      value={lyraAmount}
-                      onChange={handleLyraChange}
-                      placeholder="0"
-                      className="w-full bg-gray-800 text-white py-2 sm:py-3 pl-4 pr-12 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 shadow-inner shadow-black/30"
-                    />
-                    <Gem className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Select Wallet Button */}
-              <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 sm:py-4 rounded-xl mb-6 text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70">
-                <Wallet className="w-5 h-5" />
-                Select Wallet
+              <button className="group flex items-center gap-2 sm:gap-3 px-6 py-3 md:px-8 md:py-4 border-2 border-purple-400/40 text-purple-300 hover:border-purple-300/60 hover:text-purple-200 font-semibold md:font-bold text-base md:text-lg rounded-xl md:rounded-2xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:hover:scale-110 hover:bg-purple-500/20 shadow-lg shadow-purple-500/20">
+                <Users className="w-4 h-4 md:w-5 md:h-5" />
+                Browse Jobs
               </button>
-
-              {/* Wallet Address */}
-              <div className="text-center text-gray-400 text-sm sm:mb-6 mb-2">
-                Trouble connecting? You can also send SOL to this wallet:
-                <div className="flex items-center justify-center mt-2">
-                  <a
-                    href={`https://solscan.io/address/${walletAddress.replace(
-                      ".....",
-                      ""
-                    )}`} // Example link, replace with actual explorer
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-cyan-400 hover:text-cyan-300 font-mono text-sm break-all underline underline-offset-2 decoration-cyan-500/50 hover:decoration-cyan-500 transition-colors duration-300"
-                  >
-                    {walletAddress}
-                  </a>
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(
-                        walletAddress.replace(".....", "")
-                      )
-                    }
-                    className="ml-2 p-1 rounded-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-cyan-400 transition-colors duration-200"
-                    aria-label="Copy wallet address"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Powered by */}
-              <div className="flex items-center justify-center text-gray-500 text-xs">
-                Powered by
-                <Zap className="w-3 h-3 mx-1 text-purple-400" />
-                Web3Payments
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Slideshow Modal */}
+      {showSlideshow && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="relative w-full h-full max-w-6xl max-h-[95vh] bg-gradient-to-br from-gray-900 to-black rounded-2xl sm:rounded-3xl border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden">
+            {/* Progress bar */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gray-700/50 z-20">
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-cyan-500 transition-[width] duration-200 ease-linear"
+                style={{ width: `${progress * 100}%` }}
+              ></div>
+            </div>
+
+            {/* Close Button */}
+            <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-30">
+              <button
+                onClick={closeSlideshow}
+                className="p-2 rounded-full bg-gray-800/60 hover:bg-gray-700/60 text-gray-300 hover:text-white transition-all duration-300"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+            </div>
+
+            {/* Slideshow Content */}
+            <div
+              className="relative select-none h-full flex flex-col"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              {/* Tap areas for next/prev on mobile */}
+              <button
+                onClick={prevSlide}
+                className="absolute inset-y-0 left-0 w-1/4 z-10 bg-transparent"
+                aria-label="Previous slide"
+              />
+              <button
+                onClick={nextSlide}
+                className="absolute inset-y-0 right-0 w-1/4 z-10 bg-transparent"
+                aria-label="Next slide"
+              />
+
+              {/* Main Slide Content - Images only, full length */}
+              <div className="flex-1 min-h-0 flex items-center justify-center p-1 sm:p-2 lg:p-3 overflow-hidden">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <img
+                    src={slideshowData[currentSlide].image}
+                    alt=""
+                    className="max-h-[82vh] sm:max-h-[86vh] lg:max-h-[90vh] max-w-[96vw] sm:max-w-[94vw] lg:max-w-[90vw] w-auto h-auto object-contain rounded-lg sm:rounded-xl shadow-2xl border border-gray-700/50 bg-gray-800/20"
+                  />
+                  <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-br from-purple-500/5 to-cyan-500/5 pointer-events-none"></div>
+                </div>
+              </div>
+
+              {/* Navigation Controls - Enhanced */}
+              <div className="flex items-center justify-center gap-4 px-4 sm:px-6 py-4 border-t border-gray-800/50 bg-gray-900/80 backdrop-blur-sm">
+                <button
+                  onClick={prevSlide}
+                  className="group p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-300" />
+                </button>
+
+                <button
+                  onClick={togglePlayPause}
+                  className="group p-3 rounded-full bg-purple-600 hover:bg-purple-500 text-white transition-all duration-300 hover:scale-110 shadow-lg shadow-purple-500/25"
+                >
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
+                  ) : (
+                    <Play className="w-5 h-5 sm:w-6 sm:h-6" />
+                  )}
+                </button>
+
+                <button
+                  onClick={nextSlide}
+                  className="group p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
+                </button>
+              </div>
+
+              {/* Progress Dots - Enhanced */}
+              <div className="flex justify-center gap-2 pb-4 bg-gray-900/80 backdrop-blur-sm">
+                {slideshowData.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 hover:scale-125 ${
+                      index === currentSlide
+                        ? "bg-purple-500 scale-125 shadow-lg shadow-purple-500/50"
+                        : "bg-gray-600 hover:bg-gray-500"
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
+
 export default HeroSection;
-// Add this to your CSS to support extra small screens
-// @media (min-width: 475px) {
-//   .xs\:grid-cols-3 {
-//     grid-template-columns: repeat(3, minmax(0, 1fr));
-//   }
-// }

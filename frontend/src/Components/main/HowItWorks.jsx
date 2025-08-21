@@ -1,10 +1,19 @@
-
-import { useState, useEffect } from "react"
-import { Wallet, Search, FileText, Code, DollarSign, Star, Shield, Zap, Globe } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Wallet,
+  Search,
+  FileText,
+  Code,
+  DollarSign,
+  Star,
+  Shield,
+  Zap,
+  Globe,
+} from "lucide-react";
 import { FaDatabase } from "react-icons/fa";
 import { motion } from "framer-motion";
 
- const HowItWorksSection = () => {
+const HowItWorksSection = () => {
   const steps = [
     {
       number: 1,
@@ -41,18 +50,20 @@ import { motion } from "framer-motion";
     {
       number: 5,
       title: "Instant Crypto Payment",
-      description: "Upon approval, the smart contract releases escrowed funds instantly to the freelancer's wallet.",
+      description:
+        "Upon approval, the smart contract releases escrowed funds instantly to the freelancer's wallet.",
       icon: <DollarSign className="w-8 h-8" />,
       color: "from-pink-500 to-cyan-500",
     },
     {
       number: 6,
       title: "Build Reputation",
-      description: "Both users gain on-chain reputation. Dispute resolution ensures fair outcomes for all parties.",
+      description:
+        "Both users gain on-chain reputation. Dispute resolution ensures fair outcomes for all parties.",
       icon: <Star className="w-8 h-8" />,
       color: "from-cyan-500 to-purple-500",
     },
-  ]
+  ];
 
   return (
     <section id="how-it-works" className="py-20 px-4 relative overflow-hidden">
@@ -70,40 +81,39 @@ import { motion } from "framer-motion";
             Simple Steps to Start Freelancing
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Our decentralized platform makes it easy to connect, collaborate, and get paid securely.
+            Our decentralized platform makes it easy to connect, collaborate,
+            and get paid securely.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 w-[95%] lg:grid-cols-3 gap-8 md:gap-8">
           {steps.map((step, index) => (
             <motion.div
-            key={index}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              rotate: 0,
-            }}
-            initial={{
-              opacity: 0,
-              y: index * 40, // small offset for slide
-              scale: 0.95, // slight zoom in
-              rotate: index % 2 === 0 ? 2 : -2, // subtle rotation
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 80,
-              damping: 12,
-              delay: index * 0.08,
-            }}
-            whileHover={{
-              
-              rotate: 0,
-             
-            }}
-            className="transition-transform duration-200 ease-out"
-          >
-            <StepCard key={index} step={step} index={index} />
+              key={index}
+              whileInView={{
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                rotate: 0,
+              }}
+              initial={{
+                opacity: 0,
+                y: index * 40, // small offset for slide
+                scale: 0.95, // slight zoom in
+                rotate: index % 2 === 0 ? 2 : -2, // subtle rotation
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 80,
+                damping: 12,
+                delay: index * 0.08,
+              }}
+              whileHover={{
+                rotate: 0,
+              }}
+              className="transition-transform duration-200 ease-out"
+            >
+              <StepCard key={index} step={step} index={index} />
             </motion.div>
           ))}
         </div>
@@ -115,7 +125,8 @@ import { motion } from "framer-motion";
                 Ready to Start Your Decentralized Journey?
               </h3>
               <p className="text-gray-400 mb-6 text-lg">
-                Join thousands of skilled professionals and clients already collaborating on the future of work.
+                Join thousands of skilled professionals and clients already
+                collaborating on the future of work.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg flex items-center justify-center font-semibold transition-all">
@@ -133,45 +144,47 @@ import { motion } from "framer-motion";
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 export default HowItWorksSection;
 function StepCard({ step, index }) {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(
-      () => {
-        setIsVisible(true)
-      },
-      index * 100 + 100,
-    )
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, index * 100 + 100);
 
-    return () => clearTimeout(timer)
-  }, [index])
+    return () => clearTimeout(timer);
+  }, [index]);
 
   return (
- <div
-  className={`relative transition-all duration-700 ease-out ${
-    isVisible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-24 scale-95"
-  } group`}
->
-  <div className="relative bg-gray-900/70 backdrop-blur-md border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/70 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 ease-in-out group">
-  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
-  <div className="inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-    <div className="relative w-12 h-12 rounded-lg">
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 opacity-20 z-0" />
-      <div className="relative z-10 text-white text-xl flex items-center justify-center h-full w-full">
-        {step.icon}
+    <div
+      className={`relative transition-all duration-700 ease-out ${
+        isVisible
+          ? "opacity-100 translate-y-0 scale-100"
+          : "opacity-0 translate-y-24 scale-95"
+      } group`}
+    >
+      <div className="relative bg-gray-900/70 backdrop-blur-md border border-cyan-500/30 rounded-xl p-6 hover:border-cyan-400/70 hover:shadow-xl hover:shadow-cyan-500/20 transition-all duration-300 ease-in-out group">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500" />
+        <div className="inline-flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+          <div className="relative w-12 h-12 rounded-lg">
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 opacity-20 z-0" />
+            <div className="relative z-10 text-white text-xl flex items-center justify-center h-full w-full">
+              {step.icon}
+            </div>
+          </div>
+        </div>
+        <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+          {step.title}
+        </h3>
+        <p className="text-gray-300 leading-relaxed text-sm">
+          {step.description}
+        </p>
       </div>
     </div>
-  </div>
-  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">{step.title}</h3>
-  <p className="text-gray-300 leading-relaxed text-sm">{step.description}</p>
-</div>
-</div>
-
-  )
+  );
 }
 
 function FeatureList() {
@@ -196,11 +209,13 @@ function FeatureList() {
       title: "Instant Payments",
       description: "Get paid immediately upon completion",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-4">
-      <h4 className="text-xl font-bold text-white mb-4">Why Choose CryptoLance?</h4>
+      <h4 className="text-xl font-bold text-white mb-4">
+        Why Choose CryptoLance?
+      </h4>
       {features.map((feature, index) => (
         <div key={index} className="flex items-start gap-3">
           <div className="flex-shrink-0 mt-1">{feature.icon}</div>
@@ -211,5 +226,5 @@ function FeatureList() {
         </div>
       ))}
     </div>
-  )
+  );
 }

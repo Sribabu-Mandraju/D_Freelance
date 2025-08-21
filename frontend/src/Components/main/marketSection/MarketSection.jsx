@@ -80,47 +80,72 @@ function MarketSection() {
   const dispatch = useDispatch();
   const { gigs, error, loading } = useSelector((state) => state.gig);
 
+  // Per-card sequential reveal using custom index
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.34,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    }),
+  };
+
+  const fadeUpVariants = {
+    hidden: { opacity: 0, y: 16 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
+  };
+
   useEffect(() => {
     dispatch(fetchGigs());
   }, [dispatch]);
 
+  const firstChunk = gigs ? gigs.slice(0, 3) : [];
+  const secondChunk = gigs ? gigs.slice(0, 3) : [];
+
   return (
     <div className="text-white w-full max-w-7xl   mx-auto" id="trending">
       <div className="mb-8 text-center mt-4">
-        <h2 className="text-2xl font-orbitron sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+        <motion.h2
+          variants={fadeUpVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          className="text-2xl font-orbitron sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500"
+        >
           Kickstart Your Freelance Journey
-        </h2>
-        <p className="text-gray-400 mt-2">
+        </motion.h2>
+        <motion.p
+          variants={fadeUpVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          className="text-gray-400 mt-2"
+        >
           Explore top freelance opportunities and land your next big gig.
-        </p>
+        </motion.p>
       </div>
 
       <div className="grid md:grid-cols-4 grid-cols-1  w-[95%] md:w-full items-center justify-center mx-auto  gap-4">
-        {gigs && gigs.slice(0, 3).map((gig, index) => (
+        {firstChunk.map((gig, index) => (
           <motion.div
-            key={index}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              rotate: 0,
-            }}
-            initial={{
-              opacity: 0,
-              y: index * 40, // small offset for slide
-              scale: 0.95, // slight zoom in
-              rotate: index % 2 === 0 ? 2 : -2, // subtle rotation
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 80,
-              damping: 12,
-              delay: index * 0.08,
-            }}
-            whileHover={{
-              rotate: 0,
-            }}
-            className="transition-transform duration-200 ease-out"
+            key={gig._id || index}
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            custom={index}
+            whileHover={{ y: -6, scale: 1.02 }}
+            whileTap={{ scale: 0.99 }}
+            transition={{ type: "tween", duration: 0.2 }}
+            className="transition-transform duration-200 ease-out will-change-transform"
           >
             <MarketCard
               key={gig._id}
@@ -132,7 +157,7 @@ function MarketSection() {
               gigimage={gig.gigimage}
               images={gig.images}
               avatar={gig.avatar}
-              rating={gig.rating || 0} // Fallback if rating is undefined
+              rating={gig.rating || 0}
               projects={gig.projects}
               badges={gig.badges || []}
               location={gig.location}
@@ -149,31 +174,18 @@ function MarketSection() {
             />{" "}
           </motion.div>
         ))}
-        {gigs && gigs.slice(0, 3).map((gig, index) => (
+        {secondChunk.map((gig, index) => (
           <motion.div
-            key={index}
-            whileInView={{
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              rotate: 0,
-            }}
-            initial={{
-              opacity: 0,
-              y: index * 40, // small offset for slide
-              scale: 0.95, // slight zoom in
-              rotate: index % 2 === 0 ? 2 : -2, // subtle rotation
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 80,
-              damping: 12,
-              delay: index * 0.08,
-            }}
-            whileHover={{
-              rotate: 0,
-            }}
-            className="transition-transform duration-200 ease-out"
+            key={`second-${gig._id || index}`}
+            variants={itemVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+            custom={index + firstChunk.length}
+            whileHover={{ y: -6, scale: 1.02 }}
+            whileTap={{ scale: 0.99 }}
+            transition={{ type: "tween", duration: 0.2 }}
+            className="transition-transform duration-200 ease-out will-change-transform"
           >
             <MarketCard
               key={gig._id}
@@ -185,7 +197,7 @@ function MarketSection() {
               gigimage={gig.gigimage}
               images={gig.images}
               avatar={gig.avatar}
-              rating={gig.rating || 0} // Fallback if rating is undefined
+              rating={gig.rating || 0}
               projects={gig.projects}
               badges={gig.badges || []}
               location={gig.location}
@@ -205,18 +217,33 @@ function MarketSection() {
       </div>
 
       <div className="text-center mt-12">
-        <h3 className="text-2xl font-semibold">
+        <motion.h3
+          variants={fadeUpVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          className="text-2xl font-semibold"
+        >
           Ready to find your next project?
-        </h3>
-        <p className="text-gray-400 mt-2">
+        </motion.h3>
+        <motion.p
+          variants={fadeUpVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.3 }}
+          className="text-gray-400 mt-2"
+        >
           Join thousands of freelancers growing their careers every day.
-        </p>
-        <button
+        </motion.p>
+        <motion.button
+          whileHover={{ y: -2, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "tween", duration: 0.2 }}
           className="mt-4 bg-blue-500 px-6 py-2 rounded bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-2xl"
           onClick={() => navigate("/projects")}
         >
           Browse Projects
-        </button>
+        </motion.button>
       </div>
     </div>
   );

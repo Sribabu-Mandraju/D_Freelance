@@ -10,19 +10,17 @@ import PopularCategories from "../Components/main/PopularCategories";
 import Chatbot from "../Components/Chatbot";
 const Home = () => {
   return (
-<div
->      <Navbar />
+    <div>
+      {" "}
+      <Navbar />
       <HeroSection />
       <MarketSection />
-
       <ActiveFreelancers />
-
       {/* <PopularCategories /> */}
       <HowItWorksSection />
       <TestimonialsSection />
-      <Chatbot />
-
-      <Footer/>
+      {/* <Chatbot /> */}
+      <Footer />
     </div>
   );
 };
