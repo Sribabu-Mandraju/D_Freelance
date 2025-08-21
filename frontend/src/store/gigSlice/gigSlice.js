@@ -52,9 +52,11 @@ export const fetchGig = createAsyncThunk("gig/fetchGig", async (id, { rejectWith
   }
 });
 
-export const fetchGigs = createAsyncThunk("gig/fetchGigs", async (_, { rejectWithValue }) => {
+export const fetchGigs = createAsyncThunk("gig/fetchGigs", async (filters = {}, { rejectWithValue }) => {
   try {
-    const { data } = await axios.get("http://localhost:3001/api/gigs");
+    const params = new URLSearchParams(filters).toString();
+    const url = `http://localhost:3001/api/gigs${params ? `?${params}` : ''}`;
+    const { data } = await axios.get(url);
     return data;
   } catch (err) {
     return rejectWithValue(err.response ? err.response.data : err.message);

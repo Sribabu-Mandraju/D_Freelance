@@ -34,6 +34,9 @@ const LoadingSpinner = () => (
     </div>
   </div>
 );
+import Loader from "../../Components/Loader";
+// Loading Spinner Component
+
 
 // Error Component
 const ErrorDisplay = ({ error, onRetry }) => (
@@ -274,7 +277,7 @@ export default function ProposalDetails({ job, onBack }) {
   }, [fetchAndProcessJob]);
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   if (error) {
@@ -290,7 +293,7 @@ export default function ProposalDetails({ job, onBack }) {
   // Safety check: ensure required arrays exist and component is ready to render
   if (!jobDetails.skills || !Array.isArray(jobDetails.skills)) {
     console.log("Skills not ready, showing loading...");
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   // Additional safety check for other required arrays
@@ -299,7 +302,7 @@ export default function ProposalDetails({ job, onBack }) {
     !Array.isArray(jobDetails.deliverables)
   ) {
     console.log("Requirements or deliverables not ready, showing loading...");
-    return <LoadingSpinner />;
+    return <Loader />;
   }
 
   // Safety check: ensure required arrays exist
