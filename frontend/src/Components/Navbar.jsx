@@ -26,12 +26,20 @@ import {
   BookOpen,
   Award,
   Target,
-  ShieldCheck
+  ShieldCheck,
+  X,
+  Home,
+  Settings,
+  HelpCircle,
+  ExternalLink,
+  Sparkles,
+  User as UserIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { fetchPortfolio } from "../store/portfolioSlice/portfolioSlice";
 import { useAccount } from "wagmi";
 import { useSelector } from "react-redux";
+
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -39,36 +47,72 @@ export default function Navbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedTheme, setTheme] = useState("Dark");
   const { address, isConnected, chain } = useAccount();
- const { portfolioData} = useSelector(
-    (state) => state.portfolio
-  );
+  const { portfolioData } = useSelector((state) => state.portfolio);
+
   const navigationItems = [
     {
       name: "Find talent",
       navlink: "/gigs",
       icon: Coins,
+      description: "Discover skilled freelancers",
+      gradient: "from-yellow-400 to-orange-500",
+      badge: "Hot",
     },
     {
       name: "Find work",
       navlink: "/browse-jobs",
       icon: Users,
+      description: "Browse available projects",
+      gradient: "from-blue-400 to-cyan-500",
+      badge: "New",
     },
     {
       name: "Why CryptoLance",
       navlink: "/help",
       icon: Package,
+      description: "Learn about our platform",
+      gradient: "from-purple-400 to-pink-500",
       subItems: [
-        { name: "How to Use", link: "/help" },
-        { name: "About", link: "/about" },
+        { name: "How to Use", link: "/help", icon: BookOpen },
+        { name: "About", link: "/about", icon: Award },
       ],
     },
     {
       name: "Admin Dashboard",
       navlink: "/adminDashboard",
       icon: ShieldCheck,
+      description: "Manage your platform",
+      gradient: "from-green-400 to-emerald-500",
+      badge: "Pro",
     },
   ];
+
+  const quickActions = [
+    {
+      name: "Create Gig",
+      icon: Zap,
+      link: "/create-gig",
+      gradient: "from-violet-500 to-purple-600",
+      description: "Start earning today",
+    },
+    {
+      name: "Post Job",
+      icon: Briefcase,
+      link: "/post-job",
+      gradient: "from-indigo-500 to-blue-600",
+      description: "Find the perfect freelancer",
+    },
+    {
+      name: "Portfolio",
+      icon: Portfolio,
+      link: "/portfolio/me",
+      gradient: "from-emerald-500 to-teal-600",
+      description: "Showcase your work",
+    },
+  ];
+
   const navigate = useNavigate();
+
   const handlePortfolioClick = async (e) => {
     e.preventDefault();
     try {
@@ -104,11 +148,17 @@ export default function Navbar() {
       navigate("/portfolioForm");
     }
   };
+
   const handleMouseEnter = (itemName) => {
     setActiveDropdown(itemName);
   };
 
   const handleMouseLeave = () => {
+    setActiveDropdown(null);
+  };
+
+  const closeMobileMenu = () => {
+    setShowMobileMenu(false);
     setActiveDropdown(null);
   };
 
@@ -133,7 +183,7 @@ export default function Navbar() {
               <div className="relative overflow-hidden rounded-full w-8 h-8 bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
                 <Briefcase className="w-4 h-4 text-white" />
               </div>
-              <span className="font-bold font-orbitron hidden sm-block text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
+              <span className="font-bold font-orbitron hidden sm:block text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
                 CryptoLance
               </span>
             </Link>
@@ -194,14 +244,6 @@ export default function Navbar() {
         {/* Right Side - Portfolio, Watchlist, Search, Login */}
         <div className="flex items-center md:gap-4">
           {/* Portfolio */}
-          {/* <Link
-            to="/portfolioform"
-            className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group"
-          >
-            <Portfolio className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
-            Portfolio
-          </Link> */}
-
           <button
             onClick={handlePortfolioClick}
             className="md:flex text-sm hidden items-center text-gray-300 hover:text-cyan-400 transition-all duration-300  py-2 rounded-lg  group"
@@ -215,57 +257,11 @@ export default function Navbar() {
             <Star className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
             Watchlist
           </button>
+
           <div className="flex flex-row gap-1 items-center">
-            {/* Search Bar with neon effect */}
-           {/* <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-10 pr-8 py-1 w-56 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none focus:shadow-lg focus:shadow-cyan-500/20 backdrop-blur-sm transition-all duration-300"
-              />
-              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs bg-gray-800 px-1 rounded">
-                /
-              </span>
-            </div>*/}
-
-            {/* Language Selector */}
-            {/* <div
-              className="relative"
-              onMouseEnter={() => handleMouseEnter("language")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
-                <Globe className="w-4 h-4" />
-              </button>
-              {activeDropdown === "language" && (
-                <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
-                  >
-                    English
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
-                  >
-                    Español
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
-                  >
-                    Français
-                  </a>
-                </div>
-              )}
-            </div> */}
-
             {/* Log in Button with neon effect */}
             <WalletConnect onAuthSuccess={() => {}} />
+
             {/* Account / Settings dropdown (desktop only) */}
             <div
               className="relative ml-3 hidden md:block"
@@ -278,9 +274,12 @@ export default function Navbar() {
               >
                 <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
                   <img
-                    src={portfolioData.heroSection.profile}
+                    src={
+                      portfolioData?.heroSection?.profile ||
+                      "https://via.placeholder.com/36"
+                    }
                     alt=""
-                    className="rounded-full w-full h-full"
+                    className="rounded-full w-full h-full object-cover"
                   />
                 </div>
               </button>
@@ -359,42 +358,42 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-
           </div>
-          {/* Language Selector */}
-            <div
-              className="relative"
-              onMouseEnter={() => handleMouseEnter("language")}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
-                <Globe className="w-4 h-4" />
-              </button>
-              {activeDropdown === "language" && (
-                <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
-                  >
-                    English
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
-                  >
-                    Español
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
-                  >
-                    Français
-                  </a>
-                </div>
-              )}
-            </div>
 
-          {/* Mobile Menu */}
+          {/* Language Selector */}
+          <div
+            className="relative"
+            onMouseEnter={() => handleMouseEnter("language")}
+            onMouseLeave={handleMouseLeave}
+          >
+            <button className="text-gray-300 hover:text-cyan-400 transition-all duration-300 p-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20">
+              <Globe className="w-4 h-4" />
+            </button>
+            {activeDropdown === "language" && (
+              <div className="absolute -right-2 top-[35px] w-32 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50">
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 first:rounded-t-xl"
+                >
+                  English
+                </a>
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200"
+                >
+                  Español
+                </a>
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-white hover:bg-gray-800/50 hover:text-cyan-400 transition-all duration-200 last:rounded-b-xl"
+                >
+                  Français
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Menu Button */}
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
             className="lg:hidden text-gray-300 hover:text-cyan-400 p-2 rounded-lg hover:bg-gray-800/50 transition-all duration-300"
@@ -404,78 +403,239 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
-      {showMobileMenu && (
-        <div className="lg:hidden bg-gray-900/95 backdrop-blur-md border-b border-gray-700/50">
-          <nav className="flex flex-col space-y-2 px-4 py-4">
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="pl-10 pr-3 py-2 w-full bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none focus:shadow-lg focus:shadow-cyan-500/20"
-              />
+      {/* Enhanced Mobile Side Menu - OpenSea Style */}
+      <div
+        className={`fixed inset-0 z-50 lg:hidden transition-all duration-500 ease-in-out ${
+          showMobileMenu ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+      >
+        {/* Backdrop */}
+        <div
+          className={`absolute inset-0 bg-black/80 transition-opacity duration-500 ${
+            showMobileMenu ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={closeMobileMenu}
+        />
+
+        {/* Side Menu */}
+        <div
+          className={`absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-black transform transition-transform duration-500 ease-in-out ${
+            showMobileMenu ? "translate-x-0" : "translate-x-full"
+          } flex flex-col overflow-hidden`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-700/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">CryptoLance</h2>
+                <p className="text-xs text-gray-400">Web3 Freelancing</p>
+              </div>
+            </div>
+            <button
+              onClick={closeMobileMenu}
+              className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain">
+            {/* Search Bar */}
+            <div className="p-6 border-b border-gray-800">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search anything..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
+                />
+              </div>
             </div>
 
-            {navigationItems.map((item) => {
-              const IconComponent = item.icon;
-              const isOpen = activeDropdown === item.name;
-
-              return (
-                <div key={item.name} className="w-full">
-                  <button
-                    onClick={() => setActiveDropdown(isOpen ? null : item.name)}
-                    className="flex justify-between items-center w-full text-left px-2 py-2 text-gray-300 hover:text-cyan-400 hover:bg-gray-800/50 rounded-lg"
+            {/* Quick Actions */}
+            <div className="p-6 border-b border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-cyan-400" />
+                Quick Actions
+              </h3>
+              <div className="space-y-3">
+                {quickActions.map((action, idx) => (
+                  <Link
+                    key={idx}
+                    to={action.link}
+                    onClick={closeMobileMenu}
+                    className="group block"
                   >
-                    <div className="flex items-center space-x-2">
-                      <IconComponent className="w-4 h-4" />
-                      <span>{item.name}</span>
+                    <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-900 transition-all duration-300 border border-transparent hover:border-gray-700">
+                      <div
+                        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                      >
+                        <action.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                          {action.name}
+                        </h4>
+                        <p className="text-sm text-gray-400">
+                          {action.description}
+                        </p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition-colors duration-300" />
                     </div>
-                    {item.subItems && (
-                      <ChevronDown
-                        className={`w-4 h-4 transition-transform duration-300 ${
-                          isOpen ? "rotate-180 text-cyan-400" : ""
-                        }`}
-                      />
-                    )}
-                  </button>
-
-                  {isOpen && item.subItems && (
-                    <div className="pl-8 mt-1 space-y-1">
-                      {item.subItems.map((subItem, idx) => (
-                        <Link
-                          key={idx}
-                          to={subItem.link}
-                          className="block py-1 text-sm text-gray-400 hover:text-cyan-400"
-                        >
-                          {subItem.name}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            <div>
-              <Link
-                to="/portfolio/me"
-                className="flex text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group"
-              >
-                <Portfolio className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
-                Portfolio
-              </Link>
-
-              <button className="flex text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-800/50 hover:shadow-lg hover:shadow-cyan-500/20 group">
-                <Star className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
-                Watchlist
-              </button>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </nav>
+
+            {/* Main Navigation */}
+            <div className="p-6 border-b border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-cyan-400" />
+                Navigation
+              </h3>
+              <div className="space-y-2">
+                {navigationItems.map((item) => {
+                  const IconComponent = item.icon;
+                  const isOpen = activeDropdown === item.name;
+
+                  return (
+                    <div key={item.name} className="w-full">
+                      <button
+                        onClick={() =>
+                          setActiveDropdown(isOpen ? null : item.name)
+                        }
+                        className="flex justify-between items-center w-full text-left p-3 rounded-xl hover:bg-gray-900 transition-all duration-300 group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center shadow-lg`}
+                          >
+                            <IconComponent className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="text-left">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-white group-hover:text-cyan-400 transition-colors duration-300">
+                                {item.name}
+                              </span>
+                              {item.badge && (
+                                <span className="px-2 py-1 text-xs font-medium bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-400">
+                              {item.description}
+                            </p>
+                          </div>
+                        </div>
+                        {item.subItems && (
+                          <ChevronDown
+                            className={`w-4 h-4 text-gray-500 transition-transform duration-300 ${
+                              isOpen ? "rotate-180 text-cyan-400" : ""
+                            }`}
+                          />
+                        )}
+                      </button>
+
+                      {isOpen && item.subItems && (
+                        <div className="ml-16 mt-2 space-y-1 bg-gray-900 rounded-lg p-3">
+                          {item.subItems.map((subItem, idx) => (
+                            <Link
+                              key={idx}
+                              to={subItem.link}
+                              onClick={closeMobileMenu}
+                              className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-gray-800 transition-all duration-200 group"
+                            >
+                              <subItem.icon className="w-4 h-4 text-gray-400 group-hover:text-cyan-400 transition-colors duration-200" />
+                              <span className="text-sm text-gray-300 group-hover:text-white transition-colors duration-200">
+                                {subItem.name}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* User Actions */}
+            <div className="p-6">
+              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+                <UserIcon className="w-4 h-4 text-cyan-400" />
+                Account
+              </h3>
+              <div className="space-y-3">
+                <button
+                  onClick={handlePortfolioClick}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-900 transition-all duration-300 group border border-gray-800 hover:border-gray-700"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                    <Portfolio className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-medium text-white group-hover:text-cyan-400 transition-colors duration-300">
+                      Portfolio
+                    </h4>
+                    <p className="text-sm text-gray-400">Manage your work</p>
+                  </div>
+                </button>
+
+                <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-900 transition-all duration-300 group border border-gray-800 hover:border-gray-700">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-medium text-white group-hover:text-cyan-400 transition-colors duration-300">
+                      Watchlist
+                    </h4>
+                    <p className="text-sm text-gray-400">Saved items</p>
+                  </div>
+                </button>
+
+                <button className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-900 transition-all duration-300 group border border-gray-800 hover:border-gray-700">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                    <Settings className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-medium text-white group-hover:text-cyan-400 transition-colors duration-300">
+                      Settings
+                    </h4>
+                    <p className="text-sm text-gray-400">
+                      Preferences & account
+                    </p>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 border-t border-gray-800 bg-black">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">♦</span>
+                </div>
+                <span className="text-sm text-gray-400">v2.0.0</span>
+              </div>
+              <Link
+                to="/help"
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-300"
+              >
+                <HelpCircle className="w-4 h-4" />
+                Help
+              </Link>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Custom CSS for neon glow effects */}
       <style>{`

@@ -4,7 +4,8 @@
 
 
 body {
-  background-color:#111827;
+  /* background-color:#111827; */
+  background-color: black;
   color: #e0e0e0; /* Light gray text for contrast */
   font-family: "Inter", sans-serif;
   transition: background 0.3s ease-in-out;
