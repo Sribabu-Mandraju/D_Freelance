@@ -45,10 +45,11 @@ const ClientDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-900">
 
-      <div className="pt-32 pb-12">
+      <div className="pt-20 sm:pt-32 pb-12">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="flex justify-between items-center mb-8">
+          <Navbar/>
+          <div className="flex sm:flex-row flex-col-reverse items-end justify-between gap-4 sm:items-center mb-8">
             <div>
               <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
                 Dashboard
@@ -112,11 +113,11 @@ const ClientDashboard = () => {
                     {activeJobs.map((job) => (
                       <div key={job.id} className="bg-gray-700/50 rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
-                          <div>
+                          <div className="sm:w-auto w-[60%] ">
                             <h4 className="text-lg font-semibold text-white">{job.title}</h4>
                             <p className="text-gray-400">with {job.freelancer}</p>
                           </div>
-                          <span className="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-sm">
+                          <span className="bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full text-[10px] sm:text-sm">
                             {job.status}
                           </span>
                         </div>

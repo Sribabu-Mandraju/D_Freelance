@@ -2,6 +2,9 @@ import os
 import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- Main Configuration and Logic ---
 # This is the knowledge base for your chatbot. Customize this with your website's specific information.

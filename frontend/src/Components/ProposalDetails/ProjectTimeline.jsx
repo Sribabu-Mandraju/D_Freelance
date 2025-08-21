@@ -718,12 +718,12 @@ export default function ProjectTimeline({
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center ${currentConfig.bg} border-2 border-white/20 shadow-lg`}
+                  className={`md:w-16 md:h-16 w-10 h-8 rounded-full flex items-center justify-center ${currentConfig.bg} border-2 border-white/20 shadow-lg`}
                 >
-                  <currentConfig.icon className="w-8 h-8 text-white" />
+                  <currentConfig.icon className="md:w-8 md:h-8 w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h4 className="text-white font-bold text-xl mb-1">
+                  <h4 className="text-white font-bold text-md md:text-xl mb-1">
                     {!hasState
                       ? "No Proposal Exists"
                       : `Current State: ${getStateName(currentState)}`}
@@ -857,7 +857,7 @@ export default function ProjectTimeline({
             ></div>
 
             {/* State Nodes */}
-            <div className="flex justify-between relative z-10">
+            <div className="flex flex-wrap justify-between relative z-10">
               {[
                 ProposalState.Draft,
                 ProposalState.Open,
