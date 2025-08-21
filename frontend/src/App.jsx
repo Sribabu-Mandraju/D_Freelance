@@ -41,6 +41,7 @@ import About from "./Pages/About";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { validateStoredToken, connectSocket } from "./store/authSlice/authSlice";
+import UserDetails from "./Pages/UserDetails/UserDetails";
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
@@ -163,7 +164,7 @@ const App = () => {
               path="/cancelProposal"
               element={<CancelProposalButton proposalId={25} />}
             />
-
+            <Route path="/user/:id" element={<UserDetails/>}/>
             <Route path="/portfolioForm" element={<PortfolioForm />} />
             <Route path="/otpverification" element={<OtpVerification />} />
             <Route path="/about" element={<About />} />
