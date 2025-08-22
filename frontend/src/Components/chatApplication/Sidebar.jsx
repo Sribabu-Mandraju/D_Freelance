@@ -18,7 +18,10 @@ const Sidebar = () => {
   }, [dispatch]);
 
   const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user.address))
+    ? users.filter((user) => {
+        const id = (user._id || user.address || "").toLowerCase();
+        return Array.isArray(onlineUsers) && onlineUsers.includes(id);
+      })
     : users;
 
   if (isUsersLoading) return <SidebarSkeleton />;
@@ -79,7 +82,7 @@ const Sidebar = () => {
                   className="size-12 object-cover rounded-full border-2 border-slate-600 group-hover:border-cyan-400/50 transition-all duration-300"
                 />
                 {/* Enhanced online indicator */}
-                {onlineUsers && onlineUsers.includes(user._id) && (
+                {onlineUsers && onlineUsers.includes((user._id || user.address || "").toLowerCase()) && (
                   <div className="absolute -bottom-1 -right-1">
                     <div className="size-4 bg-green-400 rounded-full border-2 border-slate-900 animate-pulse"></div>
                     <div className="absolute inset-0 size-4 bg-green-400 rounded-full animate-ping opacity-75"></div>
@@ -94,22 +97,24 @@ const Sidebar = () => {
                 {user.fullname}
               </div>
               <div className={`text-sm flex items-center gap-2 ${
-                onlineUsers && onlineUsers.includes(user._id)
+                onlineUsers && onlineUsers.includes((user._id || user.address || "").toLowerCase())
                   ? "text-green-400"
                   : "text-slate-400"
               }`}>
                 <div className={`w-2 h-2 rounded-full ${
-                  onlineUsers && onlineUsers.includes(user._id)
+                  onlineUsers && onlineUsers.includes((user._id || user.address || "").toLowerCase())
                     ? "bg-green-400 animate-pulse"
                     : "bg-slate-500"
                 }`}></div>
-                {onlineUsers && onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                <div className="text-sm text-neon-accent">
+                  {Array.isArray(onlineUsers) && onlineUsers.includes((user._id || user.address || "").toLowerCase()) ? "Online" : "Offline"}
+                </div>
               </div>
             </div>
 
             {/* Mobile indicator */}
             <div className="lg:hidden">
-              {onlineUsers && onlineUsers.includes(user._id) && (
+              {onlineUsers && onlineUsers.includes((user._id || user.address || "").toLowerCase()) && (
                 <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
               )}
             </div>

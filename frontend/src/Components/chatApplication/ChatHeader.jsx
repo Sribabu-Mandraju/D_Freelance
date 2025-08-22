@@ -21,7 +21,7 @@ const ChatHeader = () => {
               />
             </div>
             {/* Online indicator */}
-            {onlineUsers && onlineUsers.includes(selectedUser.address) && (
+            {Array.isArray(onlineUsers) && onlineUsers.includes((selectedUser._id || selectedUser.address || "").toLowerCase()) && (
               <div className="absolute -bottom-1 -right-1">
                 <div className="size-4 bg-green-400 rounded-full border-2 border-slate-800 animate-pulse"></div>
                 <div className="absolute inset-0 size-4 bg-green-400 rounded-full animate-ping opacity-75"></div>
@@ -33,16 +33,16 @@ const ChatHeader = () => {
           <div>
             <h3 className="font-semibold text-lg text-white">{selectedUser.fullname}</h3>
             <div className={`text-sm flex items-center gap-2 ${
-              onlineUsers && onlineUsers.includes(selectedUser.address) 
+              Array.isArray(onlineUsers) && onlineUsers.includes((selectedUser._id || selectedUser.address || "").toLowerCase()) 
                 ? "text-green-400" 
                 : "text-slate-400"
             }`}>
               <div className={`w-2 h-2 rounded-full ${
-                onlineUsers && onlineUsers.includes(selectedUser.address)
+                Array.isArray(onlineUsers) && onlineUsers.includes((selectedUser._id || selectedUser.address || "").toLowerCase())
                   ? "bg-green-400 animate-pulse"
                   : "bg-slate-500"
               }`}></div>
-              {onlineUsers && onlineUsers.includes(selectedUser.address) ? "Online" : "Offline"}
+              {Array.isArray(onlineUsers) && onlineUsers.includes((selectedUser._id || selectedUser.address || "").toLowerCase()) ? "Online" : "Offline"}
             </div>
           </div>
         </div>
