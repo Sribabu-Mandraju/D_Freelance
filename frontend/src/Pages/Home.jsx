@@ -10,7 +10,7 @@ import PopularCategories from "../Components/main/PopularCategories";
 import Chatbot from "../Components/Chatbot";
 const Home = () => {
   return (
-    <div>
+    <div className="p-4">
       {" "}
       <Navbar />
       <HeroSection />
