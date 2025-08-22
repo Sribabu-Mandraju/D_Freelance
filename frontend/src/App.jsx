@@ -24,7 +24,7 @@ import DepositBidAmountButton from "./Components/testingContracts/DepositBidAmou
 import PlaceBid from "./Components/testingContracts/PlaceBid";
 import Proposal from "./Pages/proposal/Proposal";
 import StartWorkButton from "./Components/testingContracts/StartWork";
-import PortfolioForm from "./Components/portfolio/portfolioForm";
+
 import Gigs from "./Pages/gig/Gigs";
 import OtpVerification from "./Components/portfolio/OtpVerification";
 import ProposalDetails from "./Pages/proposalDetails/ProposalDetails";
@@ -42,6 +42,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { validateStoredToken, connectSocket } from "./store/authSlice/authSlice";
 import UserDetails from "./Pages/UserDetails/UserDetails";
+import PortfolioForm from "./Components/portfolio/PortfolioForm"
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
