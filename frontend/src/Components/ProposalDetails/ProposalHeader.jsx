@@ -77,11 +77,11 @@ export default function ProposalHeader({ jobDetails }) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md shadow-cyan-500/50 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/60">
+          {/* <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 shadow-md shadow-cyan-500/50 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/60">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-100">
               Submit Proposal
             </span>
-          </button>
+          </button> */}
           <div className="flex gap-2">
             <button className="bg-gray-900/50 hover:bg-gray-800/50 text-gray-300 p-2 rounded-lg transition-all duration-300 hover:text-pink-400 hover:shadow-lg hover:shadow-pink-500/20 border border-gray-700/50 hover:border-pink-500/30 group">
               <Heart className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />

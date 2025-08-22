@@ -275,12 +275,12 @@ const BrowseJobs = () => {
             <p className="text-gray-400 text-sm">
               Showing {filteredJobs.length} of {jobs.length} jobs
             </p>
-            <select className="px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            {/* <select className="px-3 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400">
               <option>Most Recent</option>
               <option>Highest Budget</option>
               <option>Lowest Budget</option>
               <option>Most Proposals</option>
-            </select>
+            </select> */}
           </div>
 
           {/* Job Listings */}
@@ -400,10 +400,7 @@ function JobCard({ job, isSaved, onToggleSave, onClick }) {
           <MapPin className="w-3 h-3" />
           <span>{job.location}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-400">
-          <Users className="w-3 h-3" />
-          <span>{job.proposals} proposals</span>
-        </div>
+      
       </div>
 
       {/* Client Info and Actions */}

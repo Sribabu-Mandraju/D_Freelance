@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 import { FaDatabase } from "react-icons/fa";
 import { motion } from "framer-motion";
-
+import { useNavigate } from "react-router-dom";
 const HowItWorksSection = () => {
+  const navigate=useNavigate();
+
   const steps = [
     {
       number: 1,
@@ -129,10 +131,10 @@ const HowItWorksSection = () => {
                 collaborating on the future of work.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg flex items-center justify-center font-semibold transition-all">
+                <button onClick={()=>navigate("/browse-jobs")} className="bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-6 py-3 rounded-lg flex items-center justify-center font-semibold transition-all">
                   Find Work
                 </button>
-                <button className="border-2 border-gray-600 hover:border-purple-500 text-gray-200 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all">
+                <button onClick={()=>navigate("/gigs")} className="border-2 border-gray-600 hover:border-purple-500 text-gray-200 hover:text-white px-6 py-3 rounded-lg font-semibold transition-all">
                   Hire Talent
                 </button>
               </div>
@@ -196,7 +198,7 @@ function FeatureList() {
     },
     {
       icon: <Zap className="w-6 h-6 text-cyan-400" />,
-      title: "Zero Platform Fees",
+      title: "1% Platform Fees",
       description: "Keep 100% of your earnings",
     },
     {

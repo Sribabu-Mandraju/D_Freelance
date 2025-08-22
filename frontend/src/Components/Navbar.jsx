@@ -48,6 +48,7 @@ export default function Navbar() {
   const [selectedTheme, setTheme] = useState("Dark");
   const { address, isConnected, chain } = useAccount();
   const { portfolioData } = useSelector((state) => state.portfolio);
+  const location = useLocation();
 
   const navigationItems = [
     {
@@ -203,8 +204,22 @@ export default function Navbar() {
                   onMouseLeave={handleMouseLeave}
                 >
                   <Link to={item.navlink}>
-                    <button className="flex items-center space-x-1 text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group">
-                      <IconComponent className="w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300" />
+                    <button
+                      className={`flex items-center space-x-1 transition-all duration-300 py-2 rounded-lg group
+                        ${
+                          location.pathname === item.navlink
+                            ? "text-cyan-400 bg-cyan-500/10 font-semibold px-2"
+                            : "text-gray-300 hover:text-cyan-400"
+                        }
+                      `}
+                    >
+                      <IconComponent
+                        className={`w-4 h-4 group-hover:text-cyan-400 transition-colors duration-300 ${
+                          location.pathname === item.navlink
+                            ? "text-cyan-400"
+                            : ""
+                        }`}
+                      />
                       <span className="text-[14px]">{item.name}</span>
                       {item.subItems && (
                         <ChevronDown
@@ -361,7 +376,7 @@ export default function Navbar() {
           </div>
 
           {/* Language Selector */}
-          <div
+          {/* <div
             className="relative"
             onMouseEnter={() => handleMouseEnter("language")}
             onMouseLeave={handleMouseLeave}
@@ -391,7 +406,7 @@ export default function Navbar() {
                 </a>
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Mobile Menu Button */}
           <button

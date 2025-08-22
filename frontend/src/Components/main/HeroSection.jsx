@@ -20,7 +20,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-
+import {Link} from "react-router-dom"
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -345,10 +345,10 @@ const HeroSection = () => {
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform duration-300" />
               </button>
 
-              <button className="group flex items-center gap-2 sm:gap-3 px-6 py-3 md:px-8 md:py-4 border-2 border-purple-400/40 text-purple-300 hover:border-purple-300/60 hover:text-purple-200 font-semibold md:font-bold text-base md:text-lg rounded-xl md:rounded-2xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:hover:scale-110 hover:bg-purple-500/20 shadow-lg shadow-purple-500/20">
+              <Link to="/browse-jobs" className="group flex items-center gap-2 sm:gap-3 px-6 py-3 md:px-8 md:py-4 border-2 border-purple-400/40 text-purple-300 hover:border-purple-300/60 hover:text-purple-200 font-semibold md:font-bold text-base md:text-lg rounded-xl md:rounded-2xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:hover:scale-110 hover:bg-purple-500/20 shadow-lg shadow-purple-500/20">
                 <Users className="w-4 h-4 md:w-5 md:h-5" />
                 Browse Jobs
-              </button>
+              </Link>
             </div>
           </div>
         </div>
