@@ -10,7 +10,7 @@ import TabNavigation from "./TabNavigation";
 import QuickContact from "./QuickContact";
 import CurrentStatus from "./CurrentStatus";
 import TechHighlights from "./TechHighlights";
-import TechStack from "./TechStack";
+import TechStack from "../../Components/portfolio/TechStack";
 import YourGigs from "./YourGigs";
 import Navbar from "../../Components/Navbar";
 import styles from "./Portfolio.module.css";
