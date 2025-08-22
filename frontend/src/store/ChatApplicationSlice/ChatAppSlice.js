@@ -100,9 +100,15 @@ export const subscribeToMessages = createAsyncThunk(
     const handler = (newMessage) => {
       const stateNow = thunkAPI.getState();
       const { selectedUser } = stateNow.chatApp;
-      // same check you had: only append if message comes from selected user
-      const isMessageSentFromSelectedUser = !!selectedUser && (newMessage.senderId === selectedUser._id);
-      if (!isMessageSentFromSelectedUser) return;
+      const { user: currentUser } = stateNow.auth;
+      
+      // Only append if message is part of the current conversation
+      const isRelevantMessage = !!selectedUser && (
+        (newMessage.senderId === selectedUser._id && newMessage.recieverId === currentUser?._id) ||
+        (newMessage.senderId === currentUser?._id && newMessage.recieverId === selectedUser._id)
+      );
+      
+      if (!isRelevantMessage) return;
       thunkAPI.dispatch(appendMessage(newMessage));
     };
 
