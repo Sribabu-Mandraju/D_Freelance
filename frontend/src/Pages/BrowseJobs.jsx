@@ -77,10 +77,11 @@ const BrowseJobs = () => {
           timeframe: p.project_duration,
           skills: p.skills_requirement || [],
           client: {
-            name: p.client_name || "Unknown Client", // adjust if stored differently
+            name: p?.userPortfolioDetails?.name || "Unknown Client", // adjust if stored differently
             rating: p.client_rating || 0,
             jobsPosted: p.client_jobs_posted || 0,
             avatar: p.client_avatar || "https://i.pravatar.cc/150",
+            email: p?.userPortfolioDetails?.email || "example@example.com",
           },
           proposals: p.bids?.length || 0,
           postedTime: new Date(p.createdAt).toLocaleDateString(),
@@ -418,10 +419,10 @@ function JobCard({ job, isSaved, onToggleSave, onClick }) {
               {job.client.name}
             </p>
             <div className="flex items-center gap-1.5 text-xs text-gray-400">
-              <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-              <span>{job.client.rating}</span>
-              <span>•</span>
-              <span>{job.client.jobsPosted} jobs</span>
+              {/* <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" /> */}
+              <span>{job.client.email}</span>
+              {/* <span>•</span> */}
+              {/* <span>{job.client.jobsPosted} jobs</span> */}
             </div>
           </div>
         </div>

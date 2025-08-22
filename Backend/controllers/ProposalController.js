@@ -195,6 +195,52 @@ export const getProposalById = async (req, res) => {
       return res.status(404).json({ message: "Proposal not found" });
     }
 
+    console.log("🔍 Proposal found:", {
+      id: proposal._id,
+      userWalletAddress: proposal.userWalletAddress,
+      title: proposal.title
+    });
+
+    // Fetch user portfolio details using userWalletAddress
+    let userPortfolioDetails = null;
+    if (proposal.userWalletAddress) {
+      try {
+        console.log("🔍 Searching portfolio for wallet:", proposal.userWalletAddress);
+        
+        const portfolio = await Portfolio.findOne({
+          "heroSection.walletAddress": proposal.userWalletAddress
+        });
+        
+        console.log("🔍 Portfolio search result:", portfolio ? "Found" : "Not found");
+        
+        if (portfolio) {
+          userPortfolioDetails = {
+            name: portfolio.heroSection.name,
+            profile: portfolio.heroSection.profile,
+            email: portfolio.contactInfo.email
+          };
+          console.log("✅ Portfolio details extracted:", userPortfolioDetails);
+        } else {
+          console.log("⚠️ No portfolio found for wallet:", proposal.userWalletAddress);
+          // Let's also check if there are any portfolios in the database
+          const totalPortfolios = await Portfolio.countDocuments();
+          console.log("📊 Total portfolios in database:", totalPortfolios);
+          
+          // Check if there are any portfolios with different wallet address format
+          const samplePortfolio = await Portfolio.findOne({});
+          if (samplePortfolio) {
+            console.log("📋 Sample portfolio wallet format:", samplePortfolio.heroSection?.walletAddress);
+          }
+        }
+      } catch (portfolioError) {
+        console.error("❌ Portfolio fetch error:", portfolioError);
+        // Portfolio fetch failed, but don't fail the entire request
+        userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+      }
+    } else {
+      console.log("⚠️ Proposal has no userWalletAddress");
+    }
+
     // If proposalId exists, fetch contract data
     let contractData = null;
     if (proposal.proposalId) {
@@ -220,8 +266,11 @@ export const getProposalById = async (req, res) => {
 
     const response = {
       ...proposal.toObject(),
+      userPortfolioDetails,
       contractData
     };
+
+    console.log("📤 Final response userPortfolioDetails:", userPortfolioDetails);
 
     return res.json(response);
   } catch (error) {
@@ -239,7 +288,50 @@ export const getAllProposals = async (req, res) => {
       .populate("bids", "bidder amount description")
       .populate("accepted_bidder", "name email");
 
-    return res.json(proposals);
+    console.log("🔍 Total proposals found:", proposals.length);
+
+    // Fetch user portfolio details for each proposal
+    const proposalsWithUserDetails = await Promise.all(
+      proposals.map(async (proposal) => {
+        let userPortfolioDetails = null;
+        
+        if (proposal.userWalletAddress) {
+          try {
+            console.log(`🔍 Searching portfolio for proposal ${proposal._id} with wallet:`, proposal.userWalletAddress);
+            
+            const portfolio = await Portfolio.findOne({
+              "heroSection.walletAddress": proposal.userWalletAddress
+            });
+            
+            if (portfolio) {
+              userPortfolioDetails = {
+                name: portfolio.heroSection.name,
+                profile: portfolio.heroSection.profile,
+                email: portfolio.contactInfo.email
+              };
+              console.log(`✅ Portfolio details found for proposal ${proposal._id}:`, userPortfolioDetails);
+            } else {
+              console.log(`⚠️ No portfolio found for proposal ${proposal._id} with wallet:`, proposal.userWalletAddress);
+            }
+          } catch (portfolioError) {
+            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
+            // Portfolio fetch failed, but don't fail the entire request
+            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+          }
+        } else {
+          console.log(`⚠️ Proposal ${proposal._id} has no userWalletAddress`);
+        }
+
+        return {
+          ...proposal.toObject(),
+          userPortfolioDetails
+        };
+      })
+    );
+
+    console.log("📊 Final result - proposals with user details:", proposalsWithUserDetails.length);
+
+    return res.json(proposalsWithUserDetails);
   } catch (error) {
     console.error("❌ Get all proposals error:", error);
     return res
