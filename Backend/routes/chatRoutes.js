@@ -1,10 +1,10 @@
 // routes/chatRoutes.js
 import express from 'express';
-import { getMessagesByProposalId } from '../controllers/chatController.js';
-import { protect } from '../middleware/authMiddleware.js'; // Assuming you have an auth middleware
-
+import authMiddleware from '../middlewares/authMiddleware.js';
+import { getUsersForSidebar,getMessages,sendMessage } from '../controllers/chatControllers.js';
 const router = express.Router();
 
-router.get('/:proposalId', protect, getMessagesByProposalId);
-
+router.get("/users",authMiddleware,getUsersForSidebar);
+router.get("/:id",authMiddleware,getMessages);
+router.post("/send/:id",authMiddleware,sendMessage)
 export default router;

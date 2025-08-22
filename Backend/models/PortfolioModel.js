@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const portfolioSchema = new mongoose.Schema({
+ 
   // Hero Section Data
   heroSection: {
     walletAddress: {
