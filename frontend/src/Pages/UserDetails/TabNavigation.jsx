@@ -4,7 +4,7 @@ function TabNavigation({ tabs, activeTab, setActiveTab }) {
   return (
     <div className="mb-6">
       <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
-        <div className="flex flex-row gap-1 p-2 bg-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-2xl shadow-2xl shadow-cyan-500/10 min-w-max">
+        <div className="flex flex-row justify-center gap-1 p-2 shadow-2xl shadow-cyan-500/10 min-w-max">
           {tabs.map((tab) => {
             const IconComponent = tab.icon;
             return (

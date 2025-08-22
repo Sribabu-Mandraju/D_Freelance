@@ -170,12 +170,12 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gray-950 text-white z-50">
+    <header className="fixed top-0 left-0 w-full bg-black/5 text-white z-50">
       {/* Neon glow background effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 opacity-50"></div>
+      {/* <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 opacity-50"></div> */}
 
       {/* Main Header */}
-      <div className="relative flex items-center justify-between w-full px-4 py-3 border-b border-gray-800/50 backdrop-blur-sm">
+      <div className="relative flex items-center justify-between w-full px-4 py-3  backdrop-blur-lg">
         {/* Left Side - Logo and Navigation */}
         <div className="flex items-center w-full space-x-8">
           {/* Logo with neon effect */}

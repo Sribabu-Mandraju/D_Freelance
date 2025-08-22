@@ -19,24 +19,29 @@ function QuickContact({ contactInfo }) {
       </h3>
       <div className="space-y-2">
         {/* Email */}
-        {email ? (
-          <a
-            href={`mailto:${email}`}
-            className="flex items-center gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-blue-500/10 transition-all duration-300 group border border-transparent hover:border-cyan-500/20"
-          >
-            <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30 group-hover:border-cyan-500/50 transition-colors duration-300">
-              <Mail className="w-4 h-4 text-cyan-400" />
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-300">
-                Email
-              </span>
-              <p className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
-                {email}
-              </p>
-            </div>
-          </a>
-        ) : (
+        {email ?(
+  <a
+    href={`mailto:${email}`}
+    className="flex items-center gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-blue-500/10 transition-all duration-300 group border border-transparent hover:border-cyan-500/20"
+  >
+    <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30 group-hover:border-cyan-500/50 transition-colors duration-300">
+      <Mail className="w-4 h-4 text-cyan-400" />
+    </div>
+    
+    <div className="max-w-xs flex-1 min-w-0">
+      <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-300 block">
+        Email
+      </span>
+      <p 
+        title={email}
+        className="text-xs text-gray-500 truncate group-hover:text-gray-400 transition-colors duration-300 block w-full"
+      >
+        {email}
+      </p>
+    </div>
+  </a>
+)
+ : (
           <div className="flex items-center gap-4 p-3 rounded-xl opacity-50">
             <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30">
               <Mail className="w-4 h-4 text-cyan-400" />
