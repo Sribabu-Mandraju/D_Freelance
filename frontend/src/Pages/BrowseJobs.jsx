@@ -173,7 +173,7 @@ const BrowseJobs = () => {
         <div className="container mx-auto">
           {/* Header */}
           <div className="text-center mb-6">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+            <h1 className="text-3xl sm:text-4xl font-orbitron font-bold text-white mb-2">
               Browse Jobs
             </h1>
             <p className="text-sm text-gray-300 max-w-xl mx-auto">
@@ -355,7 +355,7 @@ function JobCard({ job, isSaved, onToggleSave, onClick }) {
 
       <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
-          <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500 mb-1 hover:bg-gradient-to-r hover:from-purple-300 hover:to-blue-400 cursor-pointer transition-all duration-300">
+          <h3 className="text-xl font-bold bg-clip-text text-transparent my-2 bg-gradient-to-r from-purple-500 font-orbitron to-blue-600  hover:bg-gradient-to-r hover:from-purple-300 hover:to-blue-400 cursor-pointer transition-all duration-300">
             {job.title}
           </h3>
           <p className="text-xs text-gray-300 leading-relaxed line-clamp-2">
