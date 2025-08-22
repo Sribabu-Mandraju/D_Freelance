@@ -34,16 +34,19 @@ import PaySecondMilestoneButton from "./Components/testingContracts/PaySecondMil
 import PayThirdMilestoneButton from "./Components/testingContracts/PayThirdMileStone";
 import CancelProposalButton from "./Components/testingContracts/CancelProposal";
 import CompleteProposalButton from "./Components/testingContracts/CompleteProposal";
-
+import ChatApp from "./Pages/ChatApplication/ChatApp"
 import AdminDashboard from "./Pages/admin/AdminDashboard";
 import About from "./Pages/About";
 
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { validateStoredToken, connectSocket } from "./store/authSlice/authSlice";
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
 const App = () => {
   const [authToken, setAuthToken] = useState("");
+  const dispatch = useDispatch();
   const handleAuthSuccess = () => {
     return;
   };
@@ -58,9 +61,17 @@ const App = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
+    if (token) {
+      dispatch(validateStoredToken()).then((action) => {
+        if (validateStoredToken.fulfilled.match(action)) {
+          // Only connect socket if token validation was successful and user data is available
+          dispatch(connectSocket());
+        }
+      });
+    }
     setAuthToken(token);
     console.log(token);
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
@@ -90,6 +101,7 @@ const App = () => {
             <Route path="/gig/:id" element={<GigPage />} />
 
             <Route path="/adminDashboard" element={<AdminDashboard />} />
+            <Route path="/chatApplication" element={<ChatApp />} />
 
             <Route path="/claimTokens" element={<ClaimTokens />} />
             <Route path="/purchaseTokens" element={<PurchaseTokens />} />

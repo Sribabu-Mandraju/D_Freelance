@@ -1,6 +1,10 @@
+// features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { io } from "socket.io-client";
 
-// Initial state
+// module-level socket instance (keeps single connection)
+let socket = null;
+
 const initialState = {
   token: null,
   user: null,
@@ -8,12 +12,15 @@ const initialState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  socket: null, // will hold the socket instance
+  onlineUsers: [],
 };
 
-// Async thunk to call /api/auth/verify
+// --- Thunks ---
+
 export const verifyWalletAuth = createAsyncThunk(
   "auth/verifyWalletAuth",
-  async ({ address, signature, nonce }, thunkAPI) => {
+  async ({ address, signature, nonce }, { rejectWithValue }) => {
     try {
       const response = await fetch("http://localhost:3001/api/auth/verify", {
         method: "POST",
@@ -22,7 +29,8 @@ export const verifyWalletAuth = createAsyncThunk(
       });
 
       if (!response.ok) {
-        throw new Error(`Verify request failed: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Verify request failed`);
       }
 
       const data = await response.json();
@@ -31,24 +39,26 @@ export const verifyWalletAuth = createAsyncThunk(
         throw new Error(data.message || "Verification failed");
       }
 
-      // Save token in localStorage (optional)
+      // Normalize address to lowercase
+      const normalizedAddress = address.toLowerCase();
+
       localStorage.setItem("authToken", data.token);
+      localStorage.setItem("authAddress", normalizedAddress);
 
       return {
         token: data.token,
-        user: data.user,
-        userExists: data.userExists,
+        user: { _id: normalizedAddress, ...data.user },
+        userExists: !!data.userExists,
       };
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// Async thunk to validate stored token
 export const validateStoredToken = createAsyncThunk(
   "auth/validateStoredToken",
-  async (_, thunkAPI) => {
+  async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("authToken");
       const address = localStorage.getItem("authAddress");
@@ -57,25 +67,117 @@ export const validateStoredToken = createAsyncThunk(
         throw new Error("No stored authentication data");
       }
 
-      // You can add a token validation endpoint here if needed
-      // For now, we'll just restore the state
+      const response = await fetch(`http://localhost:3001/api/messages/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to fetch user profile");
+      }
+
+      // API might return { data: [...]} or array directly. handle both.
+      const allUsers = await response.json();
+      const usersArray = Array.isArray(allUsers) ? allUsers : (allUsers.data || []);
+
+      // Support both shapes: _id === wallet OR heroSection.walletAddress
+      const normalizedAddress = address.toLowerCase();
+      const currentUser = usersArray.find(
+        (u) =>
+          (u._id && u._id.toLowerCase() === normalizedAddress) ||
+          (u.heroSection && u.heroSection.walletAddress && u.heroSection.walletAddress.toLowerCase() === normalizedAddress)
+      );
+
+      if (!currentUser) {
+        throw new Error("User profile not found after token validation");
+      }
+
       return {
         token,
-        address,
-        // You might want to fetch user data here
-        user: null,
-        userExists: true, // Assume user exists if we have a token
+        user: currentUser,
+        userExists: true,
       };
     } catch (error) {
-      // Clear invalid stored data
       localStorage.removeItem("authToken");
       localStorage.removeItem("authAddress");
-      return thunkAPI.rejectWithValue(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// Auth slice
+export const connectSocket = createAsyncThunk(
+  "auth/connectSocket",
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    try {
+      // avoid multiple open connections
+      if (socket && socket.connected) {
+        console.log("Socket already connected.");
+        return socket.id;
+      }
+
+      const { user, token } = getState().auth;
+      if (!user || !token) {
+        return rejectWithValue("Cannot connect socket without authenticated user.");
+      }
+
+      const userId = user._id;
+
+      // create socket and attach auth
+      socket = io("http://localhost:3001", {
+        auth: { token },
+        // if your server reads query instead, you can add query: { userId }
+      });
+
+      // store socket instance in state
+      dispatch(setSocket(socket));
+
+      socket.on("connect", () => {
+        console.log("Socket connected with id:", socket.id);
+      });
+
+      socket.on("getOnlineUsers", (users) => {
+        dispatch(setOnlineUsers(users));
+      });
+
+      socket.on("disconnect", (reason) => {
+        console.log("Socket disconnected:", reason);
+        dispatch(clearSocket());
+      });
+
+      socket.on("connect_error", (err) => {
+        console.error("Socket connect_error:", err.message || err);
+      });
+
+      return socket.id;
+    } catch (err) {
+      return rejectWithValue(err.message || "Socket connection failed");
+    }
+  }
+);
+
+export const logoutAndDisconnect = createAsyncThunk(
+  "auth/logoutAndDisconnect",
+  async (_, { dispatch }) => {
+    try {
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+    } catch (e) {
+      console.warn("Error disconnecting socket", e);
+    } finally {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("authAddress");
+      dispatch(logout());
+    }
+  }
+);
+
+// --- Slice ---
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -85,8 +187,23 @@ const authSlice = createSlice({
       state.user = null;
       state.userExists = false;
       state.isAuthenticated = false;
+      state.loading = false;
       state.error = null;
-      localStorage.removeItem("authToken");
+      if (state.socket && state.socket.disconnect) {
+        try { state.socket.disconnect(); } catch (e) { /* ignore */ }
+      }
+      state.socket = null;
+      state.onlineUsers = [];
+    },
+    // set the socket instance (not just the id)
+    setSocket: (state, action) => {
+      state.socket = action.payload;
+    },
+    clearSocket: (state) => {
+      state.socket = null;
+    },
+    setOnlineUsers: (state, action) => {
+      state.onlineUsers = action.payload || [];
     },
   },
   extraReducers: (builder) => {
@@ -101,13 +218,13 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.userExists = action.payload.userExists;
         state.isAuthenticated = true;
-        state.error = null;
       })
-      .addCase(verifyWalletAuth.rejected, (state) => {
+      .addCase(verifyWalletAuth.rejected, (state, action) => {
         state.loading = false;
         state.isAuthenticated = false;
         state.error = action.payload || "Verification failed";
       })
+
       .addCase(validateStoredToken.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,16 +235,14 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.userExists = action.payload.userExists;
         state.isAuthenticated = true;
-        state.error = null;
       })
-      .addCase(validateStoredToken.rejected, (state) => {
+      .addCase(validateStoredToken.rejected, (state, action) => {
         state.loading = false;
         state.isAuthenticated = false;
-        state.error = null;
+        state.error = action.payload || null;
       });
   },
 });
 
-export const { logout } = authSlice.actions;
-
+export const { logout, setSocket, clearSocket, setOnlineUsers } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import jwt from 'jsonwebtoken';
 import Nonce from '../models/Nonce.js';
-import User from "../models/UserModel.js";
+import PortfolioScheema from "../models/PortfolioModel.js"; // Import PortfolioScheema
 
 const getNonce = async (req, res, next) => {
   try {
@@ -42,8 +42,20 @@ const verifySignature = async (req, res, next) => {
     if (signerAddress.toLowerCase() === address.toLowerCase()) {
       await Nonce.deleteOne({ address: address.toLowerCase() });
 
-      let user = await User.findOne({ userWallet: address.toLowerCase() });
-      const userExists = !!user;
+      let portfolioUser = await PortfolioScheema.findOne({ "heroSection.walletAddress": address.toLowerCase() });
+      let userExists = !!portfolioUser;
+
+      if (!portfolioUser) {
+        // Create a new portfolio entry if user doesn't exist
+        portfolioUser = await PortfolioScheema.create({
+          heroSection: {
+            walletAddress: address.toLowerCase(),
+            name: `User_${address.substring(2, 8)}`, // Default name
+            profilePic: "/avatar.png", // Default profile pic
+          },
+        });
+        userExists = true;
+      }
 
       const token = jwt.sign({ address: address.toLowerCase() }, process.env.JWT_SECRET, {
         expiresIn: '24h',
@@ -55,7 +67,11 @@ const verifySignature = async (req, res, next) => {
         message: 'Authentication successful',
         token,
         userExists,
-        user: user || null,
+        user: {
+          _id: portfolioUser.heroSection.walletAddress,
+          fullname: portfolioUser.heroSection.name,
+          profilePic: portfolioUser.heroSection.profilePic,
+        },
       });
     } else {
       res.status(401).json({ success: false, message: 'Invalid signature' });
