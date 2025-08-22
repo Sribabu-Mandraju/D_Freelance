@@ -14,11 +14,13 @@ import {
   ArrowRight,
   Sparkles,
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 const HowItWorksSection = () => {
   const [activeStep, setActiveStep] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef(null)
+  const navigate = useNavigate()
 
   const steps = [
     {
@@ -112,7 +114,7 @@ const HowItWorksSection = () => {
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-0">
           <div className="inline-block mb-4 px-6 py-2 border border-cyan-500 text-cyan-400 rounded-full text-sm font-medium backdrop-blur-sm bg-gray-900/30">
             <Sparkles className="w-4 h-4 inline mr-2" />
             HOW IT WORKS
@@ -320,6 +322,7 @@ const StepCard = ({ step, index, isActive, onClick, isMobile = false }) => {
 
 // Enhanced CTA Section
 const CTASection = () => {
+  const navigate = useNavigate()
   const features = [
     {
       icon: <Shield className="w-6 h-6 text-purple-400" />,
@@ -357,11 +360,11 @@ const CTASection = () => {
             blockchain technology.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="group bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-8 py-4 rounded-xl flex items-center justify-center font-semibold transition-all duration-300 transform hover:scale-105">
+            <button onClick={()=>navigate("/browse-jobs")} className="group bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-white px-8 py-4 rounded-xl flex items-center justify-center font-semibold transition-all duration-300 transform hover:scale-105">
               <span>Find Work</span>
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="group border-2 border-gray-600 hover:border-purple-500 text-gray-200 hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105">
+            <button className="group flex flex-row-reverse gap-2 border-2 border-gray-600 hover:border-purple-500 text-gray-200 hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105">
               <span>Hire Talent</span>
               <Sparkles className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform" />
             </button>
