@@ -98,13 +98,10 @@ export const subscribeToMessages = createAsyncThunk(
 
     // create handler that captures dispatch + getState
     const handler = (newMessage) => {
-      const { chat } = thunkAPI.getState();
-      const selectedUser = chat.selectedUser;
-      console.log("Received newMessage from socket:", newMessage);
-      console.log("Selected user:", selectedUser);
-      console.log("isMessageSentFromSelectedUser check:", selectedUser && (newMessage.senderId === selectedUser._id));
+      const stateNow = thunkAPI.getState();
+      const { selectedUser } = stateNow.chatApp;
       // same check you had: only append if message comes from selected user
-      const isMessageSentFromSelectedUser = selectedUser && (newMessage.senderId === selectedUser._id);
+      const isMessageSentFromSelectedUser = !!selectedUser && (newMessage.senderId === selectedUser._id);
       if (!isMessageSentFromSelectedUser) return;
       thunkAPI.dispatch(appendMessage(newMessage));
     };
