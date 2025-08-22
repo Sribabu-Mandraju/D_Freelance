@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import MarketCard from "../../Components/main/marketSection/MarketCard";
 
 const YourGigs = ({ yourgigs = [] }) => {
+  const navigate = useNavigate();
   const [gigs, setGigs] = useState([]); // fetched gig objects
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -41,7 +43,11 @@ const YourGigs = ({ yourgigs = [] }) => {
           // resp is an axios response when fulfilled: resp.value
           const candidate = resp.data ?? resp;
           // candidate may be { success: true, data: { ... } }
-          if (candidate && candidate.data && typeof candidate.data === "object") {
+          if (
+            candidate &&
+            candidate.data &&
+            typeof candidate.data === "object"
+          ) {
             return candidate.data;
           }
           return candidate;
@@ -55,7 +61,7 @@ const YourGigs = ({ yourgigs = [] }) => {
         // If API returns wrapper { success: true, data: {...} } ensure we unwrap again
         const normalized = successful.map((item) =>
           // if the API still wrapped the gig in `data`, unwrap
-          (item && item.data) ? item.data : item
+          item && item.data ? item.data : item
         );
 
         if (normalized.length === 0) {
@@ -85,64 +91,58 @@ const YourGigs = ({ yourgigs = [] }) => {
   }, [yourgigs, API_BASE]);
 
   // UI states
-  if (loading) return <div className="p-4 text-cyan-300">Loading your gigs…</div>;
+  if (loading)
+    return <div className="p-4 text-cyan-300">Loading your gigs…</div>;
   if (error) return <div className="p-4 text-red-400">{error}</div>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-      {/* Quick raw-ID view (optional) */}
-      {/* {yourgigs && yourgigs.length > 0 && (
-        <div className="mb-8 col-span-full">
-          <h3 className="text-sm font-medium mb-2">Gig IDs (provided)</h3>
-          <div className="flex flex-wrap gap-2">
-            {yourgigs.map((gigId, i) => (
-              <div
-                key={gigId ?? i}
-                className="px-2 py-1 bg-gray-800 text-sm rounded"
-              >
-                {gigId}
+    <>
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded shadow"
+          onClick={() => navigate("/create-gig")}
+        >
+          + Create Gig
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+        {/* Render fetched gig cards */}
+        {gigs && gigs.length > 0
+          ? gigs.map((gig) => (
+              <MarketCard
+                key={gig._id || gig.id}
+                username={gig.username}
+                gigId={gig._id || gig.id}
+                title={gig.title}
+                description={gig.description}
+                price={gig.price}
+                gigimage={gig.gigimage}
+                images={gig.images}
+                avatar={gig.avatar}
+                rating={gig.rating}
+                projects={gig.projects}
+                badges={gig.badges}
+                location={gig.location}
+                tags={gig.tags}
+                skills={gig.skills}
+                category={gig.category}
+                deliveryTime={gig.deliveryTime}
+                faqs={gig.faqs}
+                about={gig.about}
+                createdAt={gig.createdAt}
+                basic={gig.basic}
+                standard={gig.standard}
+                pro={gig.pro}
+              />
+            ))
+          : // If no fetched gigs, and no IDs either, helpful message:
+            (!yourgigs || yourgigs.length === 0) && (
+              <div className="p-4 text-gray-400 col-span-full">
+                No gigs to show.
               </div>
-            ))}
-          </div>
-        </div>
-      )} */}
-
-      {/* Render fetched gig cards */}
-      {gigs && gigs.length > 0 ? (
-        gigs.map((gig) => (
-          <MarketCard
-            key={gig._id || gig.id}
-            username={gig.username}
-            gigId={gig._id || gig.id}
-            title={gig.title}
-            description={gig.description}
-            price={gig.price}
-            gigimage={gig.gigimage}
-            images={gig.images}
-            avatar={gig.avatar}
-            rating={gig.rating}
-            projects={gig.projects}
-            badges={gig.badges}
-            location={gig.location}
-            tags={gig.tags}
-            skills={gig.skills}
-            category={gig.category}
-            deliveryTime={gig.deliveryTime}
-            faqs={gig.faqs}
-            about={gig.about}
-            createdAt={gig.createdAt}
-            basic={gig.basic}
-            standard={gig.standard}
-            pro={gig.pro}
-          />
-        ))
-      ) : (
-        // If no fetched gigs, and no IDs either, helpful message:
-        (!yourgigs || yourgigs.length === 0) && (
-          <div className="p-4 text-gray-400 col-span-full">No gigs to show.</div>
-        )
-      )}
-    </div>
+            )}
+      </div>
+    </>
   );
 };
 

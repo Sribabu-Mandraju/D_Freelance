@@ -20,7 +20,9 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom";
+import "./star.css";
+
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -211,22 +213,13 @@ const HeroSection = () => {
 
   return (
     <>
-      <div className="min-h-[100svh] flex items-center justify-center px-3 sm:px-4 pt-16 sm:pt-20 relative overflow-hidden bg-gradient-to-br from-black via-gray-950 to-gray-900">
+      <div className="min-h-[100svh] flex items-center justify-center px-3 sm:px-4 pt-16 sm:pt-20 relative overflow-hidden">
         {/* Enhanced background elements */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          {/* Animated gradient orbs */}
-          <div className="absolute top-24 left-4 sm:left-20 w-56 h-56 sm:w-64 sm:h-64 bg-purple-600/10 rounded-full filter blur-3xl animate-pulse"></div>
-          <div
-            className="absolute bottom-24 right-4 sm:right-20 w-64 h-64 sm:w-80 sm:h-80 bg-cyan-600/10 rounded-full filter blur-3xl animate-pulse"
-            style={{ animationDelay: "1s" }}
-          ></div>
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-96 sm:h-96 bg-blue-600/5 rounded-full filter blur-3xl animate-pulse"
-            style={{ animationDelay: "2s" }}
-          ></div>
-
-          {/* Subtle grid pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] sm:bg-[size:60px_60px] opacity-20"></div>
+        <div className="bg-animation">
+          <div id="stars"></div>
+          <div id="stars2"></div>
+          <div id="stars3"></div>
+          <div id="stars4"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
@@ -345,7 +338,10 @@ const HeroSection = () => {
                 <ArrowRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-2 transition-transform duration-300" />
               </button>
 
-              <Link to="/browse-jobs" className="group flex items-center gap-2 sm:gap-3 px-6 py-3 md:px-8 md:py-4 border-2 border-purple-400/40 text-purple-300 hover:border-purple-300/60 hover:text-purple-200 font-semibold md:font-bold text-base md:text-lg rounded-xl md:rounded-2xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:hover:scale-110 hover:bg-purple-500/20 shadow-lg shadow-purple-500/20">
+              <Link
+                to="/browse-jobs"
+                className="group flex items-center gap-2 sm:gap-3 px-6 py-3 md:px-8 md:py-4 border-2 border-purple-400/40 text-purple-300 hover:border-purple-300/60 hover:text-purple-200 font-semibold md:font-bold text-base md:text-lg rounded-xl md:rounded-2xl backdrop-blur-sm transition-all duration-300 hover:scale-105 md:hover:scale-110 hover:bg-purple-500/20 shadow-lg shadow-purple-500/20"
+              >
                 <Users className="w-4 h-4 md:w-5 md:h-5" />
                 Browse Jobs
               </Link>
