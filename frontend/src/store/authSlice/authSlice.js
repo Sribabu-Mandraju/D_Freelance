@@ -112,7 +112,6 @@ export const connectSocket = createAsyncThunk(
   "auth/connectSocket",
   async (_, { getState, dispatch, rejectWithValue }) => {
     try {
-      // avoid multiple open connections
       if (socket && socket.connected) {
         console.log("Socket already connected.");
         return socket.id;
@@ -123,15 +122,13 @@ export const connectSocket = createAsyncThunk(
         return rejectWithValue("Cannot connect socket without authenticated user.");
       }
 
-      const userId = user._id;
+      const userId = String(user._id || "").toLowerCase();
 
-      // create socket and attach auth
       socket = io("http://localhost:3001", {
         auth: { token },
-        // if your server reads query instead, you can add query: { userId }
+        query: { userId },
       });
 
-      // store socket instance in state
       dispatch(setSocket(socket));
 
       socket.on("connect", () => {
@@ -139,7 +136,7 @@ export const connectSocket = createAsyncThunk(
       });
 
       socket.on("getOnlineUsers", (users) => {
-        dispatch(setOnlineUsers(users));
+        dispatch(setOnlineUsers(Array.isArray(users) ? users : []));
       });
 
       socket.on("disconnect", (reason) => {
