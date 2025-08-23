@@ -4,6 +4,10 @@ import Sidebar from "../../Components/chatApplication/Sidebar";
 import NoChatSelected from "../../Components/chatApplication/NoChatSelected";
 import { useSelector, useDispatch } from "react-redux";
 import { connectSocket } from "../../store/authSlice/authSlice";
+import {
+  subscribeToMessages,
+  unsubscribeFromMessages,
+} from "../../store/ChatApplicationSlice/ChatAppSlice";
 
 const ChatApp = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -27,6 +31,17 @@ const ChatApp = () => {
       dispatch(connectSocket());
     }
   }, [isAuthenticated, socket, dispatch]);
+
+  // Subscribe to messages when socket is available
+  useEffect(() => {
+    if (socket && socket.connected) {
+      dispatch(subscribeToMessages());
+
+      return () => {
+        dispatch(unsubscribeFromMessages());
+      };
+    }
+  }, [socket, dispatch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">

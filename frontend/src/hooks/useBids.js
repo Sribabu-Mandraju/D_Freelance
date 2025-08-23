@@ -13,9 +13,7 @@ export const useBids = (proposalId) => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/bids`
-      );
+      const response = await fetch(`http://localhost:3001/api/bids`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch bids");
@@ -38,21 +36,18 @@ export const useBids = (proposalId) => {
       try {
         const authToken = localStorage.getItem("authToken");
 
-        const response = await fetch(
-          "https://cryptolance-server.onrender.com/api/bids",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({
-              cover_letter: bidData.cover_letter.trim(),
-              bid_amount: parseFloat(bidData.bid_amount),
-              proposal_id: proposalId,
-            }),
-          }
-        );
+        const response = await fetch("http://localhost:3001/api/bids", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            cover_letter: bidData.cover_letter.trim(),
+            bid_amount: parseFloat(bidData.bid_amount),
+            proposal_id: proposalId,
+          }),
+        });
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -76,20 +71,17 @@ export const useBids = (proposalId) => {
     try {
       const authToken = localStorage.getItem("authToken");
 
-      const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/bids/${bidId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            cover_letter: updateData.cover_letter.trim(),
-            bid_amount: parseFloat(updateData.bid_amount),
-          }),
-        }
-      );
+      const response = await fetch(`http://localhost:3001/api/bids/${bidId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          cover_letter: updateData.cover_letter.trim(),
+          bid_amount: parseFloat(updateData.bid_amount),
+        }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -113,15 +105,12 @@ export const useBids = (proposalId) => {
     try {
       const authToken = localStorage.getItem("authToken");
 
-      const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/bids/${bidId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:3001/api/bids/${bidId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -143,7 +132,7 @@ export const useBids = (proposalId) => {
     setIsLoading(true);
     setError(null);
 
-    fetch(`https://cryptolance-server.onrender.com/api/bids`)
+    fetch(`http://localhost:3001/api/bids`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch bids");

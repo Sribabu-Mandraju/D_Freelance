@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import http from "http";
-import { Server } from "socket.io";
 import cors from "cors";
 import AdminRoutes from "./routes/AdminRoutes.js";
 
@@ -21,11 +20,20 @@ import messageRoutes from "./routes/chatRoutes.js";
 import ActiveFreelancersRoutes from "./routes/ActiveFreelancersRoutes.js";
 import CrossPortfolioRoutes from "./routes/CrossPortfolioRoutes.js";
 import ProposalRoutes from "./routes/ProposalRoutes.js";
+
 // Import the WebSocket configuration
-import { app, server } from "./socket.js";
+import { initSocket } from "./socket.js";
+
 // Load environment variables
 dotenv.config();
 const PORT = process.env.PORT || 3001;
+
+// Create Express app and HTTP server
+const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.io
+initSocket(server);
 
 // Middleware to parse JSON and enable CORS
 app.use(express.json());
@@ -35,7 +43,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://crypto-lance-gamma.vercel.app"
+      "https://crypto-lance-gamma.vercel.app",
     ],
     credentials: true, // if you want to allow cookies/auth headers
   })

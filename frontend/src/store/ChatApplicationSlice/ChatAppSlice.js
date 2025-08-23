@@ -5,7 +5,7 @@ import axios from "axios";
 
 // create axios instance WITHOUT a static Authorization header
 const axiosInstance = axios.create({
-  baseURL: "https://cryptolance-server.onrender.com/api",
+  baseURL: "http://localhost:3001/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -95,10 +95,27 @@ export const subscribeToMessages = createAsyncThunk(
     if (!socket) return thunkAPI.rejectWithValue("No socket available");
 
     const handler = (newMessage) => {
+      console.log("Received new message via socket:", newMessage);
       const stateNow = thunkAPI.getState();
       const { selectedUser } = stateNow.chatApp;
       const authUser = stateNow.auth?.user;
-      if (!authUser || !selectedUser) return;
+
+      if (!authUser || !selectedUser) {
+        console.log(
+          "No selected user or auth user, adding message to current conversation"
+        );
+        // Add message to current conversation if it involves the current user
+        const me = String(authUser?._id || "").toLowerCase();
+        const sender = String(newMessage.senderId || "").toLowerCase();
+        const receiver = String(
+          newMessage.recieverId || newMessage.receiverId || ""
+        ).toLowerCase();
+
+        if (sender === me || receiver === me) {
+          thunkAPI.dispatch(appendMessage(newMessage));
+        }
+        return;
+      }
 
       const me = String(authUser._id || "").toLowerCase();
       const peer = String(
@@ -112,9 +129,11 @@ export const subscribeToMessages = createAsyncThunk(
       const involvesMeAndPeer =
         (sender === me && receiver === peer) ||
         (sender === peer && receiver === me);
-      if (!involvesMeAndPeer) return;
 
-      thunkAPI.dispatch(appendMessage(newMessage));
+      if (involvesMeAndPeer) {
+        console.log("Adding message to current conversation");
+        thunkAPI.dispatch(appendMessage(newMessage));
+      }
     };
 
     socket.on("newMessage", handler);
@@ -166,7 +185,13 @@ const chatSlice = createSlice({
       state.messages = [];
     },
     appendMessage(state, action) {
-      state.messages.push(action.payload);
+      // Check if message already exists to avoid duplicates
+      const messageExists = state.messages.some(
+        (msg) => msg._id === action.payload._id
+      );
+      if (!messageExists) {
+        state.messages.push(action.payload);
+      }
     },
     clearMessages(state) {
       state.messages = [];
@@ -210,7 +235,9 @@ const chatSlice = createSlice({
 
       // sendMessage
       .addCase(sendMessage.fulfilled, (state, action) => {
-        state.messages.push(action.payload);
+        // Don't add the message here since it will come via socket
+        // This prevents duplicate messages
+        console.log("Message sent successfully:", action.payload);
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.error = action.payload ?? action.error.message;
@@ -233,5 +260,4 @@ export const {
   setUsers,
   setSubscribed,
 } = chatSlice.actions;
-
 export default chatSlice.reducer;

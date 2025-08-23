@@ -22,14 +22,11 @@ export const verifyWalletAuth = createAsyncThunk(
   "auth/verifyWalletAuth",
   async ({ address, signature, nonce }, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        "https://cryptolance-server.onrender.com/api/auth/verify",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, signature, nonce }),
-        }
-      );
+      const response = await fetch("http://localhost:3001/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, signature, nonce }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -70,15 +67,12 @@ export const validateStoredToken = createAsyncThunk(
         throw new Error("No stored authentication data");
       }
 
-      const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/messages/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:3001/api/messages/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -136,31 +130,48 @@ export const connectSocket = createAsyncThunk(
 
       const userId = String(user._id || "").toLowerCase();
 
-      socket = io("https://cryptolance-server.onrender.com", {
-        auth: { token },
+      // Disconnect existing socket if any
+      if (socket) {
+        socket.disconnect();
+        socket = null;
+      }
+
+      socket = io("http://localhost:3001", {
         query: { userId },
+        transports: ["websocket", "polling"],
+        timeout: 20000,
       });
 
       dispatch(setSocket(socket));
 
-      socket.on("connect", () => {
-        console.log("Socket connected with id:", socket.id);
-      });
+      return new Promise((resolve, reject) => {
+        socket.on("connect", () => {
+          console.log("Socket connected with id:", socket.id);
+          resolve(socket.id);
+        });
 
-      socket.on("getOnlineUsers", (users) => {
-        dispatch(setOnlineUsers(Array.isArray(users) ? users : []));
-      });
+        socket.on("getOnlineUsers", (users) => {
+          console.log("Received online users:", users);
+          dispatch(setOnlineUsers(Array.isArray(users) ? users : []));
+        });
 
-      socket.on("disconnect", (reason) => {
-        console.log("Socket disconnected:", reason);
-        dispatch(clearSocket());
-      });
+        socket.on("disconnect", (reason) => {
+          console.log("Socket disconnected:", reason);
+          dispatch(clearSocket());
+        });
 
-      socket.on("connect_error", (err) => {
-        console.error("Socket connect_error:", err.message || err);
-      });
+        socket.on("connect_error", (err) => {
+          console.error("Socket connect_error:", err.message || err);
+          reject(err);
+        });
 
-      return socket.id;
+        // Timeout after 10 seconds
+        setTimeout(() => {
+          if (!socket.connected) {
+            reject(new Error("Socket connection timeout"));
+          }
+        }, 10000);
+      });
     } catch (err) {
       return rejectWithValue(err.message || "Socket connection failed");
     }

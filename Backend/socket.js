@@ -1,46 +1,96 @@
 // src/lib/socket.js
-import express from "express";
-import http from "http";
 import { Server } from "socket.io";
 
-const app = express();
-const server = http.createServer(app);
+let io;
 
-const io = new Server(server, {
-  cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:3000",
-      "https://cryptolance-server.onrender.com",
-    ],
-    credentials: true,
-  },
-});
-export const getRecieverSocketId = (userId) => {
-  const normalizedUserId = (userId || "").toLowerCase();
-  return userSocketMap[normalizedUserId];
-};
-const userSocketMap = {};
-io.on("connection", (socket) => {
-  console.log("A user connected", socket.id);
-  const rawUserId = socket.handshake.query.userId;
-  const userId = (rawUserId || "").toLowerCase();
-  if (userId) {
-    userSocketMap[userId] = socket.id;
-    console.log(`User ${userId} connected. Socket ID: ${socket.id}`);
-  }
-  console.log("Emitting online users:", Object.keys(userSocketMap));
-  io.emit("getOnlineUsers", Object.keys(userSocketMap));
-  socket.on("disconnect", () => {
-    console.log("A user diconnected", socket.id);
-    if (userId) delete userSocketMap[userId];
-    console.log(
-      "Emitting online users after disconnect:",
-      Object.keys(userSocketMap)
-    );
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+export const initSocket = (server) => {
+  io = new Server(server, {
+    cors: {
+      origin: [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:3000",
+        "https://crypto-lance-gamma.vercel.app",
+        "https://cryptolance-server.onrender.com",
+      ],
+      credentials: true,
+    },
   });
-});
 
-export { app, server, io };
+  const userSocketMap = {};
+
+  io.on("connection", (socket) => {
+    console.log("A user connected", socket.id);
+
+    const rawUserId = socket.handshake.query.userId;
+    const userId = (rawUserId || "").toLowerCase();
+
+    if (userId) {
+      userSocketMap[userId] = socket.id;
+      console.log(`User ${userId} connected. Socket ID: ${socket.id}`);
+
+      // Emit online users to all connected clients
+      io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    }
+
+    socket.on("disconnect", () => {
+      console.log("A user disconnected", socket.id);
+      if (userId) {
+        delete userSocketMap[userId];
+        console.log(`User ${userId} disconnected. Socket ID: ${socket.id}`);
+
+        // Emit updated online users to all connected clients
+        io.emit("getOnlineUsers", Object.keys(userSocketMap));
+      }
+    });
+
+    // Handle typing events
+    socket.on("typing", (data) => {
+      const receiverSocketId = userSocketMap[data.receiverId];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("userTyping", {
+          userId: data.userId,
+          isTyping: data.isTyping,
+        });
+      }
+    });
+
+    // Handle stop typing events
+    socket.on("stopTyping", (data) => {
+      const receiverSocketId = userSocketMap[data.receiverId];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("userStopTyping", {
+          userId: data.userId,
+          isTyping: false,
+        });
+      }
+    });
+  });
+
+  return io;
+};
+
+export const getRecieverSocketId = (userId) => {
+  if (!io) return null;
+
+  // Get all connected sockets
+  const sockets = io.sockets.sockets;
+  let targetSocketId = null;
+
+  // Find the socket ID for the given user ID
+  for (const [socketId, socket] of sockets) {
+    if (socket.handshake.query.userId === userId) {
+      targetSocketId = socketId;
+      break;
+    }
+  }
+
+  return targetSocketId;
+};
+
+export const getIO = () => {
+  if (!io) {
+    throw new Error("Socket.io not initialized!");
+  }
+  return io;
+};
