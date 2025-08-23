@@ -66,10 +66,8 @@ export const initSocket = (server) => {
       }
     });
 
-    // Debug: Log all socket events
-    socket.onAny((eventName, ...args) => {
-      console.log(`Socket event: ${eventName}`, args);
-    });
+    // Debug: Log connection events
+    console.log("Current userSocketMap:", userSocketMap);
   });
 
   return io;
@@ -106,8 +104,11 @@ export const emitToUser = (userId, event, data) => {
 
   const socketId = getRecieverSocketId(userId);
   if (socketId) {
+    console.log(`Emitting ${event} to user ${userId} (socket: ${socketId})`);
     io.to(socketId).emit(event, data);
     return true;
+  } else {
+    console.log(`User ${userId} not found in socket map`);
   }
   return false;
 };

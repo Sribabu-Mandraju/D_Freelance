@@ -10,7 +10,7 @@ export const getUsersForSidebar = async (req, res) => {
     })
       .select("heroSection.name heroSection.profile heroSection.walletAddress")
       .lean();
-      //
+    //
 
     const formattedUsers = filterUsers.map((p) => ({
       _id: p.heroSection?.walletAddress,
@@ -84,6 +84,13 @@ export const sendMessage = async (req, res) => {
     // Emit to sender for real-time updates
     const senderEmitted = emitToUser(senderId, "newMessage", newMessage);
     console.log("Message emitted to sender:", senderEmitted);
+
+    // Also emit to all connected clients for real-time updates
+    const io = require("../socket.js").getIO();
+    if (io) {
+      io.emit("newMessage", newMessage);
+      console.log("Message broadcasted to all clients");
+    }
 
     res.status(201).json(newMessage);
   } catch (error) {
