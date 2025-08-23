@@ -170,7 +170,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-gray-950 text-white z-50">
+    <header className="fixed top-0 left-0 w-full bg-gray-950 text-white z-40">
       {/* Neon glow background effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 opacity-50"></div>
 
