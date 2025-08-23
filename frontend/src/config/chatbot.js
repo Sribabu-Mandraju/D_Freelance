@@ -2,12 +2,12 @@
 export const CHATBOT_CONFIG = {
   // Development environment
   development: {
-    apiUrl: "http://localhost:5000/chat",
+    apiUrl: "https://d-freelance-chatbot.onrender.com/chat",
     timeout: 10000, // 10 seconds
   },
   // Production environment
   production: {
-    apiUrl: "https://your-domain.com/chat", // Update with your actual domain
+    apiUrl: "https://d-freelance-chatbot.onrender.com/chat", // Update with your actual domain
     timeout: 15000, // 15 seconds
   },
 };

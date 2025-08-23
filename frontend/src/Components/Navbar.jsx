@@ -46,7 +46,6 @@ import {
   useClaimTokens,
   usePurchaseTokens,
 } from "../interactions/HFTtoken__interactions";
-import { toast } from "react-hot-toast";
 
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");

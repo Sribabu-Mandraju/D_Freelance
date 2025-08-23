@@ -317,7 +317,7 @@ const HeroSection = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
-          <div className="bg-gradient-to-r from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-md rounded-2xl p-2 sm:p-4 mb-6 sm:mb-8 border border-purple-500/20 shadow-2xl shadow-purple-500/10">
+          {/* <div className="bg-gradient-to-r from-gray-900/90 via-gray-800/80 to-gray-900/90 backdrop-blur-md rounded-2xl p-2 sm:p-4 mb-6 sm:mb-8 border border-purple-500/20 shadow-2xl shadow-purple-500/10">
             <div className="md:hidden -mx-2 px-2">
               <div className="flex items-center gap-2 overflow-x-auto py-1">
                 <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
@@ -389,7 +389,7 @@ const HeroSection = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="text-center">
             <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-4 py-2 sm:px-8 sm:py-4 border border-purple-500/40 text-purple-300 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-sm hover:border-purple-400/60 hover:from-purple-500/30 hover:to-cyan-500/30 transition-all duration-300 shadow-lg shadow-purple-500/20">
