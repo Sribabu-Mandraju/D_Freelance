@@ -100,45 +100,34 @@ export const subscribeToMessages = createAsyncThunk(
       const { selectedUser } = stateNow.chatApp;
       const authUser = stateNow.auth?.user;
 
-      if (!authUser || !selectedUser) {
-        console.log(
-          "No selected user or auth user, adding message to current conversation"
-        );
-        // Add message to current conversation if it involves the current user
-        const me = String(authUser?._id || "").toLowerCase();
-        const sender = String(newMessage.senderId || "").toLowerCase();
-        const receiver = String(
-          newMessage.recieverId || newMessage.receiverId || ""
-        ).toLowerCase();
-
-        if (sender === me || receiver === me) {
-          thunkAPI.dispatch(appendMessage(newMessage));
-        }
+      if (!authUser) {
+        console.log("No auth user, skipping message");
         return;
       }
 
+      // Always add the message if it involves the current user
       const me = String(authUser._id || "").toLowerCase();
-      const peer = String(
-        selectedUser._id || selectedUser.address || ""
-      ).toLowerCase();
       const sender = String(newMessage.senderId || "").toLowerCase();
       const receiver = String(
         newMessage.recieverId || newMessage.receiverId || ""
       ).toLowerCase();
 
-      const involvesMeAndPeer =
-        (sender === me && receiver === peer) ||
-        (sender === peer && receiver === me);
-
-      if (involvesMeAndPeer) {
-        console.log("Adding message to current conversation");
+      if (sender === me || receiver === me) {
+        console.log("Adding message to conversation:", newMessage);
         thunkAPI.dispatch(appendMessage(newMessage));
       }
     };
 
+    // Remove any existing handler
+    if (socket._chatMessageHandler) {
+      socket.off("newMessage", socket._chatMessageHandler);
+    }
+
     socket.on("newMessage", handler);
     socket._chatMessageHandler = handler;
     thunkAPI.dispatch(setSubscribed(true));
+
+    console.log("Subscribed to newMessage events");
     return true;
   }
 );
@@ -160,6 +149,7 @@ export const unsubscribeFromMessages = createAsyncThunk(
       socket.off("newMessage");
     }
     thunkAPI.dispatch(setSubscribed(false));
+    console.log("Unsubscribed from newMessage events");
     return true;
   }
 );
@@ -190,7 +180,10 @@ const chatSlice = createSlice({
         (msg) => msg._id === action.payload._id
       );
       if (!messageExists) {
+        console.log("Appending new message to state:", action.payload);
         state.messages.push(action.payload);
+      } else {
+        console.log("Message already exists, skipping:", action.payload._id);
       }
     },
     clearMessages(state) {

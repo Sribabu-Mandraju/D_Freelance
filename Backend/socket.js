@@ -65,6 +65,11 @@ export const initSocket = (server) => {
         });
       }
     });
+
+    // Debug: Log all socket events
+    socket.onAny((eventName, ...args) => {
+      console.log(`Socket event: ${eventName}`, args);
+    });
   });
 
   return io;
@@ -93,4 +98,16 @@ export const getIO = () => {
     throw new Error("Socket.io not initialized!");
   }
   return io;
+};
+
+// Helper function to emit messages to specific users
+export const emitToUser = (userId, event, data) => {
+  if (!io) return false;
+
+  const socketId = getRecieverSocketId(userId);
+  if (socketId) {
+    io.to(socketId).emit(event, data);
+    return true;
+  }
+  return false;
 };

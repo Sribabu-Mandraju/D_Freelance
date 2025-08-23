@@ -1,6 +1,6 @@
 import Message from "../models/messageModel.js";
 import PortfolioScheema from "../models/PortfolioModel.js";
-import { getRecieverSocketId, getIO } from "../socket.js";
+import { emitToUser } from "../socket.js";
 
 export const getUsersForSidebar = async (req, res) => {
   try {
@@ -70,20 +70,19 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    // Get the IO instance
-    const io = getIO();
+    console.log("Message saved, emitting to users:", {
+      senderId,
+      recieverId,
+      messageId: newMessage._id,
+    });
 
     // Emit to receiver if online
-    const receiverSocketId = getRecieverSocketId(recieverId);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
-    }
+    const receiverEmitted = emitToUser(recieverId, "newMessage", newMessage);
+    console.log("Message emitted to receiver:", receiverEmitted);
 
     // Emit to sender for real-time updates
-    const senderSocketId = getRecieverSocketId(senderId);
-    if (senderSocketId) {
-      io.to(senderSocketId).emit("newMessage", newMessage);
-    }
+    const senderEmitted = emitToUser(senderId, "newMessage", newMessage);
+    console.log("Message emitted to sender:", senderEmitted);
 
     res.status(201).json(newMessage);
   } catch (error) {

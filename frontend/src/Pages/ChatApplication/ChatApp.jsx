@@ -28,6 +28,7 @@ const ChatApp = () => {
   // Ensure socket is connected when chat app is open and user is authenticated
   useEffect(() => {
     if (isAuthenticated && !socket) {
+      console.log("🔌 Connecting socket...");
       dispatch(connectSocket());
     }
   }, [isAuthenticated, socket, dispatch]);
@@ -35,13 +36,25 @@ const ChatApp = () => {
   // Subscribe to messages when socket is available
   useEffect(() => {
     if (socket && socket.connected) {
+      console.log("📡 Socket connected, subscribing to messages...");
       dispatch(subscribeToMessages());
 
       return () => {
+        console.log("📡 Unsubscribing from messages...");
         dispatch(unsubscribeFromMessages());
       };
     }
   }, [socket, dispatch]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log("ChatApp - Socket status:", {
+      isAuthenticated,
+      hasSocket: !!socket,
+      socketConnected: socket?.connected,
+      selectedUser: selectedUser?._id,
+    });
+  }, [isAuthenticated, socket, selectedUser]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white overflow-hidden">

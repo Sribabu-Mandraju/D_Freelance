@@ -142,10 +142,12 @@ export const connectSocket = createAsyncThunk(
         socket = null;
       }
 
+      // Use the deployed backend URL for socket connection
       socket = io("https://cryptolance-server.onrender.com", {
         query: { userId },
         transports: ["websocket", "polling"],
         timeout: 20000,
+        forceNew: true,
       });
 
       dispatch(setSocket(socket));
@@ -159,6 +161,10 @@ export const connectSocket = createAsyncThunk(
         socket.on("getOnlineUsers", (users) => {
           console.log("Received online users:", users);
           dispatch(setOnlineUsers(Array.isArray(users) ? users : []));
+        });
+
+        socket.on("newMessage", (message) => {
+          console.log("Received new message via socket:", message);
         });
 
         socket.on("disconnect", (reason) => {
