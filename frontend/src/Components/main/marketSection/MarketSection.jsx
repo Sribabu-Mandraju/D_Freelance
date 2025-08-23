@@ -22,6 +22,8 @@ function MarketSection() {
     dispatch(fetchGigs());
   }, [dispatch]);
 
+
+  
   return (
     <div className="text-white w-full max-w-7xl py-12 mx-auto relative" id="trending">
       {/* Heading */}
