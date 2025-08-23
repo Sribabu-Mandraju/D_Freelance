@@ -30,15 +30,12 @@ router.get("/user/accepted-proposals", authMiddleware, getAcceptedProposals);
 router.get("/user/:walletAddress", getProposalsByUserWallet);
 router.get("/userBids/:walletAddress", getProposalsByBidderWallet);
 
-
-
-
 // Protected routes (authentication required)
 router.post("/", authMiddleware, createProposal);
 
-router.post("/bulk-update", authMiddleware, bulkUpdateProposals); 
+router.post("/bulk-update", authMiddleware, bulkUpdateProposals);
 router.get("/user/my-proposals", authMiddleware, getProposalsByUser);
-router.get("/user/stats", authMiddleware, getProposalStats);  
+router.get("/user/stats", authMiddleware, getProposalStats);
 router.put("/:id", authMiddleware, updateProposal);
 router.patch("/:id/proposalId", authMiddleware, updateProposalId);
 router.delete("/:id", authMiddleware, deleteProposal);

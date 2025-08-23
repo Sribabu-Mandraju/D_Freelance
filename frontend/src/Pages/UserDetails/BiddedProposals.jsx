@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import JobCard from "../../Components/ProposalComponents/JobCard";
-// If your backend returns USDC in micro units (1e6), use this.
-// Safe even if you pass a plain number/string budget.
+
+// USDC decimals if your backend stores in micro-units
 const USDC_DECIMALS = 6;
 function formatUsdcFromMicro(value) {
   const n = Number(value);
@@ -16,22 +16,38 @@ function formatUsdcFromMicro(value) {
 }
 
 const BiddedProposals = () => {
+  const { address, isConnected } = useAccount(); // wagmi address
   const [proposals, setProposals] = useState([]);
   const [savedJobs, setSavedJobs] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const {address} = useAccount();
+
+  // Keep address in localStorage if needed
+  useEffect(() => {
+    if (address) {
+      localStorage.setItem("authAddress", address);
+    }
+  }, [address]);
+
+
+  // console.log(address.toLocaleLowerCase() === "0x30217a8c17ef5571639948d118d086c73f823058".toLowerCase());
 
   const fetchProposals = async () => {
+    if (!address) return; // don’t fetch until wallet connected
+
     setLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem("authToken");
+      console.log(
+        "Fetching from:",
+        `http://localhost:3001/api/proposals/userBids/${address.toLowerCase()}`
+      );
 
       const res = await fetch(
-       `http://localhost:3001/api/proposals/userBids/${address}`,
+        `http://localhost:3001/api/proposals/userBids/${address.toLowerCase()}`,
         {
           method: "GET",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -48,13 +64,10 @@ const BiddedProposals = () => {
       }
 
       const raw = await res.json();
-
-      // Normalize array
       const items = Array.isArray(raw) ? raw : raw?.data ?? [];
 
-      // Map backend fields into what <JobCard/> needs
       const normalized = items.map((p) => {
-        const job = p.job || p.relatedJob || {}; // common nesting if proposal references a job
+        const job = p.job || p.relatedJob || {};
         const client =
           p.client ||
           job.client ||
@@ -67,7 +80,6 @@ const BiddedProposals = () => {
 
         const id = p._id || p.id || job._id || job.id;
 
-        // Budget can be on proposal or job; format if it looks like micro-USDC
         const rawBudget =
           p.budget ?? job.budget ?? p.amount ?? job.amount ?? null;
         const budget =
@@ -80,7 +92,7 @@ const BiddedProposals = () => {
             : "$—";
 
         return {
-          id, // used for key & routing
+          id,
           title: p.title || job.title || "Untitled",
           description: p.description || job.description || "",
           budget,
@@ -101,7 +113,9 @@ const BiddedProposals = () => {
               client.image ||
               "https://i.pravatar.cc/100",
           },
-          postedTime: new Date(p.createdAt || job.createdAt || Date.now()).toLocaleDateString(),
+          postedTime: new Date(
+            p.createdAt || job.createdAt || Date.now()
+          ).toLocaleDateString(),
           location: p.location || job.location || "Remote",
           featured: Boolean(p.featured || job.featured),
         };
@@ -117,8 +131,10 @@ const BiddedProposals = () => {
   };
 
   useEffect(() => {
-    fetchProposals();
-  }, []);
+    if (isConnected && address) {
+      fetchProposals();
+    }
+  }, [isConnected, address]);
 
   const toggleSaveJob = (jobId) => {
     setSavedJobs((prev) => {
@@ -129,9 +145,12 @@ const BiddedProposals = () => {
   };
 
   const handleJobClick = (job) => {
-    // Adjust this route to your actual job/proposal detail page
     navigate(`/job/${job.id}`);
   };
+
+  if (!isConnected) {
+    return <div className="p-4">Please connect your wallet to view proposals.</div>;
+  }
 
   if (loading) return <div className="p-4">Loading accepted proposals…</div>;
 
@@ -153,14 +172,13 @@ const BiddedProposals = () => {
     return <div className="p-4">No accepted proposals found.</div>;
 
   return (
-    <div className="grid grid-cols-1  gap-4 p-4">
+    <div className="grid grid-cols-1 gap-4 p-4">
       {proposals.map((job) => (
         <JobCard
           key={job.id}
           job={job}
           isSaved={savedJobs.has(job.id)}
           onToggleSave={(e) => {
-            // Prevent the card onClick when clicking the bookmark
             e?.stopPropagation?.();
             toggleSaveJob(job.id);
           }}

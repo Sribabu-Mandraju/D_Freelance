@@ -3,7 +3,7 @@ import Portfolio from "../models/PortfolioModel.js";
 import { ethers } from "ethers";
 import ProposalManager_ABI from '../abis/ProposalManager_ABI.json' with { type: 'json' };
 import mongoose from "mongoose";
-
+import Bid from "../models/BidModel.js";
 // Contract configuration
 const provider = new ethers.JsonRpcProvider("https://base-sepolia.g.alchemy.com/v2/vt_tNAcA-byKs7AxeH4Ze");
 const ProposalManager_contractAddress = "0x9e002323F46D6908EC4ef5444f1Bd0F67AF9Cf10";
@@ -540,8 +540,9 @@ export const getProposalsByBidderWallet = async (req, res) => {
     console.log(`🔍 Searching for proposals where user ${walletAddress} has placed bids`);
 
     // First, find all bids by this user
-    const Bid = mongoose.model("Bid");
+    // const Bid = mongoose.model("Bid");
     const userBids = await Bid.find({ wallet_address: walletAddress });
+    console.log("userBids",userBids);
     
     console.log(`🔍 Total bids found for wallet ${walletAddress}: ${userBids.length}`);
 

@@ -17,10 +17,11 @@ import EscrowRoutes from "./routes/EscrowRoutes.js";
 import ProposalManagerRoutes from "./routes/ProposalManagerRoutes.js";
 import PortfolioRoutes from "./routes/PortfolioRoutes.js";
 import gigRoutes from "./routes/GigRoutes.js";
-import messageRoutes from "./routes/chatRoutes.js"
-import ActiveFreelancersRoutes from "./routes/ActiveFreelancersRoutes.js"
+import messageRoutes from "./routes/chatRoutes.js";
+import ActiveFreelancersRoutes from "./routes/ActiveFreelancersRoutes.js";
+import CrossPortfolioRoutes from "./routes/CrossPortfolioRoutes.js";
 // Import the WebSocket configuration
-import {app,server} from "./socket.js";
+import { app, server } from "./socket.js";
 // Load environment variables
 dotenv.config();
 const PORT = process.env.PORT || 3001;
@@ -53,7 +54,8 @@ app.use("/api/portfolio", PortfolioRoutes);
 app.use("/api/gigs", gigRoutes);
 app.use("/api/admin", AdminRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/api/activeFreelancers",ActiveFreelancersRoutes)
+app.use("/api/activeFreelancers", ActiveFreelancersRoutes);
+app.use("/api/cross-portfolio", CrossPortfolioRoutes);
 // Default route
 app.get("/", (req, res) => {
   res.send("API is running...");
@@ -92,12 +94,11 @@ app.post("/api/chat", async (req, res) => {
     res.json(responseData);
   } catch (error) {
     console.error("Detailed error proxying to Flask API:", error);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
 });
-
-
-
 
 // MongoDB connection
 mongoose
