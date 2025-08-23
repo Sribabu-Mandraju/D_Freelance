@@ -22,14 +22,11 @@ export const verifyWalletAuth = createAsyncThunk(
   "auth/verifyWalletAuth",
   async ({ address, signature, nonce }, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        "https://cryptolance-server.onrender.com/api/auth/verify",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, signature, nonce }),
-        }
-      );
+      const response = await fetch("http://localhost:3001/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, signature, nonce }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -70,15 +67,12 @@ export const validateStoredToken = createAsyncThunk(
         throw new Error("No stored authentication data");
       }
 
-      const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/messages/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:3001/api/messages/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -143,7 +137,7 @@ export const connectSocket = createAsyncThunk(
       }
 
       // Use the deployed backend URL for socket connection
-      socket = io("https://cryptolance-server.onrender.com", {
+      socket = io("http://localhost:3001", {
         query: { userId },
         transports: ["websocket", "polling"],
         timeout: 20000,

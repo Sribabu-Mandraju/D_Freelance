@@ -81,7 +81,7 @@ function WalletConnect({ onAuthSuccess }) {
       setIsAuthenticating(true);
       try {
         const nonceResponse = await fetch(
-          "https://cryptolance-server.onrender.com/api/auth/get-nonce",
+          "http://localhost:3001/api/auth/get-nonce",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

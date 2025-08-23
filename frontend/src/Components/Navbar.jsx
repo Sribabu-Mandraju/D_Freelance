@@ -98,7 +98,7 @@ export default function Navbar() {
       if (!token) return;
 
       const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/hftToken/userHFTtokenDetails/${address}`,
+        `http://localhost:3001/api/hftToken/userHFTtokenDetails/${address}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -320,16 +320,13 @@ export default function Navbar() {
         return;
       }
 
-      const res = await fetch(
-        "https://cryptolance-server.onrender.com/api/portfolio/me",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await fetch("http://localhost:3001/api/portfolio/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       let result = null;
       try {

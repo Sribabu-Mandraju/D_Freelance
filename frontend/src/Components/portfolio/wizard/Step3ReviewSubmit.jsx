@@ -42,10 +42,10 @@ const Step3ReviewSubmit = ({
         </h3>
         
         <div className="flex flex-col md:flex-row gap-6">
-          {portfolioData.heroSection.profileImage && (
+          {portfolioData.heroSection.profile && (
             <div className="flex-shrink-0">
               <img
-                src={portfolioData.heroSection.profileImage}
+                src={portfolioData.heroSection.profile}
                 alt="Profile"
                 className="w-24 h-24 rounded-full object-cover border-4 border-purple-500/50 shadow-lg shadow-purple-500/20"
               />

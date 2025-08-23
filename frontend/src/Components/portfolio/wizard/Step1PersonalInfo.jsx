@@ -9,9 +9,11 @@ const Section = ({ title, icon: Icon, accent = "purple", children, desc }) => (
     shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_10px_40px_-12px_rgba(0,0,0,0.6)]
     border-${accent}-500/30`}
   >
-    <div className="absolute -inset-px rounded-2xl pointer-events-none 
+    <div
+      className="absolute -inset-px rounded-2xl pointer-events-none 
       [mask-image:radial-gradient(60%_60%_at_50%_0%,black,transparent)] 
-      bg-[conic-gradient(from_220deg_at_50%_50%,rgba(168,85,247,.25),rgba(6,182,212,.25),transparent_60%)]" />
+      bg-[conic-gradient(from_220deg_at_50%_50%,rgba(168,85,247,.25),rgba(6,182,212,.25),transparent_60%)]"
+    />
     <header className="relative mb-5 flex items-start gap-3">
       <div
         className={`p-2 rounded-xl border bg-black/30 
@@ -85,8 +87,10 @@ const NeonPill = ({ children, onClick }) => (
     <span className="text-sm text-fuchsia-200 group-hover:text-white">
       {children}
     </span>
-    <span className="absolute -z-10 inset-0 rounded-xl blur-xl opacity-40 
-      bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20" />
+    <span
+      className="absolute -z-10 inset-0 rounded-xl blur-xl opacity-40 
+      bg-gradient-to-r from-fuchsia-500/20 to-cyan-500/20"
+    />
   </button>
 );
 
@@ -105,7 +109,7 @@ const Step1PersonalInfo = ({
 }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(
-    portfolioData.heroSection.profileImage || ""
+    portfolioData.heroSection.profile || ""
   );
   const [isUploading, setIsUploading] = useState(false);
 
@@ -131,7 +135,7 @@ const Step1PersonalInfo = ({
       );
       const uploadedUrl = res.data.secure_url;
       setImagePreview(uploadedUrl);
-      onUpdateNestedField("heroSection", "profileImage", uploadedUrl);
+      onUpdateNestedField("heroSection", "profile", uploadedUrl);
       setProfileImage(null);
     } catch (err) {
       console.error("Upload failed:", err);
@@ -144,7 +148,7 @@ const Step1PersonalInfo = ({
   const removeImage = () => {
     setImagePreview("");
     setProfileImage(null);
-    onUpdateNestedField("heroSection", "profileImage", "");
+    onUpdateNestedField("heroSection", "profile", "");
   };
 
   return (
@@ -152,9 +156,11 @@ const Step1PersonalInfo = ({
       {/* Header / Step Badge */}
       <div className="flex items-center justify-between">
         <div className="inline-flex items-center gap-3">
-          <div className="h-9 rounded-full px-3 inline-flex items-center gap-2 
+          <div
+            className="h-9 rounded-full px-3 inline-flex items-center gap-2 
               bg-gradient-to-r from-fuchsia-500/15 to-cyan-500/15 
-              border border-white/10">
+              border border-white/10"
+          >
             <span className="w-2 h-2 rounded-full animate-pulse bg-fuchsia-400/80 shadow-[0_0_12px_2px_rgba(217,70,239,.7)]" />
             <span className="text-xs tracking-wide text-gray-300">
               Step 1 • Personal Info
@@ -217,8 +223,10 @@ const Step1PersonalInfo = ({
             >
               <Upload className="w-4 h-4 text-gray-200" />
               <span className="text-sm text-gray-200">Choose Image</span>
-              <span className="absolute -z-10 inset-0 rounded-xl blur-xl opacity-40 
-                bg-gradient-to-r from-purple-500/20 to-cyan-500/20" />
+              <span
+                className="absolute -z-10 inset-0 rounded-xl blur-xl opacity-40 
+                bg-gradient-to-r from-purple-500/20 to-cyan-500/20"
+              />
             </label>
 
             {profileImage && (
@@ -279,7 +287,11 @@ const Step1PersonalInfo = ({
               type="text"
               value={portfolioData.heroSection.thoughtLine || ""}
               onChange={(e) =>
-                onUpdateNestedField("heroSection", "thoughtLine", e.target.value)
+                onUpdateNestedField(
+                  "heroSection",
+                  "thoughtLine",
+                  e.target.value
+                )
               }
               placeholder="Design. Build. Iterate."
             />
@@ -295,7 +307,18 @@ const Step1PersonalInfo = ({
               onUpdateNestedField("heroSection", "aboutMe", e.target.value)
             }
             placeholder="A concise bio that highlights your strengths, interests, and goals."
+            maxLength="300"
           />
+          <div className="mt-2 flex justify-end">
+            <ChipCounter
+              value={
+                portfolioData.heroSection.aboutMe
+                  ? portfolioData.heroSection.aboutMe.length
+                  : 0
+              }
+              max={300}
+            />
+          </div>
         </div>
 
         {/* Domains */}
@@ -307,7 +330,12 @@ const Step1PersonalInfo = ({
                 type="text"
                 value={domain || ""}
                 onChange={(e) =>
-                  onUpdateArrayItem("heroSection", "domains", index, e.target.value)
+                  onUpdateArrayItem(
+                    "heroSection",
+                    "domains",
+                    index,
+                    e.target.value
+                  )
                 }
                 placeholder="e.g., Full-Stack, UI/UX, DevOps"
               />
@@ -343,7 +371,12 @@ const Step1PersonalInfo = ({
                 type="text"
                 value={item || ""}
                 onChange={(e) =>
-                  onUpdateArrayItem("heroSection", "expertise", index, e.target.value)
+                  onUpdateArrayItem(
+                    "heroSection",
+                    "expertise",
+                    index,
+                    e.target.value
+                  )
                 }
                 maxLength="40"
                 placeholder="e.g., React performance, System design"
@@ -383,7 +416,12 @@ const Step1PersonalInfo = ({
                 type="text"
                 value={item || ""}
                 onChange={(e) =>
-                  onUpdateArrayItem("heroSection", "focusAreas", index, e.target.value)
+                  onUpdateArrayItem(
+                    "heroSection",
+                    "focusAreas",
+                    index,
+                    e.target.value
+                  )
                 }
                 maxLength="40"
                 placeholder="e.g., Accessibility, Micro-interactions"
@@ -442,7 +480,11 @@ const Step1PersonalInfo = ({
               type="tel"
               value={portfolioData.contactInfo.phoneNumber || ""}
               onChange={(e) =>
-                onUpdateNestedField("contactInfo", "phoneNumber", e.target.value)
+                onUpdateNestedField(
+                  "contactInfo",
+                  "phoneNumber",
+                  e.target.value
+                )
               }
               placeholder="+91 98765 43210"
             />
@@ -454,7 +496,11 @@ const Step1PersonalInfo = ({
               type="url"
               value={portfolioData.contactInfo.linkedinProfile || ""}
               onChange={(e) =>
-                onUpdateNestedField("contactInfo", "linkedinProfile", e.target.value)
+                onUpdateNestedField(
+                  "contactInfo",
+                  "linkedinProfile",
+                  e.target.value
+                )
               }
               placeholder="https://www.linkedin.com/in/username"
             />

@@ -18,9 +18,7 @@ const JobDetails = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/proposals/${id}`
-      );
+      const response = await fetch(`http://localhost:3001/api/proposals/${id}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
