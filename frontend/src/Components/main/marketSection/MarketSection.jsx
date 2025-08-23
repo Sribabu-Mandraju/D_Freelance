@@ -23,7 +23,7 @@ function MarketSection() {
   }, [dispatch]);
 
   return (
-    <div className="text-white w-full max-w-7xl py-12 mx-auto" id="trending">
+    <div className="text-white w-full max-w-7xl py-12 mx-auto relative" id="trending">
       {/* Heading */}
       <div className="sm:mb-4 mb-4 w-full text-center mt-4">
         <motion.h2
@@ -74,7 +74,7 @@ function MarketSection() {
           pauseOnMouseEnter: true, // optional: pause when hovering
         }}
         loop={true}
-        className=" w-full sm:w-[95%] py-16"
+        className=" w-full sm:w-[95%] py-16 relative"
       >
         {gigs &&
           gigs.map((gig, index) => (

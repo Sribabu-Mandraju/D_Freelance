@@ -285,7 +285,7 @@ export default function MarketCard({
         transition: { duration: 0.3, ease: "easeOut" },
       }}
       className="relative bg-black border border-gray-800/60 rounded-2xl overflow-hidden 
-                 cursor-pointer group h-[420px] backdrop-blur-sm
+                 cursor-pointer group h-[385px] backdrop-blur-sm
                  hover:border-cyan-400/60 transition-all duration-500 ease-out
                  shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(6,182,212,0.15)]"
     >

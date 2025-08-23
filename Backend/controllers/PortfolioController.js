@@ -93,6 +93,7 @@ export const sendOTP = async (req, res) => {
       heroSection: {
         walletAddress,
         name: heroSection.name,
+        profile: heroSection.profile || "",
         domains: heroSection.domains || [],
         thoughtLine: heroSection.thoughtLine || "",
         aboutMe: heroSection.aboutMe || "",
@@ -380,7 +381,7 @@ export const createPortfolio = async (req, res) => {
       heroSection: {
         walletAddress, // Explicitly set from authMiddleware
         name: heroSection.name,
-        profile:heroSection.profile,
+        profile: heroSection.profile,
         domains: heroSection.domains || [],
         thoughtLine: heroSection.thoughtLine || "",
         aboutMe: heroSection.aboutMe || "",

@@ -94,4 +94,27 @@ body {
 
 
 
+/* Move navigation arrows to the top */
+.swiper-button-next,
+.swiper-button-prev {
+  top: 20px !important;          /* Adjust distance from top */
+  transform: translateY(0) !important; /* Remove default centering */
+  color: black !important;
+  height: 30px !important;       /* Make sure arrows are visible */
+  width: 30px !important;
+  background: rgba(0, 255, 255, 0.852); /* cyan with transparency */
+backdrop-filter: blur(30px);        /* blur the background behind */
+-webkit-backdrop-filter: blur(30px); /* Safari support */
+  border-radius: 50%; /* Smaller size */
+  margin-top: 5px !important;
+  font-weight: bold !important;
+
+}
+
+/* Shrink arrow size */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 12px !important; 
+ 
+}
 

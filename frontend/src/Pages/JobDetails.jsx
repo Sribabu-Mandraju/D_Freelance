@@ -188,8 +188,8 @@ const JobDetails = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <div className="pt-2 pb-12 px-4">
-        <div className="container mx-auto">
+      <div className="">
+        <div className=" mx-auto">
           {/* {true && (
             <div className="bg-blue-500/20 border border-blue-400/50 rounded-lg p-3 text-center flex items-center justify-between mb-4">
               <span className="text-blue-300 font-medium text-sm">

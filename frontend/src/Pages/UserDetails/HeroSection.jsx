@@ -11,16 +11,30 @@ function HeroSection({ personalInfo }) {
       <div className="relative flex flex-col lg:flex-row gap-6">
         {/* Profile Image Section */}
         <div className="flex-shrink-0">
-          <div className="relative">
-            <div className="absolute -inset-2 rounded-full bg-cyan-500/15 blur-xl pointer-events-none" />
-            <img
-              src={personalInfo.profile || "https://via.placeholder.com/128?text=No+Image"}
-              alt="Profile"
-              className="relative h-32 w-32 rounded-full object-cover border-2 border-cyan-500/30"
-              onError={(e) => (e.target.src = "https://via.placeholder.com/128?text=Invalid+URL")}
-            />
-          </div>
-        </div>
+  <div className="relative">
+    <div className="absolute -inset-2 rounded-full bg-cyan-500/15 blur-xl pointer-events-none" />
+
+    {personalInfo.profile ? (
+      <img
+        src={personalInfo.profile}
+        alt="Profile"
+        className="relative h-32 w-32 rounded-full object-cover border-2 border-cyan-500/30"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.style.display = "none"; // hide broken image
+          // optional: you could trigger a fallback state here
+        }}
+      />
+    ) : (
+      <div className="relative h-32 w-32 flex items-center justify-center rounded-full bg-cyan-500/20 border-2 border-cyan-500/30">
+        <span className="text-4xl font-bold text-cyan-400">
+          {personalInfo.name ? personalInfo.name.charAt(0).toUpperCase() : "?"}
+        </span>
+      </div>
+    )}
+  </div>
+</div>
+
 
         {/* Hero Content */}
         <div className="flex-1 space-y-3">

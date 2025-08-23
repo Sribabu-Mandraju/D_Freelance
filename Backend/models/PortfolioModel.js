@@ -18,7 +18,7 @@ const portfolioSchema = new mongoose.Schema({
     },
     profile:{
       type:String,
-      required:true,
+      // required:true,
       trim:true,
     },
     domains: [{

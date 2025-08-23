@@ -328,7 +328,7 @@ const portfolioSlice = createSlice({
     },
     updateArrayItem: (state, action) => {
       const { section, field, index, value } = action.payload;
-      
+
       if (
         state.portfolioData &&
         state.portfolioData[section] &&
@@ -347,7 +347,7 @@ const portfolioSlice = createSlice({
     },
     addArrayItem: (state, action) => {
       const { section, field, defaultValue } = action.payload;
-      
+
       if (
         section === "portfolioData" &&
         Array.isArray(state.portfolioData[field])
@@ -368,7 +368,7 @@ const portfolioSlice = createSlice({
     },
     removeArrayItem: (state, action) => {
       const { section, field, index } = action.payload;
-      
+
       if (
         section === "portfolioData" &&
         Array.isArray(state.portfolioData[field])
@@ -398,7 +398,6 @@ const portfolioSlice = createSlice({
     },
     updateCurrentStatus: (state, action) => {
       const { index, field, value } = action.payload;
-     
 
       if (Array.isArray(state.editStatus) && state.editStatus[index]) {
         state.editStatus[index] = {
@@ -414,7 +413,7 @@ const portfolioSlice = createSlice({
     },
     updateCurrentStatusCreation: (state, action) => {
       const { index, field, value } = action.payload;
-      
+
       if (
         state.portfolioData &&
         Array.isArray(state.portfolioData.currentStatus)
@@ -563,10 +562,9 @@ const portfolioSlice = createSlice({
     updateTechHighlightCreation: (state, action) => {
       const { index, field, value } = action.payload;
       if (Array.isArray(state.portfolioData.techHighlights)) {
-        state.portfolioData.techHighlights =
-          state.portfolioData.techHighlights.map((item, i) =>
-            i === index ? { ...item, [field]: value } : item
-          );
+        state.portfolioData.techHighlights = state.portfolioData.techHighlights.map(
+          (item, i) => (i === index ? { ...item, [field]: value } : item)
+        );
       }
     },
 
@@ -750,7 +748,7 @@ export const {
   saveProjects,
   toggleEditingTech,
   updateTechHighlight,
-    updateTechHighlightCreation,
+  updateTechHighlightCreation,
 
   addNewTechHighlight,
   removeTechHighlight,

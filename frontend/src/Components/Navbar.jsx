@@ -4,6 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { Link, useLocation } from "react-router-dom";
 import WalletConnect from "./walletConnection/WalletConnect";
+import { GiSettingsKnobs } from "react-icons/gi";
+import { Settings2 } from "lucide-react";
+
+import { FaEthereum } from "react-icons/fa6";
+
 import {
   Search,
   Briefcase,
@@ -473,18 +478,19 @@ export default function Navbar() {
             <div className="relative ml-3">
               <button
                 onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="flex items-center gap-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200 text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 group"
+                className="flex items-center gap-2 rounded-full hover:bg-gray-800/50 transition-all duration-200 text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 group"
                 aria-expanded={showProfileMenu ? "true" : "false"}
               >
                 <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-transparent hover:ring-cyan-500/30 transition-all duration-200 relative">
-                  <img
+                  {/* <img
                     src={
                       portfolioData?.heroSection?.profile ||
                       "https://via.placeholder.com/36"
                     }
                     alt=""
                     className="rounded-full w-full h-full object-cover"
-                  />
+                  /> */}
+                  <Settings2 className="w-4 h-4" />
                   {/* Dropdown indicator */}
                   <div
                     className={`absolute -bottom-1 -right-1 w-3 h-3 bg-gray-700 rounded-full border-2 border-gray-900 transition-all duration-200 ${
@@ -514,21 +520,22 @@ export default function Navbar() {
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className="flex flex-row gap-4">
+                      {/* <div className="flex flex-row gap-4">
                         <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
                           Log In
                         </button>
                         <button className="w-auto border border-blue-600 text-blue-600 px-3 py-1 rounded-md text-sm">
                           Sign Up
                         </button>
+                      </div> */}
+                      {/* <div className="ml-3 flex items-start"> */}
+                      {/* <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow"> */}
+                      <div className="w-full flex items-center justify-between">
+                        <div className="font-semibold">Built On Base Layer 2</div>
+                        <FaEthereum className="w-4 h-4" />{" "}
                       </div>
-                      <div className="ml-3 flex items-start">
-                        <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow">
-                          <span className="text-white text-xs font-semibold">
-                            ♦
-                          </span>
-                        </div>
-                      </div>
+                      {/* </div> */}
+                      {/* </div> */}
                     </div>
                   </div>
 

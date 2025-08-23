@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JobCard from "../ProposalComponents/JobCard";
-
+import Loader from "../Loader";
 // If your backend returns USDC in micro units (1e6), use this.
 // Safe even if you pass a plain number/string budget.
 const USDC_DECIMALS = 6;
@@ -132,7 +132,7 @@ const AcceptedProposals = () => {
     navigate(`/job/${job.id}`);
   };
 
-  if (loading) return <div className="p-4">Loading accepted proposals…</div>;
+  if (loading) return <Loader caption="Loading proposals" />;
 
   if (error)
     return (

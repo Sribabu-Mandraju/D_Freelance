@@ -44,10 +44,13 @@ import { useDispatch } from "react-redux";
 import { validateStoredToken, connectSocket } from "./store/authSlice/authSlice";
 import UserDetails from "./Pages/UserDetails/UserDetails";
 import PortfolioForm from "./Components/portfolio/PortfolioForm"
+import { fetchPortfolio } from "./store/portfolioSlice/portfolioSlice";
+import { useAccount } from "wagmi";
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
 const App = () => {
+  const {address} = useAccount();
   const [authToken, setAuthToken] = useState("");
   const dispatch = useDispatch();
   const handleAuthSuccess = () => {
@@ -69,6 +72,7 @@ const App = () => {
         if (validateStoredToken.fulfilled.match(action)) {
           // Only connect socket if token validation was successful and user data is available
           dispatch(connectSocket());
+          dispatch(fetchPortfolio(address));
         }
       });
     }

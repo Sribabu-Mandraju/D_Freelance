@@ -42,20 +42,20 @@ const verifySignature = async (req, res, next) => {
     if (signerAddress.toLowerCase() === address.toLowerCase()) {
       await Nonce.deleteOne({ address: address.toLowerCase() });
 
-      let portfolioUser = await PortfolioScheema.findOne({ "heroSection.walletAddress": address.toLowerCase() });
-      let userExists = !!portfolioUser;
+      // let portfolioUser = await PortfolioScheema.findOne({ "heroSection.walletAddress": address.toLowerCase() });
+      // let userExists = !!portfolioUser;
 
-      if (!portfolioUser) {
-        // Create a new portfolio entry if user doesn't exist
-        portfolioUser = await PortfolioScheema.create({
-          heroSection: {
-            walletAddress: address.toLowerCase(),
-            name: `User_${address.substring(2, 8)}`, // Default name
-            profilePic: "/avatar.png", // Default profile pic
-          },
-        });
-        userExists = true;
-      }
+      // if (!portfolioUser) {
+      //   // Create a new portfolio entry if user doesn't exist
+      //   portfolioUser = await PortfolioScheema.create({
+      //     heroSection: {
+      //       walletAddress: address.toLowerCase(),
+      //       name: `User_${address.substring(2, 8)}`, // Default name
+      //       profilePic: "/avatar.png", // Default profile pic
+      //     },
+      //   });
+      //   userExists = true;
+      // }
 
       const token = jwt.sign({ address: address.toLowerCase() }, process.env.JWT_SECRET, {
         expiresIn: '24h',
@@ -66,12 +66,13 @@ const verifySignature = async (req, res, next) => {
         success: true,
         message: 'Authentication successful',
         token,
-        userExists,
-        user: {
-          _id: portfolioUser.heroSection.walletAddress,
-          fullname: portfolioUser.heroSection.name,
-          profilePic: portfolioUser.heroSection.profilePic,
-        },
+      //   // userExists,
+      //   user: {
+      //     _id: portfolioUser.heroSection.walletAddress,
+      //     fullname: portfolioUser.heroSection.name,
+      //     profilePic: portfolioUser.heroSection.profilePic,
+      //   // },
+      // });
       });
     } else {
       res.status(401).json({ success: false, message: 'Invalid signature' });

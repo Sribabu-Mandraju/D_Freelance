@@ -31,7 +31,7 @@ const AcceptedProposals = () => {
       const token = localStorage.getItem("authToken");
 
       const res = await fetch(
-       `http://localhost:3001/api/proposals/user/0x30217a8c17ef5571639948d118d086c73f823058`,
+       `http://localhost:3001/api/proposals/user/${address.toLowerCase()}`,
         {
           method: "GET",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
