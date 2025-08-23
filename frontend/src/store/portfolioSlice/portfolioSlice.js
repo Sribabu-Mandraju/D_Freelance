@@ -10,7 +10,7 @@ const initialState = {
       aboutMe: "",
       expertise: [""],
       focusAreas: [""],
-      profileImage: "",
+      profile: "",
     },
     contactInfo: {
       email: "",
@@ -470,9 +470,7 @@ const portfolioSlice = createSlice({
 
     toggleEditingHero: (state) => {
       state.isEditingHero = !state.isEditingHero;
-      if (!state.isEditingHero) {
-        state.editHeroData = { ...state.portfolioData.heroSection };
-      } else {
+      if (state.isEditingHero) {
         state.editHeroData = { ...state.portfolioData.heroSection };
       }
     },
@@ -483,6 +481,7 @@ const portfolioSlice = createSlice({
     saveHeroSection: (state) => {
       state.portfolioData.heroSection = { ...state.editHeroData };
       state.isEditingHero = false;
+      state.editHeroData = { ...state.portfolioData.heroSection };
     },
     toggleEditingProjects: (state) => {
       state.isEditingProjects = !state.isEditingProjects;
