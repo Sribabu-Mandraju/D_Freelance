@@ -22,6 +22,20 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import "./star.css";
+import wallet from "../../assets/wallet.png";
+import getStart from "../../assets/getStart.png";
+import accept from "../../assets/accept.png";
+import bid from "../../assets/bid.png";
+import cancel from "../../assets/cancel.png";
+import complete from "../../assets/complete.png";
+import createProposal from "../../assets/createProposal.png";
+import deposit from "../../assets/deposit.png";
+import firstPay from "../../assets/firstPay.png";
+import finalPay from "../../assets/finalPay.png";
+import initialiseProposal from "../../assets/initialiseProposal.png";
+import openBid from "../../assets/openBid.png";
+import secondPay from "../../assets/secondPay.png";
+import start from "../../assets/start.png";
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -47,43 +61,128 @@ const HeroSection = () => {
   const slideshowData = [
     {
       id: 1,
-      title: "Welcome to the Future",
-      description: "Blockchain-powered freelancing platform with instant payments.",
-      image: "/src/assets/image1.jpg",
-      features: ["Instant Payments", "Smart Contracts", "Global Access"],
-      color: "from-purple-500 to-blue-600",
+      title: "Authentication",
+      description:
+        "Securely connect your Web3 wallet to log in and verify your identity.",
+      image: wallet,
+      features: ["Wallet Connection", "Authentication"],
     },
+
     {
       id: 2,
-      title: "Create Your Profile",
-      description: "Set up skills, portfolio, and blockchain wallet.",
-      image: "/src/assets/image2.jpg",
-      features: ["Skill Verification", "Portfolio Showcase", "Blockchain Identity"],
-      color: "from-green-500 to-emerald-600",
+      title: "Getting Started",
+      description:
+        "Begin your journey on our secure and decentralized freelancing platform.",
+      image: getStart,
+      features: ["Dapp", "Get Started"],
     },
+
     {
       id: 3,
-      title: "Browse & Apply",
-      description: "Find projects that match your expertise.",
-      image: "/src/assets/image3.jpg",
-      features: ["Smart Matching", "Budget Filters", "Project Categories"],
-      color: "from-cyan-500 to-blue-600",
+      title: "Create Proposal",
+      description:
+        "Post a proposal on-chain and set up secure payments for your project.",
+      image: createProposal,
+      features: ["Freelancing", "Create Work"],
     },
+
     {
       id: 4,
-      title: "Secure Smart Contracts",
-      description: "Automated milestone payments and dispute resolution.",
-      image: "/src/assets/image4.jpg",
-      features: ["Auto Payments", "Milestone Tracking", "Dispute Resolution"],
-      color: "from-orange-500 to-red-600",
+      title: "Initialize Proposal",
+      description:
+        "Save your proposal directly on the blockchain through smart contracts.",
+      image: initialiseProposal,
+      features: ["Blockchain", "Base Network"],
     },
+
     {
       id: 5,
-      title: "Get Paid Instantly",
-      description: "Direct crypto payments with zero fees.",
-      image: "/src/assets/image5.jpg",
-      features: ["Crypto Payments", "Zero Fees", "Global Access"],
-      color: "from-purple-500 to-pink-600",
+      title: "Open Proposal for Bids",
+      description:
+        "Open your proposal for freelancers to bid, ensuring competitive pricing and efficiency.",
+      image: openBid,
+      features: ["Open Bid", "Base Network"],
+    },
+
+    {
+      id: 6,
+      title: "Bid on Proposal",
+      description:
+        "Freelancers can bid on proposals by spending 25 HFT tokens.",
+      image: bid,
+      features: ["Make Bid", "Get Work"],
+    },
+
+    {
+      id: 7,
+      title: "Accept a Bid",
+      description:
+        "Choose the most suitable freelancer to work on your proposal.",
+      image: accept,
+      features: ["Select Bidder", "Pay for Work"],
+    },
+
+    {
+      id: 8,
+      title: "Deposit Funds",
+      description:
+        "Securely lock project funds in the smart contract for safe payments.",
+      image: deposit,
+      features: ["Lock Funds", "Pay Freelancers"],
+    },
+
+    {
+      id: 9,
+      title: "Start Work",
+      description:
+        "Freelancers can start working once funds are deposited, ensuring guaranteed payments.",
+      image: start,
+      features: ["Freelancing", "Start Work"],
+    },
+
+    {
+      id: 10,
+      title: "First Payment",
+      description:
+        "Release 40% of the payment once the first milestone is completed.",
+      image: firstPay,
+      features: ["Milestone Payment"],
+    },
+
+    {
+      id: 11,
+      title: "Second Payment",
+      description:
+        "Release 30% of the payment after the second milestone is achieved.",
+      image: secondPay,
+      features: ["Milestone Payment"],
+    },
+
+    {
+      id: 12,
+      title: "Final Payment",
+      description:
+        "Release the remaining 30% once the final milestone is delivered.",
+      image: finalPay,
+      features: ["Milestone Payment"],
+    },
+
+    {
+      id: 13,
+      title: "Complete Work",
+      description:
+        "Close the proposal once all work is delivered and payments are made.",
+      image: complete,
+      features: ["Finish"],
+    },
+
+    {
+      id: 14,
+      title: "Cancel Proposal",
+      description:
+        "Cancel a proposal anytime. The client receives a refund of unused funds instantly.",
+      image: cancel,
+      features: ["Cancel"],
     },
   ];
 
@@ -172,7 +271,9 @@ const HeroSection = () => {
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slideshowData.length) % slideshowData.length);
+    setCurrentSlide(
+      (prev) => (prev - 1 + slideshowData.length) % slideshowData.length
+    );
     slideStartRef.current = null;
     setProgress(0);
   };
@@ -229,7 +330,9 @@ const HeroSection = () => {
                 <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
                   <Bitcoin className="w-3.5 h-3.5 text-yellow-500" />
                   <span className="text-[11px] text-gray-300">BTC</span>
-                  <span className="text-[11px] font-semibold text-gray-100">$84,571.66</span>
+                  <span className="text-[11px] font-semibold text-gray-100">
+                    $84,571.66
+                  </span>
                   <span className="inline-flex items-center gap-1 text-[10px] text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
                     <ArrowUpRight className="w-3 h-3" /> 2.4%
                   </span>
@@ -237,14 +340,18 @@ const HeroSection = () => {
                 <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
                   <Coins className="w-3.5 h-3.5 text-blue-500" />
                   <span className="text-[11px] text-gray-300">ETH</span>
-                  <span className="text-[11px] font-semibold text-gray-100">$1,946.28</span>
+                  <span className="text-[11px] font-semibold text-gray-100">
+                    $1,946.28
+                  </span>
                   <span className="inline-flex items-center gap-1 text-[10px] text-red-400 bg-red-400/10 px-2 py-0.5 rounded-full">
                     <ArrowDownRight className="w-3 h-3" /> 0.8%
                   </span>
                 </div>
                 <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
                   <span className="text-[11px] text-gray-400">24h Vol</span>
-                  <span className="text-[11px] font-semibold text-gray-100">$24.3M</span>
+                  <span className="text-[11px] font-semibold text-gray-100">
+                    $24.3M
+                  </span>
                 </div>
               </div>
             </div>
@@ -253,13 +360,17 @@ const HeroSection = () => {
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                 <span className="text-gray-400">Live</span>
-                <span className="text-gray-300 font-mono">{currentTime.toLocaleTimeString()}</span>
+                <span className="text-gray-300 font-mono">
+                  {currentTime.toLocaleTimeString()}
+                </span>
               </div>
               <div className="flex flex-wrap gap-6">
                 <div className="flex items-center gap-2">
                   <Bitcoin className="w-4 h-4 text-yellow-500" />
                   <span className="text-gray-400">BTC</span>
-                  <span className="text-gray-200 font-semibold">$84,571.66</span>
+                  <span className="text-gray-200 font-semibold">
+                    $84,571.66
+                  </span>
                   <span className="inline-flex items-center gap-1 text-green-400 text-xs bg-green-400/10 px-2 py-1 rounded-full">
                     <ArrowUpRight className="w-3.5 h-3.5" /> 2.4%
                   </span>
@@ -278,7 +389,7 @@ const HeroSection = () => {
                 </div>
               </div>
             </div>
-          </div>  
+          </div>
 
           <div className="text-center">
             <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-4 py-2 sm:px-8 sm:py-4 border border-purple-500/40 text-purple-300 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-sm hover:border-purple-400/60 hover:from-purple-500/30 hover:to-cyan-500/30 transition-all duration-300 shadow-lg shadow-purple-500/20">
@@ -300,7 +411,8 @@ const HeroSection = () => {
 
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 sm:mb-10 leading-relaxed max-w-3xl sm:max-w-4xl mx-auto px-2 sm:px-4">
               Connect, collaborate, and get paid instantly with cryptocurrency.
-              No intermediaries, no delays, just pure blockchain-powered freelancing.
+              No intermediaries, no delays, just pure blockchain-powered
+              freelancing.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-8 sm:mb-10 justify-center">
@@ -330,7 +442,7 @@ const HeroSection = () => {
           role="dialog"
           aria-modal="true"
         >
-          <div className="relative w-full h-full max-w-6xl max-h-[95vh] bg-gradient-to-br from-gray-900 to-black rounded-2xl sm:rounded-3xl border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden">
+          <div className="relative w-full h-full max-w-6xl max-h-[95vh] bg-black rounded-2xl sm:rounded-3xl border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden">
             {/* Progress bar */}
             <div className="absolute top-0 left-0 right-0 h-2 bg-gray-800/50 z-20">
               <div
@@ -343,7 +455,7 @@ const HeroSection = () => {
             <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
               <button
                 onClick={closeSlideshow}
-                className="p-2 sm:p-3 rounded-full bg-gray-800/70 hover:bg-gray-700/70 text-gray-200 hover:text-white transition-all duration-300 hover:scale-110"
+                className="p-2 sm:p-3 rounded-full  w-full  text-gray-200 hover:text-white transition-all duration-300 hover:scale-110"
                 aria-label="Close slideshow"
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -375,10 +487,10 @@ const HeroSection = () => {
                     key={currentSlide}
                     src={slideshowData[currentSlide].image}
                     alt={slideshowData[currentSlide].title}
-                    className="max-h-[75vh] sm:max-h-[80vh] lg:max-h-[90vh]  max-w-[90vw] sm:max-w-[85vw] lg:max-w-[80vw] w-auto h-auto object-contain rounded-xl shadow-2xl border border-gray-700/30 bg-gray-800/20 opacity-0 animate-fadeIn"
+                    className="max-h-[75vh] sm:max-h-[80vh] lg:max-h-[90vh]  max-w-[90vw] sm:max-w-[85vw] opacity-100 lg:max-w-[80vw] w-auto h-auto object-contain rounded-xl shadow-2xl"
                   />
-                  <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${slideshowData[currentSlide].color}/15 pointer-events-none`}></div>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 sm:p-6 lg:p-8 lg:py-16 text-white rounded-b-xl">
+                  {/* <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${slideshowData[currentSlide].color}/15 pointer-events-none`}></div> */}
+                  <div className="absolute bottom-0 left-0 right-0   p-4  sm:p-6 lg:p-8 lg:py-16 text-white rounded-b-xl">
                     <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 leading-tight">
                       {slideshowData[currentSlide].title}
                     </h2>
@@ -386,14 +498,16 @@ const HeroSection = () => {
                       {slideshowData[currentSlide].description}
                     </p>
                     <ul className="flex flex-wrap gap-2 sm:gap-3">
-                      {slideshowData[currentSlide].features.map((feature, idx) => (
-                        <li
-                          key={idx}
-                          className="bg-white/10 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border border-white/20 hover:bg-white/20 transition-colors duration-200"
-                        >
-                          {feature}
-                        </li>
-                      ))}
+                      {slideshowData[currentSlide].features.map(
+                        (feature, idx) => (
+                          <li
+                            key={idx}
+                            className="bg-white/10 backdrop-blur-sm px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border border-white/20 hover:bg-white/20 transition-colors duration-200"
+                          >
+                            {feature}
+                          </li>
+                        )
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -401,35 +515,37 @@ const HeroSection = () => {
 
               {/* Navigation Controls */}
               <div className="absolute bottom-4 w-full">
-              <div className="flex  items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 ">
-                <button
-                  onClick={prevSlide}
-                  className="group p-2 sm:p-3 rounded-full bg-gray-800/70 hover:bg-purple-600/70 text-gray-200 hover:text-white transition-all duration-300 hover:scale-110"
-                  aria-label="Previous slide"
-                >
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-300" />
-                </button>
+                <div className="flex  items-center justify-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 ">
+                  <button
+                    onClick={prevSlide}
+                    className="group p-2 sm:p-3 rounded-full bg-gray-800/70 hover:bg-purple-600/70 text-gray-200 hover:text-white transition-all duration-300 hover:scale-110"
+                    aria-label="Previous slide"
+                  >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform duration-300" />
+                  </button>
 
-                <button
-                  onClick={togglePlayPause}
-                  className="group p-2 sm:p-3 rounded-full bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 hover:bg-purple-500 text-white transition-all duration-300 hover:scale-110 shadow-lg shadow-purple-500/30"
-                  aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
-                >
-                  {isPlaying ? (
-                    <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
-                  ) : (
-                    <Play className="w-5 h-5 sm:w-6 sm:h-6" />
-                  )}
-                </button>
+                  <button
+                    onClick={togglePlayPause}
+                    className="group p-2 sm:p-3 rounded-full bg-gradient-to-r from-purple-600 via-purple-500 to-blue-600 hover:bg-purple-500 text-white transition-all duration-300 hover:scale-110 shadow-lg shadow-purple-500/30"
+                    aria-label={
+                      isPlaying ? "Pause slideshow" : "Play slideshow"
+                    }
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
+                    ) : (
+                      <Play className="w-5 h-5 sm:w-6 sm:h-6" />
+                    )}
+                  </button>
 
-                <button
-                  onClick={nextSlide}
-                  className="group p-2 sm:p-3 rounded-full bg-gray-800/70 hover:bg-purple-600/70 text-gray-200 hover:text-white transition-all duration-300 hover:scale-110"
-                  aria-label="Next slide"
-                >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
-                </button>
-              </div>
+                  <button
+                    onClick={nextSlide}
+                    className="group p-2 sm:p-3 rounded-full bg-gray-800/70 hover:bg-purple-600/70 text-gray-200 hover:text-white transition-all duration-300 hover:scale-110"
+                    aria-label="Next slide"
+                  >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />
+                  </button>
+                </div>
               </div>
 
               {/* Progress Dots */}
