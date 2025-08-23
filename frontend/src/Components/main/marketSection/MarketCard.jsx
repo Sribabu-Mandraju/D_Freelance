@@ -74,7 +74,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Heart, MapPin, Clock, Users, Bookmark } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import image from "../../../../public/gig.png"; // Placeholder image
 export default function MarketCard({
   username,
   gigId,
@@ -143,29 +142,25 @@ export default function MarketCard({
           },
         })
       }
-      // initial={{ opacity: 0, y: 50 }}
-      // animate={{ opacity: 1, y: 0 }}
-      // transition={{
-      //   duration: 0.6,
-      //   delay: gigId * 0.1,
-      //   ease: "easeOut",
-      // }}
-      // whileHover={{
-      //   boxShadow: "0 0 40px rgba(34, 211, 238, 0.1)",
-      // }}
-      className=" rounded-md px-[74px] py-[64px] 
-                 transition-all duration-300 cursor-pointer
-                 shadow-lg  relative overflow-hidden group  scale-[0.8] h-[550px]  z-20"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.6,
+        delay: gigId * 0.1,
+        ease: "easeOut",
+      }}
+      whileHover={{
+        scale: 1,
+        boxShadow: "0 0 40px rgba(34, 211, 238, 0.1)",
+      }}
+      className="bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-md p-3 
+                 hover:border-cyan-400/50 transition-all duration-300 cursor-pointer
+                 shadow-lg hover:shadow-cyan-500/20 relative overflow-hidden group scale-[0.8] h-[400px] z-20"
     >
       {/* Neon glow effect */}
-      {/* <div
+      <div
         className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-cyan-500/5 to-pink-500/5 
                       opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
-      /> */}
-      <img
-        src={image}
-        alt="background"
-        className="absolute inset-0  w-full h-full"
       />
 
       {/* Header with title and bookmark */}
@@ -180,7 +175,7 @@ export default function MarketCard({
           }`}
         />
       </button>
-      <img src={gigimage} alt="" className="mb-3 rounded-lg h-[200px] w-full" />
+      <img src={gigimage} alt="" className="mb-3 h-[150px] w-full" />
       <div className="flex items-start justify-between mb-4 relative z-10">
         {/* <h3
           className="text-lg font-semibold text-white group-hover:text-cyan-300 
