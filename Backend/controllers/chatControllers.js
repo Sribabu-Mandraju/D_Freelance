@@ -10,6 +10,7 @@ export const getUsersForSidebar = async (req, res) => {
     })
       .select("heroSection.name heroSection.profile heroSection.walletAddress")
       .lean();
+      //
 
     const formattedUsers = filterUsers.map((p) => ({
       _id: p.heroSection?.walletAddress,
