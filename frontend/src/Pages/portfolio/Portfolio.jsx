@@ -30,6 +30,7 @@ import CreatedProposals from "../UserDetails/CreatedProposals";
 import {
   fetchPortfolio,
   setActiveTab,
+  setPortfolioData,
 } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 import BiddedProposals from "../UserDetails/BiddedProposals";
 
@@ -52,6 +53,7 @@ function Portfolio() {
         navigate("/portfolioForm");
       }
     });
+    console.log(portfolioData);
   }, [dispatch, navigate]);
 
   useEffect(() => {
@@ -180,7 +182,7 @@ function Portfolio() {
             aria-label="About sidebar"
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
-            <QuickContact personalInfo={personalInfo} />
+            <QuickContact personalInfo={portfolioData.contactInfo} />
             <CurrentStatus
               portfolioId={portfolioData._id} // Use _id directly from portfolioData
             />
