@@ -35,8 +35,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://cryptolance-server.onrender.com",
-      "http://localhost:3000",
+      "https://crypto-lance-gamma.vercel.app"
     ],
     credentials: true, // if you want to allow cookies/auth headers
   })
