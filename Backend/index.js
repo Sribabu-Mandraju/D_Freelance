@@ -7,7 +7,7 @@ import cors from "cors";
 import AdminRoutes from "./routes/AdminRoutes.js";
 
 // Import your existing routes
-import ProposalRoutes from "./Routes/ProposalRoutes.js";
+
 import BidRoutes from "./routes/BidRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
 import authRoutes from "./routes/AuthRoutes.js";
@@ -20,6 +20,7 @@ import gigRoutes from "./routes/GigRoutes.js";
 import messageRoutes from "./routes/chatRoutes.js";
 import ActiveFreelancersRoutes from "./routes/ActiveFreelancersRoutes.js";
 import CrossPortfolioRoutes from "./routes/CrossPortfolioRoutes.js";
+import ProposalRoutes from "./routes/ProposalRoutes.js"
 // Import the WebSocket configuration
 import { app, server } from "./socket.js";
 // Load environment variables
