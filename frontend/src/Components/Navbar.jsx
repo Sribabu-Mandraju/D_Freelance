@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import WalletConnect from "./walletConnection/WalletConnect";
 import {
@@ -34,11 +34,18 @@ import {
   ExternalLink,
   Sparkles,
   User as UserIcon,
+  Clock,
+  Wallet,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { fetchPortfolio } from "../store/portfolioSlice/portfolioSlice";
 import { useAccount } from "wagmi";
 import { useSelector } from "react-redux";
+import {
+  useClaimTokens,
+  usePurchaseTokens,
+} from "../interactions/HFTtoken__interactions";
+import { toast } from "react-hot-toast";
 
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
@@ -46,9 +53,155 @@ export default function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedTheme, setTheme] = useState("Dark");
+  const [hftTokenData, setHftTokenData] = useState(null);
+  const [isLoadingTokenData, setIsLoadingTokenData] = useState(false);
   const { address, isConnected, chain } = useAccount();
   const { portfolioData } = useSelector((state) => state.portfolio);
   const location = useLocation();
+
+  // HFT Token hooks
+  const {
+    claimTokens,
+    isPending: isClaimPending,
+    isConfirmed: isClaimConfirmed,
+  } = useClaimTokens();
+  const {
+    approveUSDC,
+    purchaseToken,
+    isApprovePending,
+    isPurchasePending,
+    isPurchaseConfirmed,
+    allowance,
+    usdcBalance,
+  } = usePurchaseTokens();
+
+  const navigate = useNavigate();
+
+  // Fetch HFT token data
+  const fetchHftTokenData = async () => {
+    if (!address) return;
+
+    setIsLoadingTokenData(true);
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+
+      const response = await fetch(
+        `http://localhost:3001/api/hftToken/userHFTtokenDetails/${address}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setHftTokenData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching HFT token data:", error);
+    } finally {
+      setIsLoadingTokenData(false);
+    }
+  };
+
+  // Auto-purchase tokens (approve + purchase in sequence)
+  const handlePurchaseTokens = async () => {
+    try {
+      // First approve USDC
+      await approveUSDC();
+
+      // Wait for approval confirmation then purchase
+      // This will be handled by the useEffect in the hook
+    } catch (error) {
+      console.error("Purchase failed:", error);
+      toast.error("Failed to purchase tokens");
+    }
+  };
+
+  // Handle claim tokens
+  const handleClaimTokens = async () => {
+    try {
+      await claimTokens();
+    } catch (error) {
+      console.error("Claim failed:", error);
+      toast.error("Failed to claim tokens");
+    }
+  };
+
+  // Check if claim is available (30 days after last claim)
+  const canClaim = () => {
+    if (!hftTokenData?.lastClaimTime) return true;
+
+    const lastClaimTime = parseInt(hftTokenData.lastClaimTime);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
+
+    return currentTime - lastClaimTime >= thirtyDaysInSeconds;
+  };
+
+  // Format last claim time
+  const formatLastClaimTime = () => {
+    if (!hftTokenData?.lastClaimTime) return "Never";
+
+    const lastClaimTime = parseInt(hftTokenData.lastClaimTime);
+    const date = new Date(lastClaimTime * 1000);
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+  };
+
+  // Format HFT balance (18 decimals)
+  const formatHftBalance = () => {
+    if (!hftTokenData?.userHFTBalance) return "0";
+
+    const balance = BigInt(hftTokenData.userHFTBalance);
+    const decimals = 18;
+    const divisor = BigInt(10 ** decimals);
+
+    const wholePart = balance / divisor;
+    const fractionalPart = balance % divisor;
+
+    if (fractionalPart === BigInt(0)) {
+      return wholePart.toString();
+    }
+
+    // Format with up to 4 decimal places
+    const fractionalStr = fractionalPart.toString().padStart(decimals, "0");
+    const trimmedFractional = fractionalStr.replace(/0+$/, "").slice(0, 4);
+
+    return `${wholePart}.${trimmedFractional}`;
+  };
+
+  // Auto-purchase after approval
+  useEffect(() => {
+    if (isClaimConfirmed) {
+      toast.success("Tokens claimed successfully!");
+      fetchHftTokenData(); // Refresh data
+    }
+  }, [isClaimConfirmed]);
+
+  // Success message and refresh data after purchase completion
+  useEffect(() => {
+    if (isPurchaseConfirmed) {
+      toast.success("HFT tokens purchased successfully!");
+      fetchHftTokenData(); // Refresh data
+    }
+  }, [isPurchaseConfirmed]);
+
+  // Fetch token data when address changes
+  useEffect(() => {
+    if (address) {
+      fetchHftTokenData();
+    }
+  }, [address]);
+
+  // Auto-purchase after USDC approval
+  useEffect(() => {
+    if (allowance > BigInt(0) && !isPurchasePending) {
+      // Auto-purchase after approval
+      purchaseToken();
+    }
+  }, [allowance, isPurchasePending]);
 
   const navigationItems = [
     {
@@ -111,8 +264,6 @@ export default function Navbar() {
       description: "Showcase your work",
     },
   ];
-
-  const navigate = useNavigate();
 
   const handlePortfolioClick = async (e) => {
     e.preventDefault();
@@ -330,6 +481,104 @@ export default function Navbar() {
                     </button>
                     <hr className="border-gray-800/40 my-2" />
 
+                    {/* HFT Token Information */}
+                    {address && (
+                      <div className="mb-4 p-3 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-semibold text-purple-400 flex items-center gap-2">
+                            <Coins className="w-4 h-4" />
+                            HFT Token
+                          </h4>
+                          <button
+                            onClick={fetchHftTokenData}
+                            disabled={isLoadingTokenData}
+                            className="p-1 hover:bg-purple-500/20 rounded transition-colors disabled:opacity-50"
+                            title="Refresh token data"
+                          >
+                            <svg
+                              className="w-3 h-3 text-purple-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {isLoadingTokenData ? (
+                          <div className="text-xs text-gray-400">
+                            Loading...
+                          </div>
+                        ) : hftTokenData ? (
+                          <div className="space-y-2 text-xs">
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Balance:</span>
+                              <span className="text-white font-mono">
+                                {formatHftBalance()} HFT
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Last Claim:</span>
+                              <span className="text-white">
+                                {formatLastClaimTime()}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">Bids Count:</span>
+                              <span className="text-white">
+                                {hftTokenData.bidInfo?.bidsCount || 0}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">
+                                Claim Status:
+                              </span>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  canClaim()
+                                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                    : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                                }`}
+                              >
+                                {canClaim() ? "Available" : "30-day cooldown"}
+                              </span>
+                            </div>
+                            <hr className="border-purple-500/20 my-2" />
+                            <div className="text-xs text-purple-300 font-medium mb-2">
+                              USDC Info:
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">
+                                USDC Balance:
+                              </span>
+                              <span className="text-white font-mono">
+                                {(Number(usdcBalance) / 10 ** 6).toFixed(2)}{" "}
+                                USDC
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-gray-400">
+                                USDC Allowance:
+                              </span>
+                              <span className="text-white font-mono">
+                                {(Number(allowance) / 10 ** 6).toFixed(2)} USDC
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-gray-400">
+                            No token data available
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div className="mt-3 space-y-2 text-sm">
                       <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
                         <div className="text-gray-300">Language</div>
@@ -362,11 +611,41 @@ export default function Navbar() {
                     </div>
 
                     <div className="mt-4 flex items-center gap-2">
-                      <button className="flex w-1/2 border border-gray-700 px-3 py-2 text-sm rounded-md text-gray-200 hover:bg-gray-800/50">
-                        Get listed ▾
+                      <button
+                        onClick={handleClaimTokens}
+                        disabled={!canClaim() || isClaimPending}
+                        className={`flex w-1/2 border border-gray-700 px-3 py-2 text-sm rounded-md text-gray-200 hover:bg-gray-800/50 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          canClaim()
+                            ? "border-green-500 text-green-400 hover:bg-green-500/10"
+                            : "border-gray-700 text-gray-400"
+                        }`}
+                        title={
+                          !canClaim()
+                            ? "Wait 30 days after last claim"
+                            : "Claim your HFT tokens"
+                        }
+                      >
+                        {isClaimPending
+                          ? "Claiming..."
+                          : canClaim()
+                          ? "Claim HFT"
+                          : "Claim Locked"}
                       </button>
-                      <button className="px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md">
-                        API
+                      <button
+                        onClick={handlePurchaseTokens}
+                        disabled={isApprovePending || isPurchasePending}
+                        className={`px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed ${
+                          isApprovePending || isPurchasePending
+                            ? "opacity-50"
+                            : "hover:bg-gray-700"
+                        }`}
+                        title="Purchase HFT tokens with USDC (10 USDC per transaction)"
+                      >
+                        {isApprovePending
+                          ? "Approving USDC..."
+                          : isPurchasePending
+                          ? "Purchasing HFT..."
+                          : "Purchase HFT"}
                       </button>
                     </div>
                   </div>

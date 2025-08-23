@@ -11,7 +11,6 @@ import { useEffect } from "react";
 // Replace with your deployed contract address
 const HFT_TOKEN_ADDRESS = "0xd0D1B6E1dE2F705701FE370e91f8fb4731161d5a"; // Update with actual address
 
-
 const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 const USDC_ABI = [
   {
@@ -43,7 +42,6 @@ const USDC_ABI = [
   },
 ];
 
-
 const ERC20_ABI = [
   {
     constant: false,
@@ -73,9 +71,6 @@ const ERC20_ABI = [
     type: "function",
   },
 ];
-
-
-
 
 // Hook to call claimTokens
 export const useClaimTokens = () => {
@@ -111,18 +106,36 @@ export const useClaimTokens = () => {
   };
 };
 
-
-
 export const usePurchaseTokens = () => {
-  const { writeContract: writeApprove, data: approveHash, error: approveError, isPending: isApprovePending } = useWriteContract();
-  const { writeContract: writePurchase, data: purchaseHash, error: purchaseError, isPending: isPurchasePending } = useWriteContract();
-  const { isLoading: isApproveConfirming, isSuccess: isApproveConfirmed } = useWaitForTransactionReceipt({ hash: approveHash });
-  const { isLoading: isPurchaseConfirming, isSuccess: isPurchaseConfirmed } = useWaitForTransactionReceipt({ hash: purchaseHash });
+  const {
+    writeContract: writeApprove,
+    data: approveHash,
+    error: approveError,
+    isPending: isApprovePending,
+  } = useWriteContract();
+  const {
+    writeContract: writePurchase,
+    data: purchaseHash,
+    error: purchaseError,
+    isPending: isPurchasePending,
+  } = useWriteContract();
+  const {
+    isLoading: isApproveConfirming,
+    isSuccess: isApproveConfirmed,
+  } = useWaitForTransactionReceipt({ hash: approveHash });
+  const {
+    isLoading: isPurchaseConfirming,
+    isSuccess: isPurchaseConfirmed,
+  } = useWaitForTransactionReceipt({ hash: purchaseHash });
   const { address, chain } = useAccount();
   const chainId = chain?.id || baseSepolia.id;
 
   // Check USDC allowance
-  const { data: allowanceData, error: allowanceError, refetch: refetchAllowance } = useReadContract({
+  const {
+    data: allowanceData,
+    error: allowanceError,
+    refetch: refetchAllowance,
+  } = useReadContract({
     address: USDC_ADDRESS,
     abi: USDC_ABI,
     functionName: "allowance",
@@ -178,6 +191,24 @@ export const usePurchaseTokens = () => {
     }
   }, [isApproveConfirmed, refetchAllowance]);
 
+  // Auto-purchase after USDC approval is confirmed
+  useEffect(() => {
+    if (isApproveConfirmed && !isPurchasePending && !isPurchaseConfirmed) {
+      console.log("Approval confirmed, automatically initiating purchase...");
+      // Small delay to ensure allowance is updated
+      setTimeout(() => {
+        purchaseToken();
+      }, 1000);
+    }
+  }, [isApproveConfirmed, isPurchasePending, isPurchaseConfirmed]);
+
+  // Success message after purchase completion
+  useEffect(() => {
+    if (isPurchaseConfirmed) {
+      console.log("Purchase completed successfully!");
+    }
+  }, [isPurchaseConfirmed]);
+
   // Log transaction states for debugging
   useEffect(() => {
     console.log("Transaction states:", {
@@ -227,15 +258,35 @@ export const usePurchaseTokens = () => {
 // Hook to call placeBid
 
 export const usePlaceBid = () => {
-  const { writeContract: writeApprove, data: approveHash, error: approveError, isPending: isApprovePending } = useWriteContract();
-  const { writeContract: writePlaceBid, data: bidHash, error: bidError, isPending: isBidPending } = useWriteContract();
-  const { isLoading: isApproveConfirming, isSuccess: isApproveConfirmed } = useWaitForTransactionReceipt({ hash: approveHash });
-  const { isLoading: isBidConfirming, isSuccess: isBidConfirmed } = useWaitForTransactionReceipt({ hash: bidHash });
+  const {
+    writeContract: writeApprove,
+    data: approveHash,
+    error: approveError,
+    isPending: isApprovePending,
+  } = useWriteContract();
+  const {
+    writeContract: writePlaceBid,
+    data: bidHash,
+    error: bidError,
+    isPending: isBidPending,
+  } = useWriteContract();
+  const {
+    isLoading: isApproveConfirming,
+    isSuccess: isApproveConfirmed,
+  } = useWaitForTransactionReceipt({ hash: approveHash });
+  const {
+    isLoading: isBidConfirming,
+    isSuccess: isBidConfirmed,
+  } = useWaitForTransactionReceipt({ hash: bidHash });
   const { address, chain } = useAccount();
   const chainId = chain?.id || baseSepolia.id;
 
   // Check HFT allowance for HFT_TOKEN_ADDRESS
-  const { data: allowanceData, error: allowanceError, refetch: refetchAllowance } = useReadContract({
+  const {
+    data: allowanceData,
+    error: allowanceError,
+    refetch: refetchAllowance,
+  } = useReadContract({
     address: HFT_TOKEN_ADDRESS,
     abi: HFTtokenABI,
     functionName: "allowance",
