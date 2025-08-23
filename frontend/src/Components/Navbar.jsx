@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import WalletConnect from "./walletConnection/WalletConnect";
 import {
@@ -55,9 +55,15 @@ export default function Navbar() {
   const [selectedTheme, setTheme] = useState("Dark");
   const [hftTokenData, setHftTokenData] = useState(null);
   const [isLoadingTokenData, setIsLoadingTokenData] = useState(false);
+  const [hasTriggeredAutoPurchase, setHasTriggeredAutoPurchase] = useState(
+    false
+  );
   const { address, isConnected, chain } = useAccount();
   const { portfolioData } = useSelector((state) => state.portfolio);
   const location = useLocation();
+
+  // Ref for profile dropdown
+  const profileDropdownRef = useRef(null);
 
   // HFT Token hooks
   const {
@@ -109,11 +115,19 @@ export default function Navbar() {
   // Auto-purchase tokens (approve + purchase in sequence)
   const handlePurchaseTokens = async () => {
     try {
-      // First approve USDC
-      await approveUSDC();
+      // Reset the auto-purchase flag for new transactions
+      setHasTriggeredAutoPurchase(false);
 
-      // Wait for approval confirmation then purchase
-      // This will be handled by the useEffect in the hook
+      // Check if we already have sufficient allowance
+      if (allowance >= BigInt(10 * 10 ** 6)) {
+        // 10 USDC in wei
+        // Direct purchase if allowance is sufficient
+        await purchaseToken();
+      } else {
+        // First approve USDC
+        await approveUSDC();
+        // Purchase will be handled automatically after approval
+      }
     } catch (error) {
       console.error("Purchase failed:", error);
       toast.error("Failed to purchase tokens");
@@ -185,6 +199,7 @@ export default function Navbar() {
     if (isPurchaseConfirmed) {
       toast.success("HFT tokens purchased successfully!");
       fetchHftTokenData(); // Refresh data
+      setHasTriggeredAutoPurchase(false); // Reset for future purchases
     }
   }, [isPurchaseConfirmed]);
 
@@ -195,13 +210,39 @@ export default function Navbar() {
     }
   }, [address]);
 
-  // Auto-purchase after USDC approval
+  // Click outside handler for profile dropdown
   useEffect(() => {
-    if (allowance > BigInt(0) && !isPurchasePending) {
-      // Auto-purchase after approval
+    const handleClickOutside = (event) => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    if (showProfileMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showProfileMenu]);
+
+  // Auto-purchase after USDC approval - only once when allowance changes from 0 to > 0
+  useEffect(() => {
+    if (
+      allowance > BigInt(0) &&
+      !isPurchasePending &&
+      !isPurchaseConfirmed &&
+      !hasTriggeredAutoPurchase
+    ) {
+      // Only auto-purchase once after approval to prevent infinite loops
+      setHasTriggeredAutoPurchase(true);
       purchaseToken();
     }
-  }, [allowance, isPurchasePending]);
+  }, [allowance]);
 
   const navigationItems = [
     {
@@ -428,17 +469,14 @@ export default function Navbar() {
             {/* Log in Button with neon effect */}
             <WalletConnect onAuthSuccess={() => {}} />
 
-            {/* Account / Settings dropdown (desktop only) */}
-            <div
-              className="relative ml-3 hidden md:block"
-              onMouseEnter={() => setShowProfileMenu(true)}
-              onMouseLeave={() => setShowProfileMenu(false)}
-            >
+            {/* Account / Settings dropdown */}
+            <div className="relative ml-3">
               <button
-                className="flex items-center gap-2 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-300"
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center gap-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200 text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 group"
                 aria-expanded={showProfileMenu ? "true" : "false"}
               >
-                <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-transparent hover:ring-cyan-500/30 transition-all duration-200 relative">
                   <img
                     src={
                       portfolioData?.heroSection?.profile ||
@@ -447,15 +485,34 @@ export default function Navbar() {
                     alt=""
                     className="rounded-full w-full h-full object-cover"
                   />
+                  {/* Dropdown indicator */}
+                  <div
+                    className={`absolute -bottom-1 -right-1 w-3 h-3 bg-gray-700 rounded-full border-2 border-gray-900 transition-all duration-200 ${
+                      showProfileMenu
+                        ? "bg-cyan-500 scale-110"
+                        : "group-hover:bg-gray-600"
+                    }`}
+                  />
                 </div>
               </button>
 
-              {showProfileMenu && (
-                <div
-                  className="absolute right-0 top-[40px] w-80 bg-gray-900/95 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/10 z-50"
-                  role="menu"
-                >
-                  <div className="p-4">
+              <div
+                ref={profileDropdownRef}
+                className={`absolute right-0 top-[40px] w-80 bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/20 z-50 transition-all duration-300 ease-out transform origin-top-right ${
+                  showProfileMenu
+                    ? "opacity-100 scale-100 translate-y-0"
+                    : "opacity-0 scale-95 translate-y-2 pointer-events-none"
+                }`}
+                role="menu"
+              >
+                <div className="p-4">
+                  <div
+                    className={`transition-all duration-300 delay-100 ${
+                      showProfileMenu
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  >
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex flex-row gap-4">
                         <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
@@ -473,144 +530,165 @@ export default function Navbar() {
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    <hr className="border-gray-800/40 my-2" />
+                  <hr className="border-gray-800/40 my-2" />
+                  <div
+                    className={`transition-all duration-300 delay-150 ${
+                      showProfileMenu
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  >
                     <button className="w-full text-left text-[13px] text-blue-500 font-semibold px-1 py-2 rounded-md hover:bg-gray-800/50 flex items-center justify-between">
                       <span>💙 Help us improve by taking our survey</span>
                       <ChevronRight className="w-4 h-4 opacity-70" />
                     </button>
-                    <hr className="border-gray-800/40 my-2" />
+                  </div>
+                  <hr className="border-gray-800/40 my-2" />
 
-                    {/* HFT Token Information */}
-                    {address && (
-                      <div className="mb-4 p-3 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-purple-400 flex items-center gap-2">
-                            <Coins className="w-4 h-4" />
-                            HFT Token
-                          </h4>
-                          <button
-                            onClick={fetchHftTokenData}
-                            disabled={isLoadingTokenData}
-                            className="p-1 hover:bg-purple-500/20 rounded transition-colors disabled:opacity-50"
-                            title="Refresh token data"
+                  {/* HFT Token Information */}
+                  {address && (
+                    <div
+                      className={`mb-4 p-3 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-lg transition-all duration-300 delay-200 ${
+                        showProfileMenu
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-2"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-semibold text-purple-400 flex items-center gap-2">
+                          <Coins className="w-4 h-4" />
+                          HFT Token
+                        </h4>
+                        <button
+                          onClick={fetchHftTokenData}
+                          disabled={isLoadingTokenData}
+                          className="p-1 hover:bg-purple-500/20 rounded transition-colors disabled:opacity-50"
+                          title="Refresh token data"
+                        >
+                          <svg
+                            className="w-3 h-3 text-purple-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
                           >
-                            <svg
-                              className="w-3 h-3 text-purple-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                              />
-                            </svg>
-                          </button>
-                        </div>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                        </button>
+                      </div>
 
-                        {isLoadingTokenData ? (
-                          <div className="text-xs text-gray-400">
-                            Loading...
+                      {isLoadingTokenData ? (
+                        <div className="text-xs text-gray-400">Loading...</div>
+                      ) : hftTokenData ? (
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400">Balance:</span>
+                            <span className="text-white font-mono">
+                              {formatHftBalance()} HFT
+                            </span>
                           </div>
-                        ) : hftTokenData ? (
-                          <div className="space-y-2 text-xs">
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">Balance:</span>
-                              <span className="text-white font-mono">
-                                {formatHftBalance()} HFT
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">Last Claim:</span>
-                              <span className="text-white">
-                                {formatLastClaimTime()}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">Bids Count:</span>
-                              <span className="text-white">
-                                {hftTokenData.bidInfo?.bidsCount || 0}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">
-                                Claim Status:
-                              </span>
-                              <span
-                                className={`text-xs px-2 py-1 rounded-full ${
-                                  canClaim()
-                                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                                    : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                                }`}
-                              >
-                                {canClaim() ? "Available" : "30-day cooldown"}
-                              </span>
-                            </div>
-                            <hr className="border-purple-500/20 my-2" />
-                            <div className="text-xs text-purple-300 font-medium mb-2">
-                              USDC Info:
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">
-                                USDC Balance:
-                              </span>
-                              <span className="text-white font-mono">
-                                {(Number(usdcBalance) / 10 ** 6).toFixed(2)}{" "}
-                                USDC
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-gray-400">
-                                USDC Allowance:
-                              </span>
-                              <span className="text-white font-mono">
-                                {(Number(allowance) / 10 ** 6).toFixed(2)} USDC
-                              </span>
-                            </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400">Last Claim:</span>
+                            <span className="text-white">
+                              {formatLastClaimTime()}
+                            </span>
                           </div>
-                        ) : (
-                          <div className="text-xs text-gray-400">
-                            No token data available
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400">Bids Count:</span>
+                            <span className="text-white">
+                              {hftTokenData.bidInfo?.bidsCount || 0}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="mt-3 space-y-2 text-sm">
-                      <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
-                        <div className="text-gray-300">Language</div>
-                        <div className="text-gray-200">English</div>
-                      </div>
-                      <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
-                        <div className="text-gray-300">Currency</div>
-                        <div className="text-gray-200 flex items-center gap-1">
-                          USD <span className="text-green-400">●</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between px-1 py-2 rounded-md">
-                        <div className="text-gray-300">Theme</div>
-                        <div className="flex items-center bg-gray-800 py-1 px-1 rounded-lg">
-                          {["Light", "Dark", "System"].map((theme) => (
-                            <button
-                              key={theme}
-                              onClick={() => setTheme(theme)}
-                              className={`px-2 py-1 text-[12px] rounded transition-colors duration-200 ${
-                                selectedTheme === theme
-                                  ? "bg-gray-900 text-white"
-                                  : "bg-gray-800 text-gray-300 hover:bg-gray-700/60 hover:text-white"
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400">Claim Status:</span>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${
+                                canClaim()
+                                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                  : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
                               }`}
                             >
-                              {theme}
-                            </button>
-                          ))}
+                              {canClaim() ? "Available" : "30-day cooldown"}
+                            </span>
+                          </div>
+                          <hr className="border-purple-500/20 my-2" />
+                          <div className="text-xs text-purple-300 font-medium mb-2">
+                            USDC Info:
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400">USDC Balance:</span>
+                            <span className="text-white font-mono">
+                              {(Number(usdcBalance) / 10 ** 6).toFixed(2)} USDC
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400">
+                              USDC Allowance:
+                            </span>
+                            <span className="text-white font-mono">
+                              {(Number(allowance) / 10 ** 6).toFixed(2)} USDC
+                            </span>
+                          </div>
                         </div>
+                      ) : (
+                        <div className="text-xs text-gray-400">
+                          No token data available
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div
+                    className={`mt-3 space-y-2 text-sm transition-all duration-300 delay-300 ${
+                      showProfileMenu
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
+                      <div className="text-gray-300">Language</div>
+                      <div className="text-gray-200">English</div>
+                    </div>
+                    <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
+                      <div className="text-gray-300">Currency</div>
+                      <div className="text-gray-200 flex items-center gap-1">
+                        USD <span className="text-green-400">●</span>
                       </div>
                     </div>
+                    <div className="flex items-center justify-between px-1 py-2 rounded-md">
+                      <div className="text-gray-300">Theme</div>
+                      <div className="flex items-center bg-gray-800 py-1 px-1 rounded-lg">
+                        {["Light", "Dark", "System"].map((theme) => (
+                          <button
+                            key={theme}
+                            onClick={() => setTheme(theme)}
+                            className={`px-2 py-1 text-[12px] rounded transition-colors duration-200 ${
+                              selectedTheme === theme
+                                ? "bg-gray-900 text-white"
+                                : "bg-gray-800 text-gray-300 hover:bg-gray-700/60 hover:text-white"
+                            }`}
+                          >
+                            {theme}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
 
-                    <div className="mt-4 flex items-center gap-2">
+                  <div
+                    className={`mt-4 transition-all duration-300 delay-400 ${
+                      showProfileMenu
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
                       <button
                         onClick={handleClaimTokens}
                         disabled={!canClaim() || isClaimPending}
@@ -645,12 +723,14 @@ export default function Navbar() {
                           ? "Approving USDC..."
                           : isPurchasePending
                           ? "Purchasing HFT..."
+                          : allowance >= BigInt(10 * 10 ** 6)
+                          ? "Purchase HFT (Approved)"
                           : "Purchase HFT"}
                       </button>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
@@ -728,12 +808,42 @@ export default function Navbar() {
                 <p className="text-xs text-gray-400">Web3 Freelancing</p>
               </div>
             </div>
-            <button
-              onClick={closeMobileMenu}
-              className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-400 hover:text-white"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Profile Icon in Mobile Menu */}
+              <button
+                onClick={() => {
+                  setShowProfileMenu(!showProfileMenu);
+                  closeMobileMenu();
+                }}
+                className="flex items-center gap-2 rounded-lg hover:bg-gray-800/50 transition-all duration-200 text-gray-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 group"
+                aria-expanded={showProfileMenu ? "true" : "false"}
+              >
+                <div className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-transparent hover:ring-cyan-500/30 transition-all duration-200 relative">
+                  <img
+                    src={
+                      portfolioData?.heroSection?.profile ||
+                      "https://via.placeholder.com/36"
+                    }
+                    alt=""
+                    className="rounded-full w-full h-full object-cover"
+                  />
+                  {/* Dropdown indicator */}
+                  <div
+                    className={`absolute -bottom-1 -right-1 w-3 h-3 bg-gray-700 rounded-full border-2 border-gray-900 transition-all duration-200 ${
+                      showProfileMenu
+                        ? "bg-cyan-500 scale-110"
+                        : "group-hover:bg-gray-600"
+                    }`}
+                  />
+                </div>
+              </button>
+              <button
+                onClick={closeMobileMenu}
+                className="p-2 rounded-lg hover:bg-gray-800/50 transition-colors text-gray-400 hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto overscroll-contain">
@@ -930,6 +1040,244 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Profile Dropdown */}
+      {showProfileMenu && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 transition-opacity duration-300"
+            onClick={() => setShowProfileMenu(false)}
+          />
+
+          {/* Mobile Profile Menu */}
+          <div className="absolute right-4 top-20 w-80 max-w-[85vw] bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 rounded-xl shadow-2xl shadow-cyan-500/20 z-50 transition-all duration-300 ease-out transform origin-top-right">
+            <div className="p-4">
+              <div
+                className={`transition-all duration-300 delay-100 ${
+                  showProfileMenu
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex flex-row gap-4">
+                    <button className="w-auto bg-blue-600 text-white px-3 py-1 rounded-md text-sm">
+                      Log In
+                    </button>
+                    <button className="w-auto border border-blue-600 text-blue-600 px-3 py-1 rounded-md text-sm">
+                      Sign Up
+                    </button>
+                  </div>
+                  <div className="ml-3 flex items-start">
+                    <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center shadow">
+                      <span className="text-white text-xs font-semibold">
+                        ♦
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr className="border-gray-800/40 my-2" />
+              <div
+                className={`transition-all duration-300 delay-150 ${
+                  showProfileMenu
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2"
+                }`}
+              >
+                <button className="w-full text-left text-[13px] text-blue-500 font-semibold px-1 py-2 rounded-md hover:bg-gray-800/50 flex items-center justify-between">
+                  <span>💙 Help us improve by taking our survey</span>
+                  <ChevronRight className="w-4 h-4 opacity-70" />
+                </button>
+              </div>
+              <hr className="border-gray-800/40 my-2" />
+
+              {/* HFT Token Information */}
+              {address && (
+                <div
+                  className={`mb-4 p-3 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 rounded-lg transition-all duration-300 delay-200 ${
+                    showProfileMenu
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-2"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold text-purple-400 flex items-center gap-2">
+                      <Coins className="w-4 h-4" />
+                      HFT Token
+                    </h4>
+                    <button
+                      onClick={fetchHftTokenData}
+                      disabled={isLoadingTokenData}
+                      className="p-1 hover:bg-purple-500/20 rounded transition-colors disabled:opacity-50"
+                      title="Refresh token data"
+                    >
+                      <svg
+                        className="w-3 h-3 text-purple-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {isLoadingTokenData ? (
+                    <div className="text-xs text-gray-400">Loading...</div>
+                  ) : hftTokenData ? (
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Balance:</span>
+                        <span className="text-white font-mono">
+                          {formatHftBalance()} HFT
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Last Claim:</span>
+                        <span className="text-white">
+                          {formatLastClaimTime()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Bids Count:</span>
+                        <span className="text-white">
+                          {hftTokenData.bidInfo?.bidsCount || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">Claim Status:</span>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${
+                            canClaim()
+                              ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                              : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                          }`}
+                        >
+                          {canClaim() ? "Available" : "30-day cooldown"}
+                        </span>
+                      </div>
+                      <hr className="border-purple-500/20 my-2" />
+                      <div className="text-xs text-purple-300 font-medium mb-2">
+                        USDC Info:
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">USDC Balance:</span>
+                        <span className="text-white font-mono">
+                          {(Number(usdcBalance) / 10 ** 6).toFixed(2)} USDC
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400">USDC Allowance:</span>
+                        <span className="text-white font-mono">
+                          {(Number(allowance) / 10 ** 6).toFixed(2)} USDC
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-400">
+                      No token data available
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div
+                className={`mt-3 space-y-2 text-sm transition-all duration-300 delay-300 ${
+                  showProfileMenu
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2"
+                }`}
+              >
+                <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
+                  <div className="text-gray-300">Language</div>
+                  <div className="text-gray-200">English</div>
+                </div>
+                <div className="flex items-center justify-between px-1 py-2 rounded-md hover:bg-gray-800/40">
+                  <div className="text-gray-300">Currency</div>
+                  <div className="text-gray-200 flex items-center gap-1">
+                    USD <span className="text-green-400">●</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between px-1 py-2 rounded-md">
+                  <div className="text-gray-300">Theme</div>
+                  <div className="flex items-center bg-gray-800 py-1 px-1 rounded-lg">
+                    {["Light", "Dark", "System"].map((theme) => (
+                      <button
+                        key={theme}
+                        onClick={() => setTheme(theme)}
+                        className={`px-2 py-1 text-[12px] rounded transition-colors duration-200 ${
+                          selectedTheme === theme
+                            ? "bg-gray-900 text-white"
+                            : "bg-gray-800 text-gray-300 hover:bg-gray-700/60 hover:text-white"
+                        }`}
+                      >
+                        {theme}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`mt-4 transition-all duration-300 delay-400 ${
+                  showProfileMenu
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleClaimTokens}
+                    disabled={!canClaim() || isClaimPending}
+                    className={`flex w-1/2 border border-gray-700 px-3 py-2 text-sm rounded-md text-gray-200 hover:bg-gray-800/50 disabled:opacity-50 disabled:cursor-not-allowed ${
+                      canClaim()
+                        ? "border-green-500 text-green-400 hover:bg-green-500/10"
+                        : "border-gray-700 text-gray-400"
+                    }`}
+                    title={
+                      !canClaim()
+                        ? "Wait 30 days after last claim"
+                        : "Claim your HFT tokens"
+                    }
+                  >
+                    {isClaimPending
+                      ? "Claiming..."
+                      : canClaim()
+                      ? "Claim HFT"
+                      : "Claim Locked"}
+                  </button>
+                  <button
+                    onClick={handlePurchaseTokens}
+                    disabled={isApprovePending || isPurchasePending}
+                    className={`px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isApprovePending || isPurchasePending
+                        ? "opacity-50"
+                        : "hover:bg-gray-700"
+                    }`}
+                    title="Purchase HFT tokens with USDC (10 USDC per transaction)"
+                  >
+                    {isApprovePending
+                      ? "Approving USDC..."
+                      : isPurchasePending
+                      ? "Purchasing HFT..."
+                      : allowance >= BigInt(10 * 10 ** 6)
+                      ? "Purchase HFT (Approved)"
+                      : "Purchase HFT"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom CSS for neon glow effects */}
       <style>{`
