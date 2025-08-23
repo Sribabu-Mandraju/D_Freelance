@@ -224,8 +224,8 @@ const HeroSection = () => {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full">
           {/* Top stats bar - enhanced crypto theme */}
-          <div className="bg-transparent  rounded-2xl p-2 sm:p-4 mb-6 sm:mb-8  ">
-            {/* Mobile: horizontal scrollable pills */}
+          {/* <div className="bg-transparent  rounded-2xl p-2 sm:p-4 mb-6 sm:mb-8  ">
+            
             <div className="md:hidden -mx-2 px-2">
               <div className="flex items-center gap-2 overflow-x-auto py-1">
                 <div className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-700/60 bg-gray-800/60 px-3 py-1.5">
@@ -264,7 +264,7 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Desktop: refined layout */}
+           
             <div className="hidden bg-transparent md:flex flex-wrap justify-between items-center text-[12px] gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
@@ -298,7 +298,7 @@ const HeroSection = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div>  */}
 
           {/* Main hero content - centered layout with responsive headings */}
           <div className="text-center">

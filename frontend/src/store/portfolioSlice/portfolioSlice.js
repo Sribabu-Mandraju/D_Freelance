@@ -10,6 +10,7 @@ const initialState = {
       aboutMe: "",
       expertise: [""],
       focusAreas: [""],
+      profileImage: "",
     },
     contactInfo: {
       email: "",

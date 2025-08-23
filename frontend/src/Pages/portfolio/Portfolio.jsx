@@ -25,6 +25,7 @@ import ContactInfo from "../../Components/portfolio/ContactInfo";
 import Navbar from "../../Components/Navbar";
 import styles from "./Portfolio.module.css";
 import YourGigs from "./YourGigs";
+import AcceptedProposals from "../../Components/portfolio/AcceptedProposals";
 import {
   fetchPortfolio,
   setActiveTab,
@@ -154,15 +155,15 @@ function Portfolio() {
                 <YourGigs yourgigs={portfolioData.userGigs || []} />
               )}
               {activeTab === "Accepted Proposals" && (
-                <Education education={education} />
+                <AcceptedProposals/>
               )}
             </div>
-            <div className="space-y-6 mt-6">
+            {/* <div className="space-y-6 mt-6">
                   <FeaturedProjects
                     featuredProjects={featuredProjects}
                     portfolioId={portfolioData._id}
                   />
-                </div>
+                </div> */}
           </main>
 
           <aside
