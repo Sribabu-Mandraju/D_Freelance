@@ -2,7 +2,7 @@
 "use client";
 import { Database } from "lucide-react";
 
-function CurrentStatus({ currentStatus }) {
+function  CurrentStatus({ currentStatus }) {
   // Fallback for empty or undefined currentStatus
   if (!currentStatus || currentStatus.length === 0) {
     return (

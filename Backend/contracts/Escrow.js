@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import Escrow_ABI from '../abis/Escrow_ABI.json' with { type: 'json' };
 
-const provider = new ethers.JsonRpcProvider("https://sepolia.base.org");
+const provider = new ethers.JsonRpcProvider("https://base-sepolia.g.alchemy.com/v2/vt_tNAcA-byKs7AxeH4Ze");
 const Escrow_contractAddress = "0xb7eBD3c77C8c0B0Cf783b7C8930C01BCDf8c562C"; // Replace with your Escrow contract address
 
 

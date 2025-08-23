@@ -11,6 +11,13 @@ function formatDateFromUnix(unix) {
   return d.toLocaleString();
 }
 
+function formatDateToUnix(dateString) {
+  if (!dateString) return 0;
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 0;
+  return Math.floor(date.getTime() / 1000);
+}
+
 export default function CreateProposalCard({
   dbId,
   budget,
@@ -27,7 +34,7 @@ export default function CreateProposalCard({
     error,
     proposalEvent,
   } = useCreateProposal();
-  const [deadlineOverride, setDeadlineOverride] = useState(0);
+  const [deadlineOverride, setDeadlineOverride] = useState("");
   const [usdBudget, setUsdBudget] = useState(Number(budget || 0));
   const toastIdRef = useRef("create-proposal-toast");
   const hasPersistedRef = useRef(false);
@@ -45,7 +52,17 @@ export default function CreateProposalCard({
     return seconds;
   }, [projectDuration]);
 
-  const uiDeadline = deadlineOverride > 0 ? deadlineOverride : inferredDeadline;
+  // Convert inferred deadline to datetime-local format for display
+  const inferredDeadlineDate = useMemo(() => {
+    const ms = inferredDeadline * 1000;
+    const date = new Date(ms);
+    // Format as YYYY-MM-DDTHH:MM for datetime-local input
+    return date.toISOString().slice(0, 16);
+  }, [inferredDeadline]);
+
+  const uiDeadline = deadlineOverride
+    ? formatDateToUnix(deadlineOverride)
+    : inferredDeadline;
   const minorUnits = (() => {
     try {
       return Number(toUSDC6(usdBudget));
@@ -181,14 +198,12 @@ export default function CreateProposalCard({
           </div>
 
           <div>
-            <label className="block text-sm text-gray-300 mb-1">
-              Deadline (unix)
-            </label>
+            <label className="block text-sm text-gray-300 mb-1">Deadline</label>
             <input
-              type="number"
-              placeholder={String(inferredDeadline)}
-              value={deadlineOverride || ""}
-              onChange={(e) => setDeadlineOverride(Number(e.target.value))}
+              type="datetime-local"
+              placeholder={inferredDeadlineDate}
+              value={deadlineOverride || inferredDeadlineDate}
+              onChange={(e) => setDeadlineOverride(e.target.value)}
               className="w-full bg-slate-900/60 border border-slate-700 rounded-lg px-3 py-2 text-gray-200 focus:outline-none focus:border-fuchsia-500/60"
             />
             <div className="text-xs text-fuchsia-300 mt-1">

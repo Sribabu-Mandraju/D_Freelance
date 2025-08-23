@@ -10,6 +10,10 @@ import {
   searchProposals,
   getProposalStats,
   bulkUpdateProposals,
+  getProposalsByContractState,
+  getAcceptedProposals,
+  getProposalsByUserWallet,
+  getProposalsByBidderWallet,
   // acceptBid
 } from "../controllers/ProposalController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -18,11 +22,20 @@ const router = express.Router();
 
 // Public routes (no authentication required)
 router.get("/", getAllProposals);
+router.get("/openBids", getProposalsByContractState);
 router.get("/search", searchProposals);
 router.get("/:id", getProposalById);
 
+router.get("/user/accepted-proposals", authMiddleware, getAcceptedProposals);
+router.get("/user/:walletAddress", getProposalsByUserWallet);
+router.get("/userBids/:walletAddress", getProposalsByBidderWallet);
+
+
+
+
 // Protected routes (authentication required)
 router.post("/", authMiddleware, createProposal);
+
 router.post("/bulk-update", authMiddleware, bulkUpdateProposals); 
 router.get("/user/my-proposals", authMiddleware, getProposalsByUser);
 router.get("/user/stats", authMiddleware, getProposalStats);  
