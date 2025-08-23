@@ -2,9 +2,10 @@ import Proposal from "../models/ProposalModel.js";
 import Portfolio from "../models/PortfolioModel.js";
 import { ethers } from "ethers";
 import ProposalManager_ABI from '../abis/ProposalManager_ABI.json' with { type: 'json' };
+import mongoose from "mongoose";
 
 // Contract configuration
-const provider = new ethers.JsonRpcProvider("https://sepolia.base.org");
+const provider = new ethers.JsonRpcProvider("https://base-sepolia.g.alchemy.com/v2/vt_tNAcA-byKs7AxeH4Ze");
 const ProposalManager_contractAddress = "0x9e002323F46D6908EC4ef5444f1Bd0F67AF9Cf10";
 const ProposalManager_contract = new ethers.Contract(
   ProposalManager_contractAddress,
@@ -187,7 +188,16 @@ export const updateProposalId = async (req, res) => {
 // Get a proposal by ID with contract data if available
 export const getProposalById = async (req, res) => {
   try {
-    const proposal = await Proposal.findById(req.params.id)
+    const { id } = req.params;
+    
+    // Validate that the ID is a valid MongoDB ObjectId
+    if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
+      return res.status(400).json({ 
+        message: "Invalid proposal ID format. ID must be a 24-character hexadecimal string." 
+      });
+    }
+
+    const proposal = await Proposal.findById(id)
       .populate("bids", "bidder amount description") // Populate bids with relevant fields
       .populate("accepted_bidder", "name email"); // Populate accepted bidder info
 
@@ -278,65 +288,6 @@ export const getProposalById = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server error while fetching proposal" });
-  }
-};
-
-// Get all proposals
-export const getAllProposals = async (req, res) => {
-  try {
-    const proposals = await Proposal.find({})
-      .populate("bids", "bidder amount description")
-      .populate("accepted_bidder", "name email");
-
-    console.log("🔍 Total proposals found:", proposals.length);
-
-    // Fetch user portfolio details for each proposal
-    const proposalsWithUserDetails = await Promise.all(
-      proposals.map(async (proposal) => {
-        let userPortfolioDetails = null;
-        
-        if (proposal.userWalletAddress) {
-          try {
-            console.log(`🔍 Searching portfolio for proposal ${proposal._id} with wallet:`, proposal.userWalletAddress);
-            
-            const portfolio = await Portfolio.findOne({
-              "heroSection.walletAddress": proposal.userWalletAddress
-            });
-            
-            if (portfolio) {
-              userPortfolioDetails = {
-                name: portfolio.heroSection.name,
-                profile: portfolio.heroSection.profile,
-                email: portfolio.contactInfo.email
-              };
-              console.log(`✅ Portfolio details found for proposal ${proposal._id}:`, userPortfolioDetails);
-            } else {
-              console.log(`⚠️ No portfolio found for proposal ${proposal._id} with wallet:`, proposal.userWalletAddress);
-            }
-          } catch (portfolioError) {
-            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
-            // Portfolio fetch failed, but don't fail the entire request
-            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
-          }
-        } else {
-          console.log(`⚠️ Proposal ${proposal._id} has no userWalletAddress`);
-        }
-
-        return {
-          ...proposal.toObject(),
-          userPortfolioDetails
-        };
-      })
-    );
-
-    console.log("📊 Final result - proposals with user details:", proposalsWithUserDetails.length);
-
-    return res.json(proposalsWithUserDetails);
-  } catch (error) {
-    console.error("❌ Get all proposals error:", error);
-    return res
-      .status(500)
-      .json({ message: "Server error while fetching proposals" });
   }
 };
 
@@ -572,5 +523,464 @@ export const bulkUpdateProposals = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server error while performing bulk update" });
+  }
+};
+
+// Get proposals where a specific user has placed bids
+export const getProposalsByBidderWallet = async (req, res) => {
+  try {
+    const { walletAddress } = req.params;
+    
+    if (!walletAddress) {
+      return res
+        .status(400)
+        .json({ message: "Wallet address is required" });
+    }
+
+    console.log(`🔍 Searching for proposals where user ${walletAddress} has placed bids`);
+
+    // First, find all bids by this user
+    const Bid = mongoose.model("Bid");
+    const userBids = await Bid.find({ wallet_address: walletAddress });
+    
+    console.log(`🔍 Total bids found for wallet ${walletAddress}: ${userBids.length}`);
+
+    if (userBids.length === 0) {
+      return res.json([]);
+    }
+
+    // Extract proposal IDs from the bids
+    const proposalIds = userBids.map(bid => bid.proposal_id);
+    console.log(`🔍 Proposal IDs found: ${proposalIds.length}`);
+
+    // Fetch all proposals where the user has placed bids
+    const proposals = await Proposal.find({ _id: { $in: proposalIds } })
+      .populate("bids", "bidder amount description")
+      .populate("accepted_bidder", "name email");
+
+    console.log(`🔍 Total proposals found for bids: ${proposals.length}`);
+
+    // Fetch user portfolio details and contract data for each proposal
+    const proposalsWithDetails = await Promise.all(
+      proposals.map(async (proposal) => {
+        let userPortfolioDetails = null;
+        let contractData = null;
+        
+        // Fetch user portfolio details
+        if (proposal.userWalletAddress) {
+          try {
+            const portfolio = await Portfolio.findOne({
+              "heroSection.walletAddress": proposal.userWalletAddress
+            });
+            
+            if (portfolio) {
+              userPortfolioDetails = {
+                name: portfolio.heroSection.name,
+                profile: portfolio.heroSection.profile,
+                email: portfolio.contactInfo.email
+              };
+            }
+          } catch (portfolioError) {
+            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
+            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+          }
+        }
+
+        // Fetch contract data if proposalId exists
+        if (proposal.proposalId) {
+          try {
+            const contractProposal = await ProposalManager_contract.getProposal(proposal.proposalId);
+            
+            contractData = {
+              contractProposalId: contractProposal.id.toString(),
+              client: contractProposal.client,
+              bidder: contractProposal.bidder,
+              startTime: contractProposal.startTime.toString(),
+              endTime: contractProposal.endTime.toString(),
+              budget: contractProposal.budget.toString(),
+              bidAmount: contractProposal.bidAmount.toString(),
+              state: contractProposal.state.toString()
+            };
+          } catch (contractError) {
+            console.error(`❌ Contract data fetch error for proposal ${proposal._id}:`, contractError);
+            contractData = { error: "Failed to fetch contract data" };
+          }
+        }
+
+        // Find the user's specific bid for this proposal
+        const userBid = userBids.find(bid => 
+          bid.proposal_id.toString() === proposal._id.toString()
+        );
+
+        return {
+          ...proposal.toObject(),
+          userPortfolioDetails,
+          contractData,
+          userBid: userBid ? {
+            bidAmount: userBid.bid_amount,
+            coverLetter: userBid.cover_letter,
+            createdAt: userBid.createdAt
+          } : null
+        };
+      })
+    );
+
+    console.log(`📊 Final result - proposals where user ${walletAddress} has bid: ${proposalsWithDetails.length}`);
+
+    return res.json(proposalsWithDetails);
+  } catch (error) {
+    console.error("❌ Get proposals by bidder wallet error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching proposals by bidder wallet" });
+  }
+};
+
+// Get proposals by user wallet address (for any user, not just authenticated user)
+export const getProposalsByUserWallet = async (req, res) => {
+  try {
+    const { walletAddress } = req.params;
+    
+    if (!walletAddress) {
+      return res
+        .status(400)
+        .json({ message: "Wallet address is required" });
+    }
+
+    console.log(`🔍 Searching for proposals with userWalletAddress: ${walletAddress}`);
+
+    const proposals = await Proposal.find({ userWalletAddress: walletAddress })
+      .populate("bids", "bidder amount description")
+      .populate("accepted_bidder", "name email");
+
+    console.log(`🔍 Total proposals found for wallet ${walletAddress}: ${proposals.length}`);
+
+    // Fetch user portfolio details and contract data for each proposal
+    const proposalsWithDetails = await Promise.all(
+      proposals.map(async (proposal) => {
+        let userPortfolioDetails = null;
+        let contractData = null;
+        
+        // Fetch user portfolio details
+        if (proposal.userWalletAddress) {
+          try {
+            const portfolio = await Portfolio.findOne({
+              "heroSection.walletAddress": proposal.userWalletAddress
+            });
+            
+            if (portfolio) {
+              userPortfolioDetails = {
+                name: portfolio.heroSection.name,
+                profile: portfolio.heroSection.profile,
+                email: portfolio.contactInfo.email
+              };
+            }
+          } catch (portfolioError) {
+            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
+            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+          }
+        }
+
+        // Fetch contract data if proposalId exists
+        if (proposal.proposalId) {
+          try {
+            const contractProposal = await ProposalManager_contract.getProposal(proposal.proposalId);
+            
+            contractData = {
+              contractProposalId: contractProposal.id.toString(),
+              client: contractProposal.client,
+              bidder: contractProposal.bidder,
+              startTime: contractProposal.startTime.toString(),
+              endTime: contractProposal.endTime.toString(),
+              budget: contractProposal.budget.toString(),
+              bidAmount: contractProposal.bidAmount.toString(),
+              state: contractProposal.state.toString()
+            };
+          } catch (contractError) {
+            console.error(`❌ Contract data fetch error for proposal ${proposal._id}:`, contractError);
+            contractData = { error: "Failed to fetch contract data" };
+          }
+        }
+
+        return {
+          ...proposal.toObject(),
+          userPortfolioDetails,
+          contractData
+        };
+      })
+    );
+
+    console.log(`📊 Final result - proposals for wallet ${walletAddress}: ${proposalsWithDetails.length}`);
+
+    return res.json(proposalsWithDetails);
+  } catch (error) {
+    console.error("❌ Get proposals by user wallet error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching proposals by user wallet" });
+  }
+};
+
+// Get accepted proposals for the authenticated user (where they are the bidder)
+export const getAcceptedProposals = async (req, res) => {
+  try {
+    const walletAddress = req.user.address;
+    if (!walletAddress) {
+      return res
+        .status(400)
+        .json({ message: "User wallet address is required" });
+    }
+
+    console.log(`🔍 Searching for accepted proposals where user ${walletAddress} is the bidder`);
+
+    const proposals = await Proposal.find({})
+      .populate("bids", "bidder amount description")
+      .populate("accepted_bidder", "name email");
+
+    console.log(`🔍 Total proposals found: ${proposals.length}`);
+
+    // Fetch user portfolio details and contract data for each proposal, then filter by bidder
+    const proposalsWithDetails = await Promise.all(
+      proposals.map(async (proposal) => {
+        let userPortfolioDetails = null;
+        let contractData = null;
+        
+        // Fetch user portfolio details
+        if (proposal.userWalletAddress) {
+          try {
+            const portfolio = await Portfolio.findOne({
+              "heroSection.walletAddress": proposal.userWalletAddress
+            });
+            
+            if (portfolio) {
+              userPortfolioDetails = {
+                name: portfolio.heroSection.name,
+                profile: portfolio.heroSection.profile,
+                email: portfolio.contactInfo.email
+              };
+            }
+          } catch (portfolioError) {
+            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
+            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+          }
+        }
+
+        // Fetch contract data if proposalId exists
+        if (proposal.proposalId) {
+          try {
+            const contractProposal = await ProposalManager_contract.getProposal(proposal.proposalId);
+            
+            contractData = {
+              contractProposalId: contractProposal.id.toString(),
+              client: contractProposal.client,
+              bidder: contractProposal.bidder,
+              startTime: contractProposal.startTime.toString(),
+              endTime: contractProposal.endTime.toString(),
+              budget: contractProposal.budget.toString(),
+              bidAmount: contractProposal.bidAmount.toString(),
+              state: contractProposal.state.toString()
+            };
+          } catch (contractError) {
+            console.error(`❌ Contract data fetch error for proposal ${proposal._id}:`, contractError);
+            contractData = { error: "Failed to fetch contract data" };
+          }
+        }
+
+        return {
+          ...proposal.toObject(),
+          userPortfolioDetails,
+          contractData
+        };
+      })
+    );
+
+    // Filter proposals where the authenticated user is the bidder
+    const acceptedProposals = proposalsWithDetails.filter(proposal => {
+      // Only include proposals that have contract data and where the user is the bidder
+      return proposal.contractData && 
+             !proposal.contractData.error && 
+             proposal.contractData.bidder.toLowerCase() === walletAddress.toLowerCase();
+    });
+
+    console.log(`📊 Final result - accepted proposals for user ${walletAddress}: ${acceptedProposals.length}`);
+
+    return res.json(acceptedProposals);
+  } catch (error) {
+    console.error("❌ Get accepted proposals error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching accepted proposals" });
+  }
+};
+
+// Get proposals by contract state
+export const getProposalsByContractState = async (req, res) => {
+  try {
+    const { state = 1 } = req.query; // Default to state 1, but allow query param override
+    
+    const proposals = await Proposal.find({})
+      .populate("bids", "bidder amount description")
+      .populate("accepted_bidder", "name email");
+
+    console.log(`🔍 Total proposals found: ${proposals.length}, filtering by contract state: ${state}`);
+
+    // Fetch user portfolio details and contract data for each proposal, then filter by state
+    const proposalsWithDetails = await Promise.all(
+      proposals.map(async (proposal) => {
+        let userPortfolioDetails = null;
+        let contractData = null;
+        
+        // Fetch user portfolio details
+        if (proposal.userWalletAddress) {
+          try {
+            const portfolio = await Portfolio.findOne({
+              "heroSection.walletAddress": proposal.userWalletAddress
+            });
+            
+            if (portfolio) {
+              userPortfolioDetails = {
+                name: portfolio.heroSection.name,
+                profile: portfolio.heroSection.profile,
+                email: portfolio.contactInfo.email
+              };
+            }
+          } catch (portfolioError) {
+            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
+            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+          }
+        }
+
+        // Fetch contract data if proposalId exists
+        if (proposal.proposalId) {
+          try {
+            const contractProposal = await ProposalManager_contract.getProposal(proposal.proposalId);
+            
+            contractData = {
+              contractProposalId: contractProposal.id.toString(),
+              client: contractProposal.client,
+              bidder: contractProposal.bidder,
+              startTime: contractProposal.startTime.toString(),
+              endTime: contractProposal.endTime.toString(),
+              budget: contractProposal.budget.toString(),
+              bidAmount: contractProposal.bidAmount.toString(),
+              state: contractProposal.state.toString()
+            };
+          } catch (contractError) {
+            console.error(`❌ Contract data fetch error for proposal ${proposal._id}:`, contractError);
+            contractData = { error: "Failed to fetch contract data" };
+          }
+        }
+
+        return {
+          ...proposal.toObject(),
+          userPortfolioDetails,
+          contractData
+        };
+      })
+    );
+
+    // Filter proposals by contract state
+    const filteredProposals = proposalsWithDetails.filter(proposal => {
+      // Only include proposals that have contract data and match the specified state
+      return proposal.contractData && 
+             !proposal.contractData.error && 
+             Number(proposal.contractData.state) === Number(state);
+    });
+
+    console.log(`📊 Final result - proposals with contract state ${state}: ${filteredProposals.length}`);
+
+    return res.json(filteredProposals);
+  } catch (error) {
+    console.error("❌ Get proposals by contract state error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching proposals by contract state" });
+  }
+};
+
+// Get all proposals
+export const getAllProposals = async (req, res) => {
+  try {
+    const proposals = await Proposal.find({})
+      .populate("bids", "bidder amount description")
+      .populate("accepted_bidder", "name email");
+
+    console.log("🔍 Total proposals found:", proposals.length);
+
+    // Fetch user portfolio details and contract data for each proposal
+    const proposalsWithDetails = await Promise.all(
+      proposals.map(async (proposal) => {
+        let userPortfolioDetails = null;
+        let contractData = null;
+        
+        // Fetch user portfolio details
+        if (proposal.userWalletAddress) {
+          try {
+            console.log(`🔍 Searching portfolio for proposal ${proposal._id} with wallet:`, proposal.userWalletAddress);
+            
+            const portfolio = await Portfolio.findOne({
+              "heroSection.walletAddress": proposal.userWalletAddress
+            });
+            
+            if (portfolio) {
+              userPortfolioDetails = {
+                name: portfolio.heroSection.name,
+                profile: portfolio.heroSection.profile,
+                email: portfolio.contactInfo.email
+              };
+              console.log(`✅ Portfolio details found for proposal ${proposal._id}:`, userPortfolioDetails);
+            } else {
+              console.log(`⚠️ No portfolio found for proposal ${proposal._id} with wallet:`, proposal.userWalletAddress);
+            }
+          } catch (portfolioError) {
+            console.error(`❌ Portfolio fetch error for proposal ${proposal._id}:`, portfolioError);
+            // Portfolio fetch failed, but don't fail the entire request
+            userPortfolioDetails = { error: "Failed to fetch user portfolio details" };
+          }
+        } else {
+          console.log(`⚠️ Proposal ${proposal._id} has no userWalletAddress`);
+        }
+
+        // Fetch contract data if proposalId exists
+        if (proposal.proposalId) {
+          try {
+            const contractProposal = await ProposalManager_contract.getProposal(proposal.proposalId);
+            
+            contractData = {
+              contractProposalId: contractProposal.id.toString(),
+              client: contractProposal.client,
+              bidder: contractProposal.bidder,
+              startTime: contractProposal.startTime.toString(),
+              endTime: contractProposal.endTime.toString(),
+              budget: contractProposal.budget.toString(),
+              bidAmount: contractProposal.bidAmount.toString(),
+              state: contractProposal.state.toString()
+            };
+            console.log(`✅ Contract data fetched for proposal ${proposal._id}:`, contractData);
+          } catch (contractError) {
+            console.error(`❌ Contract data fetch error for proposal ${proposal._id}:`, contractError);
+            // Contract data fetch failed, but don't fail the entire request
+            contractData = { error: "Failed to fetch contract data" };
+          }
+        } else {
+          console.log(`⚠️ Proposal ${proposal._id} has no proposalId`);
+        }
+
+        return {
+          ...proposal.toObject(),
+          userPortfolioDetails,
+          contractData
+        };
+      })
+    );
+
+    console.log("📊 Final result - proposals with user details and contract data:", proposalsWithDetails.length);
+
+    return res.json(proposalsWithDetails);
+  } catch (error) {
+    console.error("❌ Get all proposals error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching proposals" });
   }
 };

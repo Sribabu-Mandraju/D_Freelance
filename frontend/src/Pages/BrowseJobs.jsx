@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Navbar from "../Components/Navbar";
 
-const API_BASE_URL = "http://localhost:3001/api/proposals";
+const API_BASE_URL = "http://localhost:3001/api/proposals/openBids";
 
 // USDC uses 6 decimals; values from backend may be in micro-USDC
 const USDC_DECIMALS = 6;
@@ -196,6 +196,14 @@ const BrowseJobs = () => {
                   className="w-full pl-9 pr-4 py-2 bg-gray-900/50  -cyan-500/50 rounded-lg text-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-sm"
                 />
               </div>
+
+              {/* Create Work Button */}
+              <button
+                onClick={() => navigate("/post-job")}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg transform hover:scale-105 text-sm w-full sm:w-auto"
+              >
+                + Create Work
+              </button>
 
               {/* Category Filter */}
               <select
@@ -400,7 +408,6 @@ function JobCard({ job, isSaved, onToggleSave, onClick }) {
           <MapPin className="w-3 h-3" />
           <span>{job.location}</span>
         </div>
-      
       </div>
 
       {/* Client Info and Actions */}

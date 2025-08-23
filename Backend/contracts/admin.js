@@ -6,7 +6,7 @@ import Treasury_ABI from "../abis/Treasury_ABI.json" with { type: "json" };
 import ERC20_ABI from "../abis/ERC20_ABI.json" with { type: "json" };
 
 // Initialize provider
-const provider = new ethers.JsonRpcProvider("https://sepolia.base.org");
+const provider = new ethers.JsonRpcProvider("https://base-sepolia.g.alchemy.com/v2/vt_tNAcA-byKs7AxeH4Ze");
 
 // Contract addresses
 const CONTRACT_ADDRESSES = {
