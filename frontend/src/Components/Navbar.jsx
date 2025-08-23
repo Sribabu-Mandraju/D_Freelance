@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { toast } from "react-hot-toast";
 import { Link, useLocation } from "react-router-dom";
 import WalletConnect from "./walletConnection/WalletConnect";
 import {
