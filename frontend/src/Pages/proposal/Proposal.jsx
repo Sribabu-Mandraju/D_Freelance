@@ -7,7 +7,7 @@ import ReviewSubmitStep from "../../Components/proposal/ReviewSubmit";
 import ProgressIndicator from "./ProgressIndicator";
 import Navbar from "../../Components/Navbar";
 import { toast } from "react-hot-toast";
-import { Wallet } from "lucide-react";
+import { Wallet, Upload, X, Image as ImageIcon } from "lucide-react";
 
 // USDC uses 6 decimals; 1 USD = 1_000_000 micro-USDC
 const USDC_DECIMALS = 6;
@@ -47,6 +47,8 @@ export default function Proposal() {
   const [authToken, setAuthToken] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
   // Get auth token from localStorage on component mount
   useEffect(() => {
@@ -108,9 +110,57 @@ export default function Proposal() {
     }
   };
 
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith("image/")) {
+        setSelectedFile(file);
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error("Please upload an image file");
+      }
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type.startsWith("image/")) {
+        setSelectedFile(file);
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error("Please upload an image file");
+      }
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedFile(null);
+    setFormData((prev) => ({ ...prev, image: "" }));
+  };
+
   const handleSubmit = async () => {
     if (!authToken) {
       toast.error("Authentication required. Please connect your wallet.");
+      return;
+    }
+
+    if (isSubmitting) {
+      toast.error("Submission already in progress. Please wait.");
       return;
     }
 
@@ -125,6 +175,7 @@ export default function Proposal() {
       return;
     }
 
+    setIsSubmitting(true);
     setLoading(true);
     setError("");
     setSuccess(false);
@@ -137,6 +188,7 @@ export default function Proposal() {
         imageUrl = await handleImageUpload(selectedFile);
         if (!imageUrl) {
           setLoading(false);
+          setIsSubmitting(false);
           return;
         }
         setFormData((prev) => ({ ...prev, image: imageUrl }));
@@ -249,6 +301,7 @@ export default function Proposal() {
       console.error("Error creating proposal:", err);
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -272,7 +325,7 @@ export default function Proposal() {
   // Show authentication required message if user is not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="mx-auto px-4 py-8 w-[95%] md:w-[70%] mt-[70px] md:mt-[50px]">
+      <div className="mx-auto px-4 py-8 w-[95%] md:w-[70%] lg:w-[60%] xl:w-[50%] mt-[70px] md:mt-[50px]">
         <Navbar />
         <div className="text-center py-16">
           <div className="w-24 h-24 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -297,7 +350,7 @@ export default function Proposal() {
   }
 
   return (
-    <div className=" mx-auto px-4 py-8 w-[95%] md:w-[70%] mt-[70px] md:mt-[50px] ">
+    <div className="mx-auto px-4 py-8 w-[95%] md:w-[80%] lg:w-[70%] xl:w-[60%] 2xl:w-[50%] mt-[70px] md:mt-[50px]">
       <Navbar />
       <div className="mb-4"></div>
       {/* Header */}
@@ -340,6 +393,12 @@ export default function Proposal() {
               selectedFile={selectedFile}
               setSelectedFile={setSelectedFile}
               handleImageUpload={handleImageUpload}
+              isSubmitting={isSubmitting}
+              dragActive={dragActive}
+              handleDrag={handleDrag}
+              handleDrop={handleDrop}
+              handleFileSelect={handleFileSelect}
+              removeImage={removeImage}
             />
           )}
         </div>

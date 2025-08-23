@@ -194,7 +194,7 @@ def send_message(user_prompt):
         str: The model's generated response, formatted in Markdown with aligned bullet points and clickable links.
     """
     try:
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        genai.configure(api_key="AIzaSyD42H1VMFhmFkcXS7MiWhdwaPgmkBmPN1w")
         model = genai.GenerativeModel('gemini-2.5-flash')
 
         formatting_instructions = """

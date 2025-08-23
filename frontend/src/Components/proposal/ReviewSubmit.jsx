@@ -8,20 +8,9 @@ export default function ReviewSubmit({
   prevStep,
   handleSubmit,
   success,
+  isSubmitting,
 }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  //   const handleSubmit = async () => {
-  //     setIsSubmitting(true)
-
-  //     // Simulate API call
-  //     await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  //     console.log("Proposal Data:", formData)
-  //     setIsSubmitting(false)
-  //     setIsSubmitted(true)
-  //   }
 
   const handleEditableToggle = () => {
     updateFormData({ isEditable: !formData.isEditable });
@@ -210,9 +199,10 @@ export default function ReviewSubmit({
             <button
               type="button"
               onClick={handleEditableToggle}
+              disabled={isSubmitting}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ${
                 formData.isEditable ? "bg-cyan-500" : "bg-gray-600"
-              }`}
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
@@ -228,16 +218,21 @@ export default function ReviewSubmit({
       <div className="flex justify-between mt-8 pt-6 border-t border-gray-700">
         <button
           onClick={prevStep}
-          className="md:px-8 px-2 md:py-3 py-2  bg-slate-700 text-gray-300 font-semibold rounded-xl hover:bg-slate-600 transform hover:scale-105 transition-all duration-200"
+          disabled={isSubmitting}
+          className={`md:px-8 px-2 md:py-3 py-2 bg-slate-700 text-gray-300 font-semibold rounded-xl transform transition-all duration-200 ${
+            isSubmitting
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-slate-600 hover:scale-105"
+          }`}
         >
           ← Previous
         </button>
         <button
           onClick={handleSubmit}
           disabled={isSubmitting}
-          className={`md:px-8 px-2 py-3 font-semibold rounded-xl transform transition-all duration-200 shadow-lg hover:shadow-xl ${
+          className={`md:px-8 px-2 py-3 font-semibold rounded-xl transform transition-all duration-200 shadow-lg ${
             isSubmitting
-              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+              ? "bg-gray-600 text-gray-400 cursor-not-allowed opacity-50"
               : "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-400 hover:to-emerald-400 hover:scale-105 shadow-green-500/25 hover:shadow-green-500/40"
           }`}
         >

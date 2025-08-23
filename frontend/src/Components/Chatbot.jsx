@@ -1,16 +1,27 @@
-"use client"
+"use client";
 
-import { useState, Component, useRef, useEffect } from "react"
-import ReactMarkdown from "react-markdown"
-import rehypeRaw from "rehype-raw"
-import { MessageSquare, X, Send, LucideStar, Paperclip, LucideImage, LucideSmile, Bot, Sparkles } from "lucide-react"
+import { useState, Component, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import {
+  MessageSquare,
+  X,
+  Send,
+  LucideStar,
+  Paperclip,
+  LucideImage,
+  LucideSmile,
+  Bot,
+  Sparkles,
+} from "lucide-react";
+import { getChatbotConfig } from "../config/chatbot.js";
 
 // Error Boundary Component
 class ErrorBoundary extends Component {
-  state = { hasError: false, error: null }
+  state = { hasError: false, error: null };
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   render() {
@@ -20,15 +31,15 @@ class ErrorBoundary extends Component {
           <p className="font-semibold">Something went wrong</p>
           <p className="text-xs mt-1">Please try refreshing the chat</p>
         </div>
-      )
+      );
     }
-    return this.props.children
+    return this.props.children;
   }
 }
 
 export default function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [currentView, setCurrentView] = useState("welcome")
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentView, setCurrentView] = useState("welcome");
   const [messages, setMessages] = useState([
     {
       id: "1",
@@ -36,102 +47,154 @@ export default function Chatbot() {
       isBot: true,
       timestamp: new Date(),
     },
-  ])
-  const [inputValue, setInputValue] = useState("")
-  const [rating, setRating] = useState(0)
-  const [feedback, setFeedback] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBackendConnected, setIsBackendConnected] = useState(true);
 
-  const chatContainerRef = useRef(null)
+  const chatContainerRef = useRef(null);
+
+  // Health check function to verify backend connectivity
+  const checkBackendHealth = async () => {
+    try {
+      const config = getChatbotConfig();
+      const response = await fetch(config.apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: "health_check" }),
+      });
+      const isConnected = response.ok;
+      setIsBackendConnected(isConnected);
+      return isConnected;
+    } catch (error) {
+      console.warn("Backend health check failed:", error);
+      setIsBackendConnected(false);
+      return false;
+    }
+  };
 
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
         top: chatContainerRef.current.scrollHeight,
         behavior: "smooth",
-      })
+      });
     }
-  }, [messages])
+  }, [messages]);
+
+  // Check backend health on component mount
+  useEffect(() => {
+    checkBackendHealth();
+  }, []);
 
   const faqItems = [
     { icon: "🌟", text: "What are the premium features?" },
     { icon: "🔐", text: "How secure is my data?" },
     { icon: "⚡", text: "What's new in the latest update?" },
     { icon: "🎮", text: "How do I get started?" },
-  ]
+  ];
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return
+    if (!inputValue.trim()) return;
 
     const newMessage = {
       id: Date.now().toString(),
       text: inputValue,
       isBot: false,
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, newMessage])
-    setInputValue("")
-    setIsLoading(true)
+    setMessages((prev) => [...prev, newMessage]);
+    setInputValue("");
+    setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chat", {
+      const config = getChatbotConfig();
+
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+
+      const response = await fetch(config.apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: newMessage.text }),
-      })
+        signal: controller.signal,
+      });
 
-      if (!response.ok) throw new Error("Failed to fetch bot response")
+      clearTimeout(timeoutId);
 
-      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
       const botResponse = {
         id: (Date.now() + 1).toString(),
         text: data.response || "Sorry, I couldn't process that request.",
         isBot: true,
         timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, botResponse]);
+      // Update connection status to connected after successful response
+      setIsBackendConnected(true);
+    } catch (error) {
+      console.error("Error fetching bot response:", error);
+
+      let errorText =
+        "⚠️ **Connection Error:** Unable to reach the chatbot server. Please ensure the backend is running or try again later.";
+
+      if (error.name === "AbortError") {
+        errorText =
+          "⚠️ **Timeout Error:** The request took too long. Please try again.";
+      } else if (error.message.includes("Failed to fetch")) {
+        errorText =
+          "⚠️ **Network Error:** Please check your internet connection and try again.";
       }
 
-      setMessages((prev) => [...prev, botResponse])
-    } catch (error) {
-      console.error("Error fetching bot response:", error)
       const errorMessage = {
         id: (Date.now() + 1).toString(),
-        text: "⚠️ **Connection Error:** Unable to reach the server. Please try again.",
+        text: errorText,
         isBot: true,
         timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleFaqClick = (question) => {
-    setCurrentView("chat")
+    setCurrentView("chat");
     const faqMessage = {
       id: Date.now().toString(),
       text: question,
       isBot: false,
       timestamp: new Date(),
-    }
-    setMessages((prev) => [...prev, faqMessage])
-    handleSendMessage()
-  }
+    };
+    setMessages((prev) => [...prev, faqMessage]);
+    handleSendMessage();
+  };
 
   const handleFeedbackSubmit = () => {
-    console.log("Feedback submitted:", { rating, feedback })
-    setCurrentView("welcome")
-    setRating(0)
-    setFeedback("")
-  }
+    console.log("Feedback submitted:", { rating, feedback });
+    setCurrentView("welcome");
+    setRating(0);
+    setFeedback("");
+  };
 
-  const MessageIcon = ({ size = 20 }) => <MessageSquare size={size} />
-  const XIcon = ({ size = 18 }) => <X size={size} />
-  const SendIcon = ({ size = 16 }) => <Send size={size} />
-  const StarIcon = ({ filled }) => <LucideStar size={20} fill={filled ? "currentColor" : "none"} />
-  const PaperclipIcon = ({ size = 14 }) => <Paperclip size={size} />
-  const ImageIcon = ({ size = 14 }) => <LucideImage size={size} />
-  const SmileIcon = ({ size = 14 }) => <LucideSmile size={size} />
+  const MessageIcon = ({ size = 20 }) => <MessageSquare size={size} />;
+  const XIcon = ({ size = 18 }) => <X size={size} />;
+  const SendIcon = ({ size = 16 }) => <Send size={size} />;
+  const StarIcon = ({ filled }) => (
+    <LucideStar size={20} fill={filled ? "currentColor" : "none"} />
+  );
+  const PaperclipIcon = ({ size = 14 }) => <Paperclip size={size} />;
+  const ImageIcon = ({ size = 14 }) => <LucideImage size={size} />;
+  const SmileIcon = ({ size = 14 }) => <LucideSmile size={size} />;
 
   return (
     <>
@@ -158,8 +221,27 @@ export default function Chatbot() {
                       {currentView === "welcome" ? "AI Assistant" : "Chat"}
                     </h3>
                     <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <p className="text-xs text-gray-400">Online</p>
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          isBackendConnected ? "bg-green-500" : "bg-red-500"
+                        }`}
+                      ></div>
+                      <p
+                        className={`text-xs ${
+                          isBackendConnected ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {isBackendConnected ? "Online" : "Offline"}
+                      </p>
+                      {!isBackendConnected && (
+                        <button
+                          onClick={checkBackendHealth}
+                          className="ml-2 text-xs text-blue-400 hover:text-blue-300 underline"
+                          title="Retry connection"
+                        >
+                          Retry
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -172,7 +254,10 @@ export default function Chatbot() {
               </div>
             </div>
 
-            <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
+            >
               {currentView === "welcome" && (
                 <div className="space-y-6">
                   <div className="text-center space-y-4">
@@ -180,15 +265,28 @@ export default function Chatbot() {
                       <Sparkles size={24} className="text-gray-300" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-100 mb-2">Welcome! How can I help?</h2>
+                      <h2 className="text-lg font-semibold text-gray-100 mb-2">
+                        Welcome! How can I help?
+                      </h2>
                       <p className="text-gray-400 text-sm leading-relaxed">
-                        I'm here to assist you with any questions or tasks you might have
+                        I'm here to assist you with any questions or tasks you
+                        might have
                       </p>
+                      {!isBackendConnected && (
+                        <div className="mt-3 p-2 bg-red-900/20 border border-red-700/30 rounded-lg">
+                          <p className="text-red-400 text-xs">
+                            ⚠️ Backend server is offline. Some features may not
+                            work properly.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <p className="text-gray-300 text-sm font-medium">Quick questions:</p>
+                    <p className="text-gray-300 text-sm font-medium">
+                      Quick questions:
+                    </p>
                     <div className="grid grid-cols-1 gap-2">
                       {faqItems.map((item, index) => (
                         <button
@@ -198,7 +296,9 @@ export default function Chatbot() {
                         >
                           <div className="flex items-center space-x-3">
                             <span className="text-lg">{item.icon}</span>
-                            <span className="text-gray-300 text-sm">{item.text}</span>
+                            <span className="text-gray-300 text-sm">
+                              {item.text}
+                            </span>
                           </div>
                         </button>
                       ))}
@@ -222,10 +322,16 @@ export default function Chatbot() {
                 <div className="space-y-4 pb-4">
                   {messages.map((message) => (
                     <ErrorBoundary key={message.id}>
-                      <div className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}>
+                      <div
+                        className={`flex ${
+                          message.isBot ? "justify-start" : "justify-end"
+                        }`}
+                      >
                         <div
                           className={`max-w-[85%] p-3 rounded-lg ${
-                            message.isBot ? "bg-gray-800 text-gray-200" : "bg-gray-700 text-white"
+                            message.isBot
+                              ? "bg-gray-800 text-gray-200"
+                              : "bg-gray-700 text-white"
                           }`}
                         >
                           {message.isBot && (
@@ -233,14 +339,21 @@ export default function Chatbot() {
                               <div className="w-5 h-5 bg-gray-700 rounded flex items-center justify-center">
                                 <Bot size={10} className="text-gray-300" />
                               </div>
-                              <span className="text-xs text-gray-400 font-medium">Assistant</span>
+                              <span className="text-xs text-gray-400 font-medium">
+                                Assistant
+                              </span>
                             </div>
                           )}
                           <div className="text-sm leading-relaxed">
-                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>{message.text}</ReactMarkdown>
+                            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                              {message.text}
+                            </ReactMarkdown>
                           </div>
                           <p className="text-xs opacity-70 mt-2 text-right">
-                            {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            {message.timestamp.toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
                           </p>
                         </div>
                       </div>
@@ -275,8 +388,12 @@ export default function Chatbot() {
                     <div className="w-12 h-12 bg-gray-800 rounded-lg mx-auto flex items-center justify-center">
                       <LucideStar size={20} className="text-yellow-500" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-100">Rate Your Experience</h3>
-                    <p className="text-gray-400 text-sm">Help us improve our service</p>
+                    <h3 className="text-lg font-semibold text-gray-100">
+                      Rate Your Experience
+                    </h3>
+                    <p className="text-gray-400 text-sm">
+                      Help us improve our service
+                    </p>
                   </div>
 
                   <div className="space-y-6">
@@ -288,17 +405,27 @@ export default function Chatbot() {
                             onClick={() => setRating(star)}
                             className="transition-all duration-200 hover:scale-110"
                           >
-                            <div className={`${star <= rating ? "text-yellow-500" : "text-gray-600"}`}>
+                            <div
+                              className={`${
+                                star <= rating
+                                  ? "text-yellow-500"
+                                  : "text-gray-600"
+                              }`}
+                            >
                               <StarIcon filled={star <= rating} />
                             </div>
                           </button>
                         ))}
                       </div>
-                      <p className="text-center text-sm text-gray-400">{rating}/5 stars</p>
+                      <p className="text-center text-sm text-gray-400">
+                        {rating}/5 stars
+                      </p>
                     </div>
 
                     <div>
-                      <p className="text-gray-300 text-sm mb-3 font-medium">Your Feedback</p>
+                      <p className="text-gray-300 text-sm mb-3 font-medium">
+                        Your Feedback
+                      </p>
                       <textarea
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
@@ -337,7 +464,9 @@ export default function Chatbot() {
                         onChange={(e) => setInputValue(e.target.value)}
                         placeholder="Type your message..."
                         className="w-full bg-gray-900 border border-gray-600 text-gray-200 placeholder-gray-500 pr-20 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 text-sm"
-                        onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                        onKeyPress={(e) =>
+                          e.key === "Enter" && handleSendMessage()
+                        }
                         disabled={isLoading}
                       />
                       <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-1">
@@ -376,5 +505,5 @@ export default function Chatbot() {
         </div>
       )}
     </>
-  )
+  );
 }
