@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import ProposalManager_ABI from '../abis/ProposalManager_ABI.json' with { type: 'json' };
 
-const provider = new ethers.JsonRpcProvider("https://sepolia.base.org");
+const provider = new ethers.JsonRpcProvider("https://base-sepolia.g.alchemy.com/v2/vt_tNAcA-byKs7AxeH4Ze");
 const ProposalManager_contractAddress = "0x9e002323F46D6908EC4ef5444f1Bd0F67AF9Cf10";
 
 const ProposalManager_contract = new ethers.Contract(

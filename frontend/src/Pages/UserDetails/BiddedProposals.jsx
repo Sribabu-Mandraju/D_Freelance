@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import JobCard from "../ProposalComponents/JobCard";
-
+import { useAccount } from "wagmi";
+import JobCard from "../../Components/ProposalComponents/JobCard";
 // If your backend returns USDC in micro units (1e6), use this.
 // Safe even if you pass a plain number/string budget.
 const USDC_DECIMALS = 6;
@@ -15,12 +15,13 @@ function formatUsdcFromMicro(value) {
   })}`;
 }
 
-const AcceptedProposals = () => {
+const BiddedProposals = () => {
   const [proposals, setProposals] = useState([]);
   const [savedJobs, setSavedJobs] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const {address} = useAccount();
 
   const fetchProposals = async () => {
     setLoading(true);
@@ -30,7 +31,7 @@ const AcceptedProposals = () => {
       const token = localStorage.getItem("authToken");
 
       const res = await fetch(
-        "http://localhost:3001/api/proposals/user/accepted-proposals",
+       `http://localhost:3001/api/proposals/userBids/${address}`,
         {
           method: "GET",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -170,4 +171,4 @@ const AcceptedProposals = () => {
   );
 };
 
-export default AcceptedProposals;
+export default BiddedProposals;

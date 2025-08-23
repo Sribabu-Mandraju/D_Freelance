@@ -104,7 +104,7 @@ const HowItWorksSection = () => {
   }, [isVisible, steps.length])
 
   return (
-    <section ref={sectionRef} id="how-it-works" className="py-20 px-4 relative overflow-hidden min-h-screen">
+    <section ref={sectionRef} id="how-it-works" className="py-20 px-4 relative hidden sm:block overflow-hidden min-h-screen">
       {/* Enhanced Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl animate-pulse"></div>

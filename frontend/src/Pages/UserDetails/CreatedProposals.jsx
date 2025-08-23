@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import JobCard from "../ProposalComponents/JobCard";
-
+import JobCard from "../../Components/ProposalComponents/JobCard";
+import { useAccount } from "wagmi";
 // If your backend returns USDC in micro units (1e6), use this.
 // Safe even if you pass a plain number/string budget.
 const USDC_DECIMALS = 6;
@@ -21,6 +21,7 @@ const AcceptedProposals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const {address} = useAccount();
 
   const fetchProposals = async () => {
     setLoading(true);
@@ -30,7 +31,7 @@ const AcceptedProposals = () => {
       const token = localStorage.getItem("authToken");
 
       const res = await fetch(
-        "http://localhost:3001/api/proposals/user/accepted-proposals",
+       `http://localhost:3001/api/proposals/user/${address}`,
         {
           method: "GET",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -132,7 +133,8 @@ const AcceptedProposals = () => {
     navigate(`/job/${job.id}`);
   };
 
-  if (loading) return <div className="p-4">Loading accepted proposals…</div>;
+  if (loading) return <div className="p-4">Loading created proposals…</div>;
+
 
   if (error)
     return (
@@ -149,7 +151,7 @@ const AcceptedProposals = () => {
     );
 
   if (!proposals.length)
-    return <div className="p-4">No accepted proposals found.</div>;
+    return <div className="p-4">No created proposals found.</div>;
 
   return (
     <div className="grid grid-cols-1  gap-4 p-4">
