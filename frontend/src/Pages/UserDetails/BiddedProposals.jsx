@@ -30,7 +30,6 @@ const BiddedProposals = () => {
     }
   }, [address]);
 
-
   // console.log(address.toLocaleLowerCase() === "0x30217a8c17ef5571639948d118d086c73f823058".toLowerCase());
 
   const fetchProposals = async () => {
@@ -43,11 +42,11 @@ const BiddedProposals = () => {
       const token = localStorage.getItem("authToken");
       console.log(
         "Fetching from:",
-        `http://localhost:3001/api/proposals/userBids/${address.toLowerCase()}`
+        `https://cryptolance-server.onrender.com/api/proposals/userBids/${address.toLowerCase()}`
       );
 
       const res = await fetch(
-        `http://localhost:3001/api/proposals/userBids/${address.toLowerCase()}`,
+        `https://cryptolance-server.onrender.com/api/proposals/userBids/${address.toLowerCase()}`,
         {
           method: "GET",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -68,8 +67,7 @@ const BiddedProposals = () => {
 
       const normalized = items.map((p) => {
         const job = p.job || p.relatedJob || {};
-        const client =
-          p.client ||
+        const client = p.client ||
           job.client ||
           p.clientDetails ||
           job.clientDetails || {
@@ -149,7 +147,9 @@ const BiddedProposals = () => {
   };
 
   if (!isConnected) {
-    return <div className="p-4">Please connect your wallet to view proposals.</div>;
+    return (
+      <div className="p-4">Please connect your wallet to view proposals.</div>
+    );
   }
 
   if (loading) return <div className="p-4">Loading accepted proposals…</div>;

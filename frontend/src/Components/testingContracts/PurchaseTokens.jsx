@@ -18,7 +18,7 @@ function PurchaseTokens() {
     setIsLoadingData(true);
     try {
       const response = await fetchData(
-        `http://localhost:3001/api/hftToken/userHFTtokenDetails/${address}`
+        `https://cryptolance-server.onrender.com/api/hftToken/userHFTtokenDetails/${address}`
       );
       if (response.success) {
         setUserTokenMetaData({
@@ -172,11 +172,23 @@ function PurchaseTokens() {
     } else if (isApproveConfirmed) {
       toastId = toast.success("USDC approved successfully!");
     } else if (purchaseError) {
-      const isCancelled = purchaseError.code === 4001 || /rejected|denied|cancelled/i.test(purchaseError.message);
-      toastId = toast.error(isCancelled ? "Transaction cancelled" : `Purchase error: ${purchaseError.message}`);
+      const isCancelled =
+        purchaseError.code === 4001 ||
+        /rejected|denied|cancelled/i.test(purchaseError.message);
+      toastId = toast.error(
+        isCancelled
+          ? "Transaction cancelled"
+          : `Purchase error: ${purchaseError.message}`
+      );
     } else if (approveError) {
-      const isCancelled = approveError.code === 4001 || /rejected|denied|cancelled/i.test(approveError.message);
-      toastId = toast.error(isCancelled ? "Transaction cancelled" : `Approval error: ${approveError.message}`);
+      const isCancelled =
+        approveError.code === 4001 ||
+        /rejected|denied|cancelled/i.test(approveError.message);
+      toastId = toast.error(
+        isCancelled
+          ? "Transaction cancelled"
+          : `Approval error: ${approveError.message}`
+      );
     }
     return () => {
       if (toastId) toast.dismiss(toastId);
@@ -230,7 +242,9 @@ function PurchaseTokens() {
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {isApprovePending || isApproveConfirming ? "Processing Approval..." : "Approve USDC"}
+          {isApprovePending || isApproveConfirming
+            ? "Processing Approval..."
+            : "Approve USDC"}
         </button>
       ) : (
         <button
@@ -258,7 +272,9 @@ function PurchaseTokens() {
               : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
-          {isPurchasePending || isPurchaseConfirming ? "Processing Purchase..." : "Purchase Tokens"}
+          {isPurchasePending || isPurchaseConfirming
+            ? "Processing Purchase..."
+            : "Purchase Tokens"}
         </button>
       )}
     </div>

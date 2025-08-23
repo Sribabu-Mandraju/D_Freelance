@@ -43,25 +43,35 @@ const initialState = {
   currentGigId: null,
 };
 
-export const fetchGig = createAsyncThunk("gig/fetchGig", async (id, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get(`http://localhost:3001/api/gigs/${id}`);
-    return data;
-  } catch (err) {
-    return rejectWithValue(err.response ? err.response.data : err.message);
+export const fetchGig = createAsyncThunk(
+  "gig/fetchGig",
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(
+        `https://cryptolance-server.onrender.com/api/gigs/${id}`
+      );
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response ? err.response.data : err.message);
+    }
   }
-});
+);
 
-export const fetchGigs = createAsyncThunk("gig/fetchGigs", async (filters = {}, { rejectWithValue }) => {
-  try {
-    const params = new URLSearchParams(filters).toString();
-    const url = `http://localhost:3001/api/gigs${params ? `?${params}` : ''}`;
-    const { data } = await axios.get(url);
-    return data;
-  } catch (err) {
-    return rejectWithValue(err.response ? err.response.data : err.message);
+export const fetchGigs = createAsyncThunk(
+  "gig/fetchGigs",
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const url = `https://cryptolance-server.onrender.com/api/gigs${
+        params ? `?${params}` : ""
+      }`;
+      const { data } = await axios.get(url);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response ? err.response.data : err.message);
+    }
   }
-});
+);
 
 // ✅ Async thunk for submitting gig
 export const submitGig = createAsyncThunk(
@@ -95,7 +105,7 @@ export const submitGig = createAsyncThunk(
       );
 
       const { data } = await axios.post(
-        "http://localhost:3001/api/gigs",
+        "https://cryptolance-server.onrender.com/api/gigs",
         payload,
         {
           headers: {
@@ -126,23 +136,42 @@ export const updateGig = createAsyncThunk(
       const payload = {
         ...formData,
         deliveryTime: Number(formData.deliveryTime),
-        images: Array.isArray(formData.images) ? formData.images.filter((img) => img?.url) : [],
-        basic: { ...packageData.basic, hourlyPay: Number(packageData.basic.hourlyPay) },
-        standard: { ...packageData.standard, hourlyPay: Number(packageData.standard.hourlyPay) },
-        pro: { ...packageData.pro, hourlyPay: Number(packageData.pro.hourlyPay) },
-      };
-      Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
-
-      const { data } = await axios.put(`http://localhost:3001/api/gigs/${id}`, payload, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+        images: Array.isArray(formData.images)
+          ? formData.images.filter((img) => img?.url)
+          : [],
+        basic: {
+          ...packageData.basic,
+          hourlyPay: Number(packageData.basic.hourlyPay),
         },
-      });
+        standard: {
+          ...packageData.standard,
+          hourlyPay: Number(packageData.standard.hourlyPay),
+        },
+        pro: {
+          ...packageData.pro,
+          hourlyPay: Number(packageData.pro.hourlyPay),
+        },
+      };
+      Object.keys(payload).forEach(
+        (k) => payload[k] === undefined && delete payload[k]
+      );
+
+      const { data } = await axios.put(
+        `https://cryptolance-server.onrender.com/api/gigs/${id}`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
 
       return data;
     } catch (err) {
-      return rejectWithValue(err.response ? err.response.data.message : err.message);
+      return rejectWithValue(
+        err.response ? err.response.data.message : err.message
+      );
     }
   }
 );
@@ -152,7 +181,6 @@ const gigSlice = createSlice({
   initialState,
   reducers: {
     setFormData: (state, action) => {
-     
       state.formData = { ...state.formData, ...action.payload };
     },
 
@@ -180,7 +208,7 @@ const gigSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-       .addCase(fetchGig.pending, (state) => {
+      .addCase(fetchGig.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -193,42 +221,63 @@ const gigSlice = createSlice({
           description: action.payload.description ?? state.formData.description,
           gigimage:
             action.payload.gigimage ??
-            (Array.isArray(action.payload.images) && action.payload.images[0]?.url) ??
+            (Array.isArray(action.payload.images) &&
+              action.payload.images[0]?.url) ??
             state.formData.gigimage,
           images:
-            Array.isArray(action.payload.images) && action.payload.images.length > 0
+            Array.isArray(action.payload.images) &&
+            action.payload.images.length > 0
               ? action.payload.images
               : state.formData.images,
           category: action.payload.category ?? state.formData.category,
           price: action.payload.price ?? state.formData.price,
-          deliveryTime: action.payload.deliveryTime ?? state.formData.deliveryTime,
-          faqs: Array.isArray(action.payload.faqs) ? action.payload.faqs : state.formData.faqs,
+          deliveryTime:
+            action.payload.deliveryTime ?? state.formData.deliveryTime,
+          faqs: Array.isArray(action.payload.faqs)
+            ? action.payload.faqs
+            : state.formData.faqs,
           about: action.payload.about ?? state.formData.about,
-          tags: Array.isArray(action.payload.tags) ? action.payload.tags : state.formData.tags,
-          skills: Array.isArray(action.payload.skills) ? action.payload.skills : state.formData.skills,
-          badges: Array.isArray(action.payload.badges) ? action.payload.badges : state.formData.badges,
+          tags: Array.isArray(action.payload.tags)
+            ? action.payload.tags
+            : state.formData.tags,
+          skills: Array.isArray(action.payload.skills)
+            ? action.payload.skills
+            : state.formData.skills,
+          badges: Array.isArray(action.payload.badges)
+            ? action.payload.badges
+            : state.formData.badges,
           projects: action.payload.projects ?? state.formData.projects,
           status: action.payload.status ?? state.formData.status,
           location: action.payload.location ?? state.formData.location,
-          responseTime: action.payload.responseTime ?? state.formData.responseTime,
+          responseTime:
+            action.payload.responseTime ?? state.formData.responseTime,
           successRate: action.payload.successRate ?? state.formData.successRate,
           avatar: action.payload.avatar ?? state.formData.avatar,
         };
         state.packageData = {
           basic: {
-            hourlyPay: action.payload.basic?.hourlyPay !== undefined ? String(action.payload.basic.hourlyPay) : "",
+            hourlyPay:
+              action.payload.basic?.hourlyPay !== undefined
+                ? String(action.payload.basic.hourlyPay)
+                : "",
             duration: action.payload.basic?.duration ?? "",
             custom_ui: action.payload.basic?.custom_ui ?? "no",
             code_reviews: action.payload.basic?.code_reviews ?? "",
           },
           standard: {
-            hourlyPay: action.payload.standard?.hourlyPay !== undefined ? String(action.payload.standard.hourlyPay) : "",
+            hourlyPay:
+              action.payload.standard?.hourlyPay !== undefined
+                ? String(action.payload.standard.hourlyPay)
+                : "",
             duration: action.payload.standard?.duration ?? "",
             custom_ui: action.payload.standard?.custom_ui ?? "no",
             code_reviews: action.payload.standard?.code_reviews ?? "",
           },
           pro: {
-            hourlyPay: action.payload.pro?.hourlyPay !== undefined ? String(action.payload.pro.hourlyPay) : "",
+            hourlyPay:
+              action.payload.pro?.hourlyPay !== undefined
+                ? String(action.payload.pro.hourlyPay)
+                : "",
             duration: action.payload.pro?.duration ?? "",
             custom_ui: action.payload.pro?.custom_ui ?? "no",
             code_reviews: action.payload.pro?.code_reviews ?? "",
@@ -256,7 +305,7 @@ const gigSlice = createSlice({
         state.error = null;
         state.submissionStatus = "pending";
       })
-      .addCase(submitGig.fulfilled, (state,action) => {
+      .addCase(submitGig.fulfilled, (state, action) => {
         state.loading = false;
         state.submissionStatus = "succeeded";
         state.currentGigId = action.payload._id;
@@ -284,6 +333,12 @@ const gigSlice = createSlice({
   },
 });
 
-export const { setFormData, setPackageData, nextStep, prevStep,setCurrentGigId, resetGig } =
-  gigSlice.actions;
+export const {
+  setFormData,
+  setPackageData,
+  nextStep,
+  prevStep,
+  setCurrentGigId,
+  resetGig,
+} = gigSlice.actions;
 export default gigSlice.reducer;

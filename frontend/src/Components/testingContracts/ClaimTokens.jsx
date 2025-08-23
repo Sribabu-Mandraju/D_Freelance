@@ -22,7 +22,7 @@ function ClaimTokens() {
       setIsLoadingData(true);
       try {
         const response = await fetchData(
-          `http://localhost:3001/api/hftToken/userHFTtokenDetails/${address}`
+          `https://cryptolance-server.onrender.com/api/hftToken/userHFTtokenDetails/${address}`
         );
         if (response.success) {
           setUserTokenMetaData({
@@ -44,8 +44,13 @@ function ClaimTokens() {
   }, [address, isConnected]);
 
   // Use hooks
-  const { claimTokens, isPending, isConfirming, isConfirmed, error } =
-    useClaimTokens();
+  const {
+    claimTokens,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+  } = useClaimTokens();
 
   // Check ETH balance for gas (0.001 ETH threshold)
   const { data: balanceData } = useBalance({ address });

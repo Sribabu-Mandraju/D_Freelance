@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 function UserProfile({ token, userExists, user, address, onProfileUpdate }) {
   const [formData, setFormData] = useState({
-    userWallet: address || '',
-    username: user?.username || '',
-    email: user?.email || '',
+    userWallet: address || "",
+    username: user?.username || "",
+    email: user?.email || "",
     rating: user?.rating || 0,
     gigs: user?.gigs || [],
     experience: user?.experience || [],
-    role: user?.role || 'bidder',
+    role: user?.role || "bidder",
   });
   const [newExperience, setNewExperience] = useState({
-    title: '',
-    timeline: '',
-    tags: '',
-    role: '',
-    company: '',
+    title: "",
+    timeline: "",
+    tags: "",
+    role: "",
+    company: "",
   });
   const [status, setStatus] = useState(null);
 
@@ -44,15 +44,20 @@ function UserProfile({ token, userExists, user, address, onProfileUpdate }) {
   };
 
   const addExperience = () => {
-    const tagsArray = newExperience.tags ? newExperience.tags.split(',').map(tag => tag.trim()) : [];
+    const tagsArray = newExperience.tags
+      ? newExperience.tags.split(",").map((tag) => tag.trim())
+      : [];
     setFormData((prev) => ({
       ...prev,
-      experience: [
-        ...prev.experience,
-        { ...newExperience, tags: tagsArray },
-      ],
+      experience: [...prev.experience, { ...newExperience, tags: tagsArray }],
     }));
-    setNewExperience({ title: '', timeline: '', tags: '', role: '', company: '' });
+    setNewExperience({
+      title: "",
+      timeline: "",
+      tags: "",
+      role: "",
+      company: "",
+    });
   };
 
   const removeExperience = (index) => {
@@ -66,14 +71,14 @@ function UserProfile({ token, userExists, user, address, onProfileUpdate }) {
     e.preventDefault();
     try {
       const url = userExists
-        ? `http://localhost:3001/api/users/${user._id}`
-        : 'http://localhost:3001/api/users';
-      const method = userExists ? 'PUT' : 'POST';
+        ? `https://cryptolance-server.onrender.com/api/users/${user._id}`
+        : "https://cryptolance-server.onrender.com/api/users";
+      const method = userExists ? "PUT" : "POST";
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
@@ -81,14 +86,14 @@ function UserProfile({ token, userExists, user, address, onProfileUpdate }) {
       const result = await response.json();
 
       if (response.ok) {
-        setStatus(userExists ? 'Profile updated' : 'Profile created');
+        setStatus(userExists ? "Profile updated" : "Profile created");
         onProfileUpdate(result);
       } else {
-        setStatus(result.message || 'Error saving profile');
+        setStatus(result.message || "Error saving profile");
       }
     } catch (error) {
-      console.error('Profile error:', error);
-      setStatus('Error saving profile');
+      console.error("Profile error:", error);
+      setStatus("Error saving profile");
     }
   };
 
@@ -96,7 +101,7 @@ function UserProfile({ token, userExists, user, address, onProfileUpdate }) {
 
   return (
     <div>
-      <h2>{userExists ? 'Update Profile' : 'Create Profile'}</h2>
+      <h2>{userExists ? "Update Profile" : "Create Profile"}</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Username:</label>
@@ -180,14 +185,17 @@ function UserProfile({ token, userExists, user, address, onProfileUpdate }) {
         <ul>
           {formData.experience.map((exp, index) => (
             <li key={index}>
-              {exp.title} ({exp.timeline}) - {exp.role} at {exp.company} [Tags: {exp.tags.join(', ')}]
+              {exp.title} ({exp.timeline}) - {exp.role} at {exp.company} [Tags:{" "}
+              {exp.tags.join(", ")}]
               <button type="button" onClick={() => removeExperience(index)}>
                 Remove
               </button>
             </li>
           ))}
         </ul>
-        <button type="submit">{userExists ? 'Update' : 'Create'} Profile</button>
+        <button type="submit">
+          {userExists ? "Update" : "Create"} Profile
+        </button>
       </form>
       {status && <p>{status}</p>}
     </div>

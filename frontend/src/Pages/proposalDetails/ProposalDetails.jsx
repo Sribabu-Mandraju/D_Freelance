@@ -37,7 +37,6 @@ const LoadingSpinner = () => (
 import Loader from "../../Components/Loader";
 // Loading Spinner Component
 
-
 // Error Component
 const ErrorDisplay = ({ error, onRetry }) => (
   <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden flex items-center justify-center">
@@ -107,7 +106,9 @@ export default function ProposalDetails({ job, onBack }) {
       }
 
       // Otherwise fetch from API
-      const response = await fetch(`http://localhost:3001/api/proposals/${id}`);
+      const response = await fetch(
+        `https://cryptolance-server.onrender.com/api/proposals/${id}`
+      );
 
       if (!response.ok) {
         throw new Error(

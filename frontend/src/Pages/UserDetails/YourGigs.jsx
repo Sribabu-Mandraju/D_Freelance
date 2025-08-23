@@ -1,4 +1,3 @@
-
 // "use client";
 // import { useEffect, useState } from "react";
 // import axios from "axios";
@@ -9,7 +8,7 @@
 //   const [loading, setLoading] = useState(false);
 //   const [error, setError] = useState(null);
 
-//   const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+//   const API_BASE = process.env.REACT_APP_API_BASE || "https://cryptolance-server.onrender.com";
 
 //   useEffect(() => {
 //     if (!Array.isArray(yourgigs) || yourgigs.length === 0) {
@@ -115,7 +114,6 @@
 
 // export default YourGigs;
 
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -127,7 +125,8 @@ const YourGigs = ({ yourgigs = [] }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:3001";
+  const API_BASE =
+    process.env.REACT_APP_API_BASE || "https://cryptolance-server.onrender.com";
 
   useEffect(() => {
     // If no IDs, clear state and exit early
@@ -215,7 +214,6 @@ const YourGigs = ({ yourgigs = [] }) => {
 
   return (
     <>
-     
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Render fetched gig cards */}
         {gigs && gigs.length > 0

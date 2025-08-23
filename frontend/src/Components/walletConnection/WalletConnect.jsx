@@ -63,11 +63,7 @@ function WalletConnect({ onAuthSuccess }) {
     // Only authenticate if not already authenticated for this address
     const storedToken = localStorage.getItem("authToken");
     const storedAddress = localStorage.getItem("authAddress");
-    if (
-      storedToken &&
-      storedAddress === address &&
-      authState.isAuthenticated
-    ) {
+    if (storedToken && storedAddress === address && authState.isAuthenticated) {
       hasAuthenticatedRef.current = true;
       return;
     }
@@ -85,7 +81,7 @@ function WalletConnect({ onAuthSuccess }) {
       setIsAuthenticating(true);
       try {
         const nonceResponse = await fetch(
-          "http://localhost:3001/api/auth/get-nonce",
+          "https://cryptolance-server.onrender.com/api/auth/get-nonce",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

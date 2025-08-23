@@ -21,7 +21,7 @@ const AcceptedProposals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const {address} = useAccount();
+  const { address } = useAccount();
 
   const fetchProposals = async () => {
     setLoading(true);
@@ -31,7 +31,7 @@ const AcceptedProposals = () => {
       const token = localStorage.getItem("authToken");
 
       const res = await fetch(
-       `http://localhost:3001/api/proposals/user/${address.toLowerCase()}`,
+        `https://cryptolance-server.onrender.com/api/proposals/user/${address.toLowerCase()}`,
         {
           method: "GET",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -55,8 +55,7 @@ const AcceptedProposals = () => {
       // Map backend fields into what <JobCard/> needs
       const normalized = items.map((p) => {
         const job = p.job || p.relatedJob || {}; // common nesting if proposal references a job
-        const client =
-          p.client ||
+        const client = p.client ||
           job.client ||
           p.clientDetails ||
           job.clientDetails || {
@@ -101,7 +100,9 @@ const AcceptedProposals = () => {
               client.image ||
               "https://i.pravatar.cc/100",
           },
-          postedTime: new Date(p.createdAt || job.createdAt || Date.now()).toLocaleDateString(),
+          postedTime: new Date(
+            p.createdAt || job.createdAt || Date.now()
+          ).toLocaleDateString(),
           location: p.location || job.location || "Remote",
           featured: Boolean(p.featured || job.featured),
         };
@@ -134,7 +135,6 @@ const AcceptedProposals = () => {
   };
 
   if (loading) return <div className="p-4">Loading created proposals…</div>;
-
 
   if (error)
     return (

@@ -1,11 +1,11 @@
 // features/chat/chatSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import toast from 'react-hot-toast';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 // create axios instance WITHOUT a static Authorization header
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3001/api",
+  baseURL: "https://cryptolance-server.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,17 +39,12 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-
-
-
-
-
 // Async thunks
 export const getUsers = createAsyncThunk(
-  'chat/getUsers',
+  "chat/getUsers",
   async (_, thunkAPI) => {
     try {
-      const res = await axiosInstance.get('/messages/users');
+      const res = await axiosInstance.get("/messages/users");
       return res.data;
     } catch (err) {
       const message = err?.response?.data?.message ?? err.message;
@@ -60,7 +55,7 @@ export const getUsers = createAsyncThunk(
 );
 
 export const getMessages = createAsyncThunk(
-  'chat/getMessages',
+  "chat/getMessages",
   async (userId, thunkAPI) => {
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
@@ -74,11 +69,14 @@ export const getMessages = createAsyncThunk(
 );
 
 export const sendMessage = createAsyncThunk(
-  'chat/sendMessage',
+  "chat/sendMessage",
   async ({ receiverId, messageData }, thunkAPI) => {
     try {
       // selectedUser equivalent passed in via receiverId
-      const res = await axiosInstance.post(`/messages/send/${receiverId}`, messageData);
+      const res = await axiosInstance.post(
+        `/messages/send/${receiverId}`,
+        messageData
+      );
       return res.data; // created message
     } catch (err) {
       const message = err?.response?.data?.message ?? err.message;
@@ -90,11 +88,11 @@ export const sendMessage = createAsyncThunk(
 
 // Thunk to subscribe to socket's "newMessage" event
 export const subscribeToMessages = createAsyncThunk(
-  'chat/subscribeToMessages',
+  "chat/subscribeToMessages",
   async (_, thunkAPI) => {
     const state = thunkAPI.getState();
     const socket = state.auth?.socket; // assumes auth slice contains socket
-    if (!socket) return thunkAPI.rejectWithValue('No socket available');
+    if (!socket) return thunkAPI.rejectWithValue("No socket available");
 
     const handler = (newMessage) => {
       const stateNow = thunkAPI.getState();
@@ -102,18 +100,24 @@ export const subscribeToMessages = createAsyncThunk(
       const authUser = stateNow.auth?.user;
       if (!authUser || !selectedUser) return;
 
-      const me = String(authUser._id || '').toLowerCase();
-      const peer = String(selectedUser._id || selectedUser.address || '').toLowerCase();
-      const sender = String(newMessage.senderId || '').toLowerCase();
-      const receiver = String(newMessage.recieverId || newMessage.receiverId || '').toLowerCase();
+      const me = String(authUser._id || "").toLowerCase();
+      const peer = String(
+        selectedUser._id || selectedUser.address || ""
+      ).toLowerCase();
+      const sender = String(newMessage.senderId || "").toLowerCase();
+      const receiver = String(
+        newMessage.recieverId || newMessage.receiverId || ""
+      ).toLowerCase();
 
-      const involvesMeAndPeer = (sender === me && receiver === peer) || (sender === peer && receiver === me);
+      const involvesMeAndPeer =
+        (sender === me && receiver === peer) ||
+        (sender === peer && receiver === me);
       if (!involvesMeAndPeer) return;
 
       thunkAPI.dispatch(appendMessage(newMessage));
     };
 
-    socket.on('newMessage', handler);
+    socket.on("newMessage", handler);
     socket._chatMessageHandler = handler;
     thunkAPI.dispatch(setSubscribed(true));
     return true;
@@ -122,19 +126,19 @@ export const subscribeToMessages = createAsyncThunk(
 
 // Thunk to unsubscribe from socket
 export const unsubscribeFromMessages = createAsyncThunk(
-  'chat/unsubscribeFromMessages',
+  "chat/unsubscribeFromMessages",
   async (_, thunkAPI) => {
     const state = thunkAPI.getState();
     const socket = state.auth?.socket;
-    if (!socket) return thunkAPI.rejectWithValue('No socket available');
+    if (!socket) return thunkAPI.rejectWithValue("No socket available");
 
     const handler = socket._chatMessageHandler;
     if (handler) {
-      socket.off('newMessage', handler);
+      socket.off("newMessage", handler);
       delete socket._chatMessageHandler;
     } else {
       // fallback: remove all listeners for event
-      socket.off('newMessage');
+      socket.off("newMessage");
     }
     thunkAPI.dispatch(setSubscribed(false));
     return true;
@@ -149,11 +153,11 @@ const initialState = {
   isUsersLoading: false,
   isMessagesLoading: false,
   subscribed: false, // track subscription state
-  error: null
+  error: null,
 };
 
 const chatSlice = createSlice({
-  name: 'chat',
+  name: "chat",
   initialState,
   reducers: {
     setSelectedUser(state, action) {
@@ -172,7 +176,7 @@ const chatSlice = createSlice({
     },
     setSubscribed(state, action) {
       state.subscribed = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -219,7 +223,7 @@ const chatSlice = createSlice({
       .addCase(unsubscribeFromMessages.rejected, (state, action) => {
         state.error = action.payload ?? action.error.message;
       });
-  }
+  },
 });
 
 export const {
@@ -227,7 +231,7 @@ export const {
   appendMessage,
   clearMessages,
   setUsers,
-  setSubscribed
+  setSubscribed,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

@@ -20,7 +20,7 @@ import gigRoutes from "./routes/GigRoutes.js";
 import messageRoutes from "./routes/chatRoutes.js";
 import ActiveFreelancersRoutes from "./routes/ActiveFreelancersRoutes.js";
 import CrossPortfolioRoutes from "./routes/CrossPortfolioRoutes.js";
-import ProposalRoutes from "./routes/ProposalRoutes.js"
+import ProposalRoutes from "./routes/ProposalRoutes.js";
 // Import the WebSocket configuration
 import { app, server } from "./socket.js";
 // Load environment variables
@@ -35,7 +35,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "http://localhost:3001",
+      "https://cryptolance-server.onrender.com",
       "http://localhost:3000",
     ],
     credentials: true, // if you want to allow cookies/auth headers

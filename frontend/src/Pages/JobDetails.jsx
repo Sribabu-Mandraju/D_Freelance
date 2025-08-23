@@ -18,7 +18,9 @@ const JobDetails = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(`http://localhost:3001/api/proposals/${id}`);
+      const response = await fetch(
+        `https://cryptolance-server.onrender.com/api/proposals/${id}`
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -80,9 +82,9 @@ const JobDetails = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <Navbar />
-      
-         <Loader caption="Job Details"/>
-      
+
+        <Loader caption="Job Details" />
+
         <Footer />
       </div>
     );

@@ -22,11 +22,14 @@ export const verifyWalletAuth = createAsyncThunk(
   "auth/verifyWalletAuth",
   async ({ address, signature, nonce }, { rejectWithValue }) => {
     try {
-      const response = await fetch("http://localhost:3001/api/auth/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, signature, nonce }),
-      });
+      const response = await fetch(
+        "https://cryptolance-server.onrender.com/api/auth/verify",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address, signature, nonce }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -67,12 +70,15 @@ export const validateStoredToken = createAsyncThunk(
         throw new Error("No stored authentication data");
       }
 
-      const response = await fetch(`http://localhost:3001/api/messages/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `https://cryptolance-server.onrender.com/api/messages/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -81,14 +87,18 @@ export const validateStoredToken = createAsyncThunk(
 
       // API might return { data: [...]} or array directly. handle both.
       const allUsers = await response.json();
-      const usersArray = Array.isArray(allUsers) ? allUsers : (allUsers.data || []);
+      const usersArray = Array.isArray(allUsers)
+        ? allUsers
+        : allUsers.data || [];
 
       // Support both shapes: _id === wallet OR heroSection.walletAddress
       const normalizedAddress = address.toLowerCase();
       const currentUser = usersArray.find(
         (u) =>
           (u._id && u._id.toLowerCase() === normalizedAddress) ||
-          (u.heroSection && u.heroSection.walletAddress && u.heroSection.walletAddress.toLowerCase() === normalizedAddress)
+          (u.heroSection &&
+            u.heroSection.walletAddress &&
+            u.heroSection.walletAddress.toLowerCase() === normalizedAddress)
       );
 
       if (!currentUser) {
@@ -119,12 +129,14 @@ export const connectSocket = createAsyncThunk(
 
       const { user, token } = getState().auth;
       if (!user || !token) {
-        return rejectWithValue("Cannot connect socket without authenticated user.");
+        return rejectWithValue(
+          "Cannot connect socket without authenticated user."
+        );
       }
 
       const userId = String(user._id || "").toLowerCase();
 
-      socket = io("http://localhost:3001", {
+      socket = io("https://cryptolance-server.onrender.com", {
         auth: { token },
         query: { userId },
       });
@@ -187,7 +199,11 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = null;
       if (state.socket && state.socket.disconnect) {
-        try { state.socket.disconnect(); } catch (e) { /* ignore */ }
+        try {
+          state.socket.disconnect();
+        } catch (e) {
+          /* ignore */
+        }
       }
       state.socket = null;
       state.onlineUsers = [];
@@ -241,5 +257,10 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setSocket, clearSocket, setOnlineUsers } = authSlice.actions;
+export const {
+  logout,
+  setSocket,
+  clearSocket,
+  setOnlineUsers,
+} = authSlice.actions;
 export default authSlice.reducer;

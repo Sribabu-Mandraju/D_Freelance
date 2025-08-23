@@ -13,7 +13,9 @@ export default function ActiveFreelancers() {
   useEffect(() => {
     const fetchFreelancers = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/activeFreelancers");
+        const response = await fetch(
+          "https://cryptolance-server.onrender.com/api/activeFreelancers"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch freelancers");
         }
@@ -33,7 +35,9 @@ export default function ActiveFreelancers() {
           status: freelancer.currentStatus[0]?.status || "Available",
           location: "Remote", // Location not provided in API
           hourlyRate: 50, // Placeholder, as API doesn't provide this
-          avatar: freelancer.heroSection.profile || "https://i.pravatar.cc/150?img=32", // Fallback avatar
+          avatar:
+            freelancer.heroSection.profile ||
+            "https://i.pravatar.cc/150?img=32", // Fallback avatar
           // Include full freelancer data for navigation
           fullData: freelancer,
         }));
@@ -80,7 +84,8 @@ export default function ActiveFreelancers() {
             </span>
           </h2>
           <p className="text-gray-300 max-w-2xl mx-auto mt-2">
-            Skilled professionals currently working on high-impact Web3 projects.
+            Skilled professionals currently working on high-impact Web3
+            projects.
           </p>
         </div>
 
@@ -115,14 +120,16 @@ export default function ActiveFreelancers() {
                 <div className="absolute top-2 right-4">
                   <span
                     className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-                      freelancer.status === "Available" || freelancer.status === "active"
+                      freelancer.status === "Available" ||
+                      freelancer.status === "active"
                         ? "bg-green-500/10 text-green-400 border border-green-500/20"
                         : "bg-red-500/10 text-red-400 border border-red-500/20"
                     }`}
                   >
                     <div
                       className={`w-2 h-2 rounded-full ${
-                        freelancer.status === "Available" || freelancer.status === "active"
+                        freelancer.status === "Available" ||
+                        freelancer.status === "active"
                           ? "bg-green-400 animate-pulse"
                           : "bg-red-400"
                       }`}
@@ -149,7 +156,9 @@ export default function ActiveFreelancers() {
                     <h3 className="text-lg font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors">
                       {freelancer.name}
                     </h3>
-                    <p className="text-gray-300 text-sm mb-2">{freelancer.title}</p>
+                    <p className="text-gray-300 text-sm mb-2">
+                      {freelancer.title}
+                    </p>
                     <div className="flex items-center gap-2 text-xs text-gray-300">
                       <MapPin className="w-3 h-3" />
                       {freelancer.location}
@@ -190,10 +199,14 @@ export default function ActiveFreelancers() {
                       <Star className="w-4 h-4 fill-yellow-400" />
                       {freelancer.rating}
                     </div>
-                    <p className="text-xs text-gray-300">{freelancer.projects} projects</p>
+                    <p className="text-xs text-gray-300">
+                      {freelancer.projects} projects
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-white font-semibold">${freelancer.hourlyRate}/hr</p>
+                    <p className="text-white font-semibold">
+                      ${freelancer.hourlyRate}/hr
+                    </p>
                     <p className="text-xs text-gray-300">Hourly rate</p>
                   </div>
                 </div>
@@ -201,7 +214,9 @@ export default function ActiveFreelancers() {
                 <button
                   className="w-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white text-sm py-2 rounded-lg transition-colors"
                   onClick={() =>
-                    navigate(`/user/${freelancer._id}`, { state: { freelancer: freelancer.fullData } })
+                    navigate(`/user/${freelancer._id}`, {
+                      state: { freelancer: freelancer.fullData },
+                    })
                   }
                 >
                   View Profile
