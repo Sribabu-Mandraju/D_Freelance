@@ -181,6 +181,18 @@ const chatSlice = createSlice({
       );
       if (!messageExists) {
         console.log("Appending new message to state:", action.payload);
+
+        // Remove optimistic message if it exists (same text and sender)
+        state.messages = state.messages.filter(
+          (msg) =>
+            !(
+              msg.__optimistic &&
+              msg.text === action.payload.text &&
+              msg.senderId === action.payload.senderId &&
+              msg.recieverId === action.payload.recieverId
+            )
+        );
+
         state.messages.push(action.payload);
       } else {
         console.log("Message already exists, skipping:", action.payload._id);
@@ -194,6 +206,16 @@ const chatSlice = createSlice({
     },
     setSubscribed(state, action) {
       state.subscribed = action.payload;
+    },
+    // Add message immediately when sent (optimistic update)
+    addMessageOptimistically(state, action) {
+      state.messages.push(action.payload);
+    },
+    // Remove optimistic message
+    removeOptimisticMessage(state, action) {
+      state.messages = state.messages.filter(
+        (msg) => msg._id !== action.payload
+      );
     },
   },
   extraReducers: (builder) => {
@@ -252,5 +274,7 @@ export const {
   clearMessages,
   setUsers,
   setSubscribed,
+  addMessageOptimistically,
+  removeOptimisticMessage,
 } = chatSlice.actions;
 export default chatSlice.reducer;

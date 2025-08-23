@@ -12,6 +12,7 @@ const ChatContainer = () => {
   );
   const { user: authUser } = useSelector((state) => state.auth);
   console.log("ChatContainer - authUser:", authUser);
+  console.log("ChatContainer - messages:", messages);
   const dispatch = useDispatch();
   const messageEndRef = useRef(null);
 
@@ -45,12 +46,14 @@ const ChatContainer = () => {
         {authUser &&
           messages.map((message, index) => {
             const isOwnMessage = authUser && message.senderId === authUser._id;
+            const isOptimistic = message.__optimistic;
+
             return (
               <div
                 key={message._id}
                 className={`flex ${
                   isOwnMessage ? "justify-end" : "justify-start"
-                } animate-fadeIn`}
+                } animate-fadeIn ${isOptimistic ? "opacity-70" : ""}`}
                 ref={index === messages.length - 1 ? messageEndRef : null}
               >
                 <div
@@ -86,6 +89,7 @@ const ChatContainer = () => {
                       }`}
                     >
                       {formatMessageTime(message.createdAt)}
+                      {isOptimistic && " (sending...)"}
                     </div>
 
                     {/* Message bubble */}

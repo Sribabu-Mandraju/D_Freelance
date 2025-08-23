@@ -2,13 +2,18 @@ import { useRef, useState } from "react";
 import { Image, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSelector, useDispatch } from "react-redux";
-import { sendMessage } from "../../store/ChatApplicationSlice/ChatAppSlice";
+import {
+  sendMessage,
+  addMessageOptimistically,
+} from "../../store/ChatApplicationSlice/ChatAppSlice";
+
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
   const { selectedUser } = useSelector((state) => state.chatApp);
+  const { user: authUser } = useSelector((state) => state.auth);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -34,17 +39,39 @@ const MessageInput = () => {
     if (!text.trim() && !imagePreview) return;
 
     try {
-      await dispatch(sendMessage({ receiverId: selectedUser._id, messageData: {
+      // Create optimistic message
+      const optimisticMessage = {
+        _id: `temp_${Date.now()}`,
         text: text.trim(),
-        image: imagePreview,
-      } }));
+        image: imagePreview || "",
+        senderId: authUser._id,
+        recieverId: selectedUser._id,
+        createdAt: new Date().toISOString(),
+        __optimistic: true, // Mark as optimistic
+      };
 
-      // Clear form
+      // Add message immediately to UI (optimistic update)
+      dispatch(addMessageOptimistically(optimisticMessage));
+
+      // Clear form immediately
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+
+      // Send message to backend
+      await dispatch(
+        sendMessage({
+          receiverId: selectedUser._id,
+          messageData: {
+            text: text.trim(),
+            image: imagePreview,
+          },
+        })
+      );
     } catch (error) {
       console.error("Failed to send message:", error);
+      // Optionally remove the optimistic message on error
+      // dispatch(removeOptimisticMessage(optimisticMessage._id));
     }
   };
 
@@ -85,7 +112,7 @@ const MessageInput = () => {
             {/* Subtle neon glow on focus */}
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400/10 to-purple-400/10 opacity-0 focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
           </div>
-          
+
           <input
             type="file"
             accept="image/*"
@@ -97,8 +124,8 @@ const MessageInput = () => {
           <button
             type="button"
             className={`p-3 rounded-xl transition-all duration-300 border-2 backdrop-blur-sm ${
-              imagePreview 
-                ? "bg-emerald-500/20 border-emerald-400/50 text-emerald-400 hover:bg-emerald-500/30" 
+              imagePreview
+                ? "bg-emerald-500/20 border-emerald-400/50 text-emerald-400 hover:bg-emerald-500/30"
                 : "bg-slate-700/50 border-slate-600/50 text-slate-400 hover:border-cyan-400/50 hover:text-cyan-400 hover:bg-cyan-400/10"
             }`}
             onClick={() => fileInputRef.current?.click()}
@@ -106,7 +133,7 @@ const MessageInput = () => {
             <Image size={20} />
           </button>
         </div>
-        
+
         <button
           type="submit"
           className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg 
@@ -121,4 +148,5 @@ const MessageInput = () => {
     </div>
   );
 };
+
 export default MessageInput;
