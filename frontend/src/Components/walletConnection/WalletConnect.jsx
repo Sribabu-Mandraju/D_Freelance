@@ -57,77 +57,33 @@ function WalletConnect({ onAuthSuccess }) {
   }, [dispatch, onAuthSuccess]);
 
   useEffect(() => {
-    console.log("useEffect triggered", {
-      status,
-      isConnected,
-      address,
-      chain: chain?.id,
-      authState: authState.isAuthenticated,
-      hasAuthenticated: hasAuthenticatedRef.current,
-    });
+    // Only run when wallet connection or address changes
+    if (!isConnected || !address || status !== "connected") return;
+
+    // Only authenticate if not already authenticated for this address
+    const storedToken = localStorage.getItem("authToken");
+    const storedAddress = localStorage.getItem("authAddress");
+    if (
+      storedToken &&
+      storedAddress === address &&
+      authState.isAuthenticated
+    ) {
+      hasAuthenticatedRef.current = true;
+      return;
+    }
+
+    if (hasAuthenticatedRef.current) return;
+
+    // Chain check
+    if (chain && ![base.id, baseSepolia.id].includes(chain.id)) {
+      setChainError("Please switch to Base Mainnet or Base Sepolia");
+      return;
+    }
+    setChainError(null);
 
     const authenticate = async () => {
-      // Don't authenticate if already in process
-      if (isAuthenticating) {
-        console.log("Authentication already in progress, skipping...");
-        return;
-      }
-
-      // Don't authenticate if wallet is not connected
-      if (!isConnected || !address || status !== "connected") {
-        console.log("Wallet not connected or wrong status", {
-          status,
-          isConnected,
-          address,
-        });
-        setAuthStatus("Please connect your wallet");
-        return;
-      }
-
-      // Check if we already have a valid token for this address
-      const existingToken = localStorage.getItem("authToken");
-      const existingAddress = localStorage.getItem("authAddress");
-
-      if (
-        existingToken &&
-        existingAddress === address &&
-        authState.isAuthenticated
-      ) {
-        console.log("Already authenticated with valid token for this address");
-        hasAuthenticatedRef.current = true;
-        return;
-      }
-
-      // Check if address or chain has actually changed
-      const addressChanged = prevAddressRef.current !== address;
-      const chainChanged = prevChainRef.current !== chain?.id;
-
-      if (!addressChanged && !chainChanged && hasAuthenticatedRef.current) {
-        console.log("No changes detected, skipping re-authentication");
-        return;
-      }
-
-      // Check chain compatibility
-      if (chain && ![base.id, baseSepolia.id].includes(chain.id)) {
-        console.log("Invalid chain detected", { chainId: chain?.id });
-        setChainError("Please switch to Base Mainnet or Base Sepolia");
-        try {
-          console.log("Attempting to switch to Base Sepolia");
-          await switchChain({ chainId: baseSepolia.id });
-          console.log("Switched to Base Sepolia");
-          // Wait a bit for chain switch to complete
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        } catch (error) {
-          console.error("Chain switch error:", error);
-          setChainError(`Failed to switch chain: ${error.message}`);
-          return;
-        }
-      }
-      setChainError(null);
-
       setIsAuthenticating(true);
       try {
-        console.log("Fetching nonce for address:", address);
         const nonceResponse = await fetch(
           "http://localhost:3001/api/auth/get-nonce",
           {
@@ -136,27 +92,16 @@ function WalletConnect({ onAuthSuccess }) {
             body: JSON.stringify({ address }),
           }
         );
-        console.log(
-          "Nonce response status:",
-          nonceResponse.status,
-          nonceResponse.statusText
-        );
         if (!nonceResponse.ok) {
-          throw new Error(`Nonce request failed: ${nonceResponse.statusText}`);
+          setAuthStatus("Failed to get nonce");
+          return;
         }
         const { success, nonce, message } = await nonceResponse.json();
-        console.log("Nonce response data:", { success, nonce, message });
         if (!success) {
           setAuthStatus(message || "Failed to get nonce");
           return;
         }
-
-        console.log("Requesting signature for nonce:", nonce);
         const signature = await signMessageAsync({ message: nonce });
-        console.log("Signature obtained:", signature);
-
-        console.log("Verifying signature");
-
         const resultAction = await dispatch(
           verifyWalletAuth({ address, signature, nonce })
         );
@@ -164,11 +109,8 @@ function WalletConnect({ onAuthSuccess }) {
         if (verifyResult?.token) {
           setAuthStatus("Authentication successful");
           hasAuthenticatedRef.current = true;
-
-          // Store authentication data
           localStorage.setItem("authToken", verifyResult.token);
           localStorage.setItem("authAddress", address);
-
           onAuthSuccess(
             verifyResult.token,
             verifyResult.userExists,
@@ -179,47 +121,16 @@ function WalletConnect({ onAuthSuccess }) {
           hasAuthenticatedRef.current = false;
         }
       } catch (error) {
-        console.error("Authentication error:", error);
         setAuthStatus(`Authentication failed: ${error.message}`);
         hasAuthenticatedRef.current = false;
       } finally {
         setIsAuthenticating(false);
       }
     };
-
-    // Only authenticate if we have all required data
-    if (status === "connected" && isConnected && address) {
-      // Check if we're already authenticated with this wallet
-      const storedToken = localStorage.getItem("authToken");
-      const storedAddress = localStorage.getItem("authAddress");
-
-      if (
-        storedToken &&
-        storedAddress === address &&
-        authState.isAuthenticated
-      ) {
-        console.log("Already authenticated with this wallet, skipping...");
-        hasAuthenticatedRef.current = true;
-        return;
-      }
-
-      authenticate();
-    }
-
-    // Update refs after processing
+    authenticate();
     prevAddressRef.current = address;
     prevChainRef.current = chain?.id;
-  }, [
-    isConnected,
-    address,
-    chain,
-    status,
-    signMessageAsync,
-    switchChain,
-    onAuthSuccess,
-    authState.isAuthenticated,
-    isAuthenticating,
-  ]);
+  }, [isConnected, address, chain, status, authState.isAuthenticated]);
 
   // Clear auth state when wallet disconnects
   useEffect(() => {
