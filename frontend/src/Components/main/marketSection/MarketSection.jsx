@@ -44,22 +44,21 @@ function MarketSection() {
         >
           Explore top freelance opportunities and land your next big gig.
         </motion.p>
-        
       </div>
-      <div className="text-right  px-20 ">
-          <motion.button
-          
-          className="mt-4 bg-blue-500 px-6 py-2 rounded bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-xl"
+      <div className="text-right px-20 ">
+        <motion.button
+          className=" bg-blue-500 px-6 py-2 cursor-pointer rounded bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-xl"
           onClick={() => navigate("/gigs")}
+          style={{ zIndex: 10, position: "relative" }}
         >
           View all
         </motion.button>
-        </div>
+      </div>
 
       {/* ✅ Swiper Slider instead of Grid */}
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
-        spaceBetween={-0}
+        spaceBetween={60}
         slidesPerView={1}
         navigation
         pagination={{ clickable: true }}
@@ -70,12 +69,12 @@ function MarketSection() {
           // 1280: { slidesPerView: 4 },
         }}
         autoplay={{
-          delay: 2500,             // time (ms) between slides
+          delay: 2500, // time (ms) between slides
           disableOnInteraction: false, // keep autoplay after user interaction
           pauseOnMouseEnter: true, // optional: pause when hovering
         }}
         loop={true}
-        className="px-2  w-full "
+        className=" w-full sm:w-[95%] py-16"
       >
         {gigs &&
           gigs.map((gig, index) => (
@@ -84,7 +83,7 @@ function MarketSection() {
                 whileHover={{ y: -6, scale: 1.02 }}
                 whileTap={{ scale: 0.99 }}
                 transition={{ type: "tween", duration: 0.2 }}
-                className="transition-transform duration-200 ease-out will-change-transform"
+                className="transition-transform  duration-200 ease-out will-change-transform"
               >
                 <MarketCard
                   key={gig._id}
@@ -139,6 +138,7 @@ function MarketSection() {
           whileTap={{ scale: 0.98 }}
           transition={{ type: "tween", duration: 0.2 }}
           className="mt-4 bg-blue-500 px-6 py-2 rounded bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-700 hover:to-cyan-600 text-2xl"
+          style={{ zIndex: 10, position: "relative" }}
           onClick={() => navigate("/browse-jobs")}
         >
           Browse Projects

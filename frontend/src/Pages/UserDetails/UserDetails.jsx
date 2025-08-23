@@ -54,9 +54,7 @@ function UserDetails() {
   }, [freelancer, activeTab]);
 
   const tabs = [
-    { id: "Bidded Proposals", label: "Bidded Proposals", icon: User },
-    { id: "Gigs", label: "Your Gigs", icon: Code },
-    { id: "Accepted Proposals", label: "Accepted Proposals", icon: Briefcase },
+    { id: "Gigs", label: "Gigs", icon: Code },
   ];
 
   if (!freelancer || !freelancer.heroSection) {
@@ -94,28 +92,18 @@ function UserDetails() {
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
             <HeroSection personalInfo={personalInfo} />
-            <TabNavigation
-              tabs={tabs}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-            />
-            <div className="space-y-8">
-              {activeTab === "Bidded Proposals" && (
-                <TechStack techStack={techStack} biddedProposals={biddedProposals} />
-              )}
-              {activeTab === "Gigs" && <YourGigs yourgigs={userGigs} />}
-              {activeTab === "Accepted Proposals" && (
-                <div className="text-gray-300">
-                  {acceptedProposals.length > 0
-                    ? acceptedProposals.map((proposal, index) => (
-                        <div key={index} className="p-2 text-gray-300">
-                          Proposal: {proposal}
-                        </div>
-                      ))
-                    : "No accepted proposals available"}
-                </div>
-              )}
-            </div>
+            <div className="text-center my-4">
+            <span className="text-3xl relative
+  before:absolute before:left-[-150px] before:w-32 before:h-1 before:bg-gradient-to-r before:from-purple-400 before:to-cyan-400 before:mx-auto before:mt-4 before:rounded-full 
+  after:absolute after:right-[-150px] after:w-32 after:h-1 after:bg-gradient-to-r after:from-cyan-400 after:to-purple-400 after:mx-auto after:mt-4 after:rounded-full
+  text-center font-bold font-orbitron 
+  bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6">
+  Gigs
+</span>
+</div>
+
+
+           <YourGigs yourgigs={userGigs}/>
             <div className="space-y-6 mt-6">
               <FeaturedProjects featuredProjects={featuredProjects} />
             </div>

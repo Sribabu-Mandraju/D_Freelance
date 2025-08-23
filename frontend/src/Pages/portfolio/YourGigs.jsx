@@ -97,10 +97,15 @@ const YourGigs = ({ yourgigs = [] }) => {
 
   return (
     <>
-      {/* <div className="flex justify-end mb-4">
-     
-      </div> */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded shadow"
+          onClick={() => navigate("/create-gig")}
+        >
+          + Create Gig
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Render fetched gig cards */}
         {gigs && gigs.length > 0
           ? gigs.map((gig) => (

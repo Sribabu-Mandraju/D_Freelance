@@ -1,7 +1,7 @@
 "use client";
 
 import { useDispatch, useSelector } from "react-redux";
-import { Code, Edit, Save, X, Plus, Trash2 } from "lucide-react";
+import { Code, Edit, Save, X, Plus, Trash2, Star } from "lucide-react";
 import { toast } from "react-hot-toast";
 import {
   toggleEditingTech,
@@ -46,7 +46,6 @@ function TechHighlights({ techHighlights, portfolioId }) {
         });
       }
     } catch (error) {
-      
       toast.dismiss(loadingToast);
       toast.error(error.message || "Failed to save changes. Please try again.", {
         icon: "❌",
@@ -186,9 +185,9 @@ function TechHighlights({ techHighlights, portfolioId }) {
               ) : (
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <div
+                    <Star
                       key={i}
-                      className={`w-2 h-2 rounded-full ${i < tech.rating ? "bg-cyan-400" : "bg-gray-600"}`}
+                      className={`w-3 h-3 ${i < tech.rating ? "text-cyan-400 fill-cyan-400" : "text-gray-600 fill-gray-600"}`}
                       title={`${tech.rating} star${tech.rating > 1 ? "s" : ""}`}
                     />
                   ))}

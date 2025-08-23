@@ -2,6 +2,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { User, Shield, Zap, Edit, Save, X } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   toggleEditingHero,
   updateHeroField,
@@ -13,9 +15,55 @@ import {
 function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
   const dispatch = useDispatch();
   const { isEditingHero, editHeroData } = useSelector((state) => state.portfolio);
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(personalInfo.profile || "");
+
+  useEffect(() => {
+    setPreview(personalInfo.profile || "");
+  }, [personalInfo.profile]);
 
   const handleChange = (field, value) => {
     dispatch(updateHeroField({ field, value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!image) {
+      toast.error("Please select an image first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", image);
+    formData.append("upload_preset", "Freelance_Website");
+    formData.append("cloud_name", "dd33ovgv1");
+
+    const toastId = toast.loading("Uploading image...");
+    try {
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/dd33ovgv1/image/upload",
+        formData
+      );
+      const uploadedUrl = res.data.secure_url;
+      if (uploadedUrl.length > 300) {
+        toast.error("Uploaded image URL exceeds 300 characters.", { id: toastId });
+        return;
+      }
+      dispatch(updateHeroField({ field: "profile", value: uploadedUrl }));
+      setPreview(uploadedUrl);
+      setImage(null);
+      toast.success("Image uploaded successfully!", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error("Image upload failed. Please try again.", { id: toastId });
+    }
   };
 
   const validateLimits = () => {
@@ -39,7 +87,7 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
       return false;
     }
     if ((editHeroData.profile || "").length > 300) {
-      toast.error("Profile image URL cannot exceed 200 characters");
+      toast.error("Profile image URL cannot exceed 300 characters");
       return false;
     }
     if (expertise.length > 4) {
@@ -61,45 +109,43 @@ function HeroSection({ personalInfo, setPersonalInfo, portfolioId }) {
     return true;
   };
 
-const handleEdit = () => {
-    // Initialize editHeroData with personalInfo to ensure correct state
-  dispatch(setPortfolioData({ heroSection: { ...personalInfo } }));
-  dispatch(toggleEditingHero());
-};
+  const handleEdit = () => {
+    dispatch(toggleEditingHero());
+  };
 
-const handleSave = async () => {
-  if (!validateLimits()) {
-    return;
-  }
+  const handleSave = async () => {
+    if (!validateLimits()) {
+      return;
+    }
 
-  const toastId = toast.loading("Saving hero section...");
-  try {
-      // Update frontend state
-    dispatch(saveHeroSection());
-
-      // Update backend
-    const action = await dispatch(
-      updatePortfolio({ portfolioId, data: { heroSection: editHeroData } })
-    );
-    if (updatePortfolio.fulfilled.match(action)) {
+    const toastId = toast.loading("Saving hero section...");
+    try {
+      dispatch(saveHeroSection());
+      const action = await dispatch(
+        updatePortfolio({ portfolioId, data: { heroSection: editHeroData } })
+      );
+      if (action.meta.requestStatus === 'fulfilled') {
         dispatch(setPortfolioData({ heroSection: { ...editHeroData } }));
-        // Update parent state to reflect changes in UI
-      toast.success("Hero section updated successfully!", { id: toastId });
+        setPersonalInfo(editHeroData); // Update parent state
+        toast.success("Hero section updated successfully!", { id: toastId });
+      } else if (action.meta.requestStatus === 'rejected') {
+        throw new Error(action.error?.message || "Update portfolio action failed");
       } else {
         throw new Error("Update portfolio action failed");
+      }
+    } catch (err) {
+      toast.error(`Failed to save changes: ${err.message}`, { id: toastId });
     }
-  } catch (err) {
-    toast.error(`Failed to save changes: ${err.message}`, { id: toastId });
-  }
-};
+  };
 
   const handleCancel = () => {
     dispatch(toggleEditingHero());
+    setImage(null);
+    setPreview(personalInfo.profile || "");
   };
 
   return (
     <div className="relative bg-gray-950/40 backdrop-blur-2xl border border-cyan-500/20 rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-cyan-500/10 mb-6">
-      {/* Gradient overlay with pointer-events-none to avoid blocking clicks */}
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 opacity-50 group-hover:opacity-80 transition-opacity duration-500 pointer-events-none" />
 
       <div className="relative flex flex-col lg:flex-row gap-6">
@@ -108,7 +154,7 @@ const handleSave = async () => {
           {isEditingHero ? (
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <label className="text-sm text-gray-400">Profile Image URL:</label>
+                <label className="text-sm text-gray-400">Profile Image:</label>
                 <span
                   className={`text-xs tabular-nums ${
                     (editHeroData.profile || "").length > 300 ? "text-red-400" : "text-gray-500"
@@ -117,25 +163,33 @@ const handleSave = async () => {
                   {(editHeroData.profile || "").length}/300
                 </span>
               </div>
-              <input
-                type="text"
-                value={editHeroData.profile || ""}
-                onChange={(e) => handleChange("profile", e.target.value)}
-                placeholder="Enter image URL"
-                className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-gray-200 text-sm focus:outline-none focus:ring-2 ${
-                  (editHeroData.profile || "").length > 300
-                    ? "border-red-500/50 focus:ring-red-400/60"
-                    : "border-cyan-500/40 focus:ring-cyan-400/70"
-                }`}
-              />
-              {editHeroData.profile && (
-                <div className="relative mt-2">
-                <img
-                  src={editHeroData.profile}
-                  alt="Profile Preview"
-                    className="h-32 w-32 rounded-full object-cover border-2 border-cyan-500/30"
-                  onError={(e) => (e.target.src = "https://via.placeholder.com/128?text=Invalid+URL")}
+              <div className="flex flex-col gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="bg-gray-900/50 border border-cyan-500/40 rounded-lg px-4 py-3 text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400/70"
                 />
+                <button
+                  onClick={handleUpload}
+                  disabled={!image}
+                  className={`px-4 py-2 bg-gray-900/50 border rounded-lg transition-all duration-300 ${
+                    image
+                      ? "border-cyan-500/50 hover:border-cyan-400 hover:shadow-[0_0_10px_rgba(0,255,255,0.3)]"
+                      : "border-gray-500/50 opacity-50 cursor-not-allowed"
+                  }`}
+                >
+                  <span className="text-sm text-cyan-400 font-medium">Upload Image</span>
+                </button>
+              </div>
+              {preview && (
+                <div className="relative mt-2">
+                  <img
+                    src={preview}
+                    alt="Profile Preview"
+                    className="h-32 w-32 rounded-full object-cover border-2 border-cyan-500/30"
+                    onError={(e) => (e.target.src = "https://via.placeholder.com/128?text=Invalid+URL")}
+                  />
                   <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-white/10" />
                 </div>
               )}
@@ -143,11 +197,11 @@ const handleSave = async () => {
           ) : (
             <div className="relative">
               <div className="absolute -inset-2 rounded-full bg-cyan-500/15 blur-xl pointer-events-none" />
-            <img
-              src={personalInfo.profile || "https://via.placeholder.com/128?text=No+Image"}
-              alt="Profile"
+              <img
+                src={personalInfo.profile || "https://via.placeholder.com/128?text=No+Image"}
+                alt="Profile"
                 className="relative h-32 w-32 rounded-full object-cover border-2 border-cyan-500/30"
-            />
+              />
             </div>
           )}
         </div>
@@ -174,10 +228,10 @@ const handleSave = async () => {
                   onChange={(e) => handleChange("name", e.target.value)}
                   className={`w-full bg-gray-900/50 border rounded-lg px-4 py-3 text-3xl sm:text-4xl lg:text-5xl font-bold focus:outline-none focus:ring-2 bg-clip-text text-transparent
                     ${
-                    (editHeroData.name || "").length > 100
+                      (editHeroData.name || "").length > 100
                         ? "border-red-500/50 focus:ring-red-400/60"
                         : "border-cyan-500/40 focus:ring-cyan-400/70"
-                  }`}
+                    }`}
                   style={{
                     backgroundImage:
                       "linear-gradient(90deg, rgba(34,211,238,1), rgba(59,130,246,1), rgba(168,85,247,1))",

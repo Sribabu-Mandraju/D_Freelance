@@ -25,10 +25,14 @@ import ContactInfo from "../../Components/portfolio/ContactInfo";
 import Navbar from "../../Components/Navbar";
 import styles from "./Portfolio.module.css";
 import YourGigs from "./YourGigs";
+import AcceptedProposals from "../../Components/portfolio/AcceptedProposals";
+import CreatedProposals from "../UserDetails/CreatedProposals";
 import {
   fetchPortfolio,
   setActiveTab,
+  setPortfolioData,
 } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
+import BiddedProposals from "../UserDetails/BiddedProposals";
 
 function Portfolio() {
   const dispatch = useDispatch();
@@ -49,6 +53,7 @@ function Portfolio() {
         navigate("/portfolioForm");
       }
     });
+    console.log(portfolioData);
   }, [dispatch, navigate]);
 
   useEffect(() => {
@@ -77,6 +82,9 @@ function Portfolio() {
     { id: "Bidded Proposals", label: "Bidded Proposals", icon: User },
     { id: "Gigs", label: "Your Gigs", icon: Code },
     { id: "Accepted Proposals", label: "Accepted Proposals", icon: Briefcase },
+        { id: "Created Proposals", label: "Created Proposals", icon: Briefcase },
+
+
   ];
 
   if (loading) {
@@ -148,21 +156,24 @@ function Portfolio() {
             <div className="space-y-8">
               
               {activeTab === "Bidded Proposals" && (
-                <TechStack techStack={techStack} />
+                <BiddedProposals/>
               )}
               {activeTab === "Gigs" && (
                 <YourGigs yourgigs={portfolioData.userGigs || []} />
               )}
               {activeTab === "Accepted Proposals" && (
-                <Education education={education} />
+                <AcceptedProposals/>
+              )}
+              {activeTab === "Created Proposals" && (
+                <CreatedProposals/>
               )}
             </div>
-            <div className="space-y-6 mt-6">
+            {/* <div className="space-y-6 mt-6">
                   <FeaturedProjects
                     featuredProjects={featuredProjects}
                     portfolioId={portfolioData._id}
                   />
-                </div>
+                </div> */}
           </main>
 
           <aside
@@ -171,7 +182,7 @@ function Portfolio() {
             aria-label="About sidebar"
             style={{ maxHeight: "calc(100vh - 80px)" }}
           >
-            <QuickContact personalInfo={personalInfo} />
+            <QuickContact personalInfo={portfolioData.contactInfo} />
             <CurrentStatus
               portfolioId={portfolioData._id} // Use _id directly from portfolioData
             />

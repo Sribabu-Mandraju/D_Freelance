@@ -37,6 +37,7 @@ import CompleteProposalButton from "./Components/testingContracts/CompletePropos
 import ChatApp from "./Pages/ChatApplication/ChatApp"
 import AdminDashboard from "./Pages/admin/AdminDashboard";
 import About from "./Pages/About";
+import ScrollToTop from "./Components/ScrollToTop";
 
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
@@ -79,6 +80,7 @@ const App = () => {
     <>
       <div className="">
         <Router>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/portfolio/me" element={<Portfolio />} />

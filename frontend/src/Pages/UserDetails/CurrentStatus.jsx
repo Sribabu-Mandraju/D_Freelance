@@ -1,4 +1,3 @@
-
 "use client";
 import { Database } from "lucide-react";
 
@@ -34,13 +33,30 @@ function CurrentStatus({ currentStatus }) {
         {currentStatus.map((status) => (
           <div
             key={status._id}
-            className="p-4 bg-gray-900/50 rounded-lg border border-gray-700/50 relative"
+            className="p-4 bg-gray-900/50 rounded-lg border border-gray-700/50"
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex flex-col items-start gap-3">
-                <div className="relative flex justify-start">
+            <div className="flex items-center gap-3">
+              <div className="relative flex items-center">
+                <div
+                  className={`w-4 h-4 rounded-full ${
+                    status.color === "green"
+                      ? "bg-green-400"
+                      : status.color === "blue"
+                      ? "bg-blue-400"
+                      : status.color === "red"
+                      ? "bg-red-400"
+                      : status.color === "yellow"
+                      ? "bg-yellow-400"
+                      : status.color === "purple"
+                      ? "bg-purple-400"
+                      : status.color === "orange"
+                      ? "bg-orange-400"
+                      : "bg-gray-400"
+                  } ${status.isActive ? "animate-ping opacity-75" : "animate-pulse"}`}
+                ></div>
+                {status.isActive && (
                   <div
-                    className={`w-4 h-4 rounded-full ${
+                    className={`absolute w-3 h-3 rounded-full ${
                       status.color === "green"
                         ? "bg-green-400"
                         : status.color === "blue"
@@ -54,32 +70,14 @@ function CurrentStatus({ currentStatus }) {
                         : status.color === "orange"
                         ? "bg-orange-400"
                         : "bg-gray-400"
-                    } ${status.isActive ? "animate-ping opacity-75" : "animate-pulse"}`}
+                    }`}
+                    style={{ left: "2px", top: "2px" }}
                   ></div>
-                  {status.isActive && (
-                    <div
-                      className={`absolute inset-0 w-4 h-4 rounded-full ${
-                        status.color === "green"
-                        ? "bg-green-400"
-                        : status.color === "blue"
-                        ? "bg-blue-400"
-                        : status.color === "red"
-                        ? "bg-red-400"
-                        : status.color === "yellow"
-                        ? "bg-yellow-400"
-                        : status.color === "purple"
-                        ? "bg-purple-400"
-                        : status.color === "orange"
-                        ? "bg-orange-400"
-                        : "bg-gray-400"
-                      }`}
-                    ></div>
-                  )}
-                </div>
-                <span className="text-gray-300 font-medium text-base block">
-                  {status.status || "No status text"}
-                </span>
+                )}
               </div>
+              <span className="text-gray-300 font-medium text-base">
+                {status.status || "No status text"}
+              </span>
             </div>
           </div>
         ))}
