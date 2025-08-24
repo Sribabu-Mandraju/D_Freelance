@@ -1,12 +1,11 @@
-Here is an effective and professional `README.md` for CryptoLance, structured for clarity, impact, and GitHub best practices.
 
-***
 
 
 
 # CryptoLance: Decentralized Freelance Marketplace
 
-> "Where Talent Meets Trust—Freelance, Bid, and Get Paid Securely on Chain."
+> <img width="925" height="516" alt="image" src="https://github.com/user-attachments/assets/23f926de-bdc5-4d1c-a3b1-c257f92efb74" />
+
 
 ***
 # Problem Statement  
@@ -67,15 +66,23 @@ A next-generation freelancing ecosystem should be:
 CryptoLance offers a decentralized platform for clients and freelancers to post jobs/gigs, bid using platform tokens, securely escrow budgets, and release milestone-based payments through smart contracts. Our system ensures transparency, instant payouts, and spam-resistant bidding for all users in the global talent economy.
 
 ***
+## 👨‍💻 Meet the HighFive Team  
 
-## 🧠 Team & Approach
+We are a passionate team of builders, innovators, and dreamers bringing decentralized freelancing to life. 🚀  
 
-### Team Name
-`CryptoLance Core`
+| Member | GitHub | LinkedIn | X (Twitter) |
+|--------|--------|----------|--------------|
+| **Dharaneeswar Reddy Avula** | [🔗 GitHub](https://github.com/Dharaneeswar-Reddy-Avula) | [🔗 LinkedIn](https://www.linkedin.com/in/dharaneeswar-reddy-avula-6600912aa/) | [🔗 X](https://x.com/Dharaneeswar_) |
+| **Sribabu Mandraju** | [🔗 GitHub](https://github.com/Sribabu-Mandraju) | [🔗 LinkedIn](https://www.linkedin.com/in/sribabu-mandraju-590524233/) | [🔗 X](https://x.com/5R1B4BU) |
+| **Sireesha Sibbala** | [🔗 GitHub](https://github.com/sibbalas) | [🔗 LinkedIn](https://www.linkedin.com/in/sireesha-sibbala-b2467631b) | [🔗 X](https://x.com/SireeshaSibbala) |
+| **Nakshatra Yeluri** | [🔗 GitHub](https://github.com/Yeluri-Nakshatra) | [🔗 LinkedIn](https://www.linkedin.com/in/nakshatra-yeluri) | [🔗 X](https://x.com/nakshatrayeluri) |
 
-### Team Members
-- You (Project Lead)
-- ... (Add team members, roles, Twitter/GitHub links if needed)
+---
+
+### ✨ Styled Alternative (With Badges)
+
+If you want something more **colorful and modern**, use **Shields.io badges**:
+
 
 ### Approach
 - **Why this problem?**: Our team saw the urgent need for transparent, on-chain gig management and milestone payment workflows for the Web3 era. By combining secure wallet authentication, automated escrow, and modular token-based bidding, we remove central control and put freelancers in charge of their payments.
@@ -216,7 +223,7 @@ forge script script/DeployAll.s.sol:DeployAll --private-key $your-private-key --
 
 - Discord bot for job/trade notifications  
 - Referral system for freelancers  
-- Multi-chain job posting (Polygon, Base, etc.)  
+- Multi-chain job posting ( Base, etc.)  
 - Advanced portfolio analytics  
 - In-app messaging and dispute resolution module
 
@@ -225,8 +232,7 @@ forge script script/DeployAll.s.sol:DeployAll --private-key $your-private-key --
 ## 📌 Resources / Credits
 
 - OpenZepplin Contracts, Hardhat/Foundry  
-- MetaMask, WalletConnect  
-- Thanks to our community testers and feedback providers
+- MetaMask, WalletConnect  ,RainbowKit
 
 ***
 
@@ -238,9 +244,4 @@ CryptoLance empowers everyone—from solo devs to enterprise clients—to collab
 
 **CryptoLance—Decentralized Talent, Unstoppable Opportunity.**
 
-[1](https://www.templatemonster.com/ui-elements/cryptolance-freelancers-website-template-295430.html)
-[2](https://dev.to/documatic/how-to-write-an-awesome-readme-cfl)
-[3](https://theme.bitrixinfotech.com/product-detail/cryptolance-html5-website-template)
-[4](https://dev.to/scottydocs/how-to-write-a-kickass-readme-5af9)
-[5](https://allclonescript.com/product-detail/cryptolance-html5-website-template)
-[6](https://www.freelancer.com/jobs/blockchain)
+
