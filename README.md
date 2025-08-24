@@ -101,44 +101,87 @@ If you want something more **colorful and modern**, use **Shields.io badges**:
 - **Tools**: HFT Token smart contract, role-based access management, milestone escrow logic
 
 ***
+## 🗺️ Workflow Overview  
 
-## ## ✨ Key Features  
-
-Our decentralized freelancing platform offers a seamless, transparent, and trustless workflow from job creation to final payment.  
-
----
-
-### 🚀 Decentralized Jobs/Gigs  
-Clients can create jobs or gigs directly on-chain, and freelancers can place bids using tokens.  
-![Decentralized Jobs](./frontend/src/assets/getStart.png)  
-![Wallet Connection](./frontend/src/assets/wallet.png)  
-![Create Proposal](./frontend/src/assets/createProposal.png)  
-![Initialize Proposal](./frontend/src/assets/initialiseProposal.png)  
-![Open for Bidding](./frontend/src/assets/openBid.png)  
-![Bid Submission](./frontend/src/assets/bid.png)  
+Our platform provides a seamless decentralized workflow for freelancers and clients.  
+Each step is secured on-chain and fully transparent.  
 
 ---
 
-### 💰 Milestone-Based Escrow  
-Payments are secured through milestone-based escrow. Freelancers receive payouts as work progresses:  
+### 1️⃣ Connect Wallet  
+Authenticate by connecting your wallet to access the platform.  
+
+<p align="center">
+  <img src="./frontend/src/assets/getStart.png" width="45%" />
+  <img src="./frontend/src/assets/wallet.png" width="45%" />
+</p>  
+
+---
+
+### 2️⃣ Create Proposal / Job Posting  
+Clients can create proposals or post jobs, setting project details, budgets, and requirements.  
+
+<p align="center">
+  <img src="./frontend/src/assets/createProposal.png" width="45%" />
+  <img src="./frontend/src/assets/initialiseProposal.png" width="45%" />
+</p>  
+
+---
+
+### 3️⃣ Open for Bidding & Submit Bids  
+Freelancers can view open projects and place bids using **HFT tokens**.  
+
+<p align="center">
+  <img src="./frontend/src/assets/openBid.png" width="45%" />
+  <img src="./frontend/src/assets/bid.png" width="45%" />
+</p>  
+
+---
+
+### 4️⃣ Bid Acceptance & Budget Escrow  
+Clients review bids, select the best freelancer, and escrow the **entire project budget** into the smart contract.  
+
+<p align="center">
+  <img src="./frontend/src/assets/accept.png" width="45%" />
+  <img src="./frontend/src/assets/deposit.png" width="45%" />
+</p>  
+
+---
+
+### 5️⃣ Project Kickoff & Milestone Payments  
+Freelancers start working once escrow is confirmed. Payments are released in secure milestones:  
 - **40%** after first milestone approval  
 - **70%** after second milestone approval  
 - **100%** on final completion  
 
-This ensures both client satisfaction and freelancer security.  
-![Bid Acceptance](./frontend/src/assets/accept.png)  
-![Deposit Escrow](./frontend/src/assets/deposit.png)  
-![Start Work](./frontend/src/assets/start.png)  
-![First Milestone Payment](./frontend/src/assets/firstPay.png)  
-![Second Milestone Payment](./frontend/src/assets/secondPay.png)  
-![Final Payment](./frontend/src/assets/finalPay.png)  
+<p align="center">
+  <img src="./frontend/src/assets/start.png" width="45%" />
+  <img src="./frontend/src/assets/firstPay.png" width="45%" />
+</p>  
+
+<p align="center">
+  <img src="./frontend/src/assets/secondPay.png" width="45%" />
+  <img src="./frontend/src/assets/finalPay.png" width="45%" />
+</p>  
 
 ---
 
-### 🛡️ Budget Security  
-Before a project begins, the client must escrow the **entire project budget** on-chain. Funds are only released through milestone approvals, guaranteeing payment assurance.  
-![Project Completion](./frontend/src/assets/complete.png)  
-![Project Cancellation](./frontend/src/assets/cancel.png)  
+### 6️⃣ Project Completion or Cancellation  
+Once the work is fully completed and approved, the contract releases the final payment.  
+In case of cancellation, funds are handled transparently through the smart contract.  
+
+<p align="center">
+  <img src="./frontend/src/assets/complete.png" width="45%" />
+  <img src="./frontend/src/assets/cancel.png" width="45%" />
+</p>  
+
+---
+
+### 7️⃣ Platform Fee  
+A minimal **1% fee** is automatically deducted from the project budget and routed to the treasury contract.  
+This sustains the platform while keeping costs fair for both freelancers and clients.  
+
+---
 
 ---
 
@@ -167,19 +210,8 @@ All transactions, proposals, bids, and payments are recorded **directly on-chain
 ---
 
 
-***
 
-## 🗺️ Workflow Overview
 
-1. **Connect Wallet:** Authenticate with your wallet to access the platform
-2. **Create Gigs/Jobs:** Clients post projects and open them to bids
-3. **Bid Submission:** Freelancers bid using HFT tokens
-4. **Bid Acceptance & Budget Escrow:** Client selects a bid and escrows budget to smart contract
-5. **Milestone Payments:**  
-   - 40% released after first approval  
-   - 70% released after second milestone  
-   - 100% released upon full completion
-6. **Platform Fees:** 1% fee auto-routed to treasury
 
 ***
 
