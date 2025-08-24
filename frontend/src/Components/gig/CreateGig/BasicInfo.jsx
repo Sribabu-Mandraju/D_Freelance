@@ -1,12 +1,30 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { DollarSign, Clock, Tag, Upload, X, RefreshCw } from "lucide-react";
+import {
+  DollarSign,
+  Clock,
+  Tag,
+  Upload,
+  X,
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setPackageData } from "../../../store/gigSlice/gigSlice";
 
-const PackageFields = ({ pkgName, pkg, handlePackageChange }) => {
+const PackageFields = ({
+  pkgName,
+  pkg,
+  handlePackageChange,
+  validationErrors,
+}) => {
+  const getFieldError = (field) => {
+    return validationErrors[`${pkgName}_${field}`];
+  };
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -23,10 +41,20 @@ const PackageFields = ({ pkgName, pkg, handlePackageChange }) => {
               onChange={(e) =>
                 handlePackageChange(pkgName, "hourlyPay", e.target.value)
               }
-              className="w-full pl-10 pr-4 py-3 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20"
+              className={`w-full pl-10 pr-4 py-3 bg-gray-900/80 border rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg ${
+                getFieldError("hourlyPay")
+                  ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                  : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+              }`}
               placeholder="e.g., 20"
               required
             />
+            {getFieldError("hourlyPay") && (
+              <div className="flex items-center gap-1 mt-1 text-red-400 text-xs">
+                <AlertCircle className="w-3 h-3" />
+                {getFieldError("hourlyPay")}
+              </div>
+            )}
           </div>
         </div>
         <div>
@@ -41,10 +69,20 @@ const PackageFields = ({ pkgName, pkg, handlePackageChange }) => {
               onChange={(e) =>
                 handlePackageChange(pkgName, "duration", e.target.value)
               }
-              className="w-full pl-10 pr-4 py-3 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20"
+              className={`w-full pl-10 pr-4 py-3 bg-gray-900/80 border rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg ${
+                getFieldError("duration")
+                  ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                  : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+              }`}
               placeholder="e.g., 3 or 3-5"
               required
             />
+            {getFieldError("duration") && (
+              <div className="flex items-center gap-1 mt-1 text-red-400 text-xs">
+                <AlertCircle className="w-3 h-3" />
+                {getFieldError("duration")}
+              </div>
+            )}
           </div>
         </div>
         <div>
@@ -56,13 +94,23 @@ const PackageFields = ({ pkgName, pkg, handlePackageChange }) => {
             onChange={(e) =>
               handlePackageChange(pkgName, "custom_ui", e.target.value)
             }
-            className="w-full px-4 py-3 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20"
+            className={`w-full px-4 py-3 bg-gray-900/80 border rounded-lg text-white text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg ${
+              getFieldError("custom_ui")
+                ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+            }`}
             required
           >
             <option value="no">No</option>
             <option value="yes">Yes</option>
             <option value="client_choice">Client Choice</option>
           </select>
+          {getFieldError("custom_ui") && (
+            <div className="flex items-center gap-1 mt-1 text-red-400 text-xs">
+              <AlertCircle className="w-3 h-3" />
+              {getFieldError("custom_ui")}
+            </div>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-cyan-300 mb-2 tracking-wide">
@@ -75,9 +123,19 @@ const PackageFields = ({ pkgName, pkg, handlePackageChange }) => {
               handlePackageChange(pkgName, "code_reviews", e.target.value)
             }
             placeholder="e.g., 2 times, 3-5 times, unlimited"
-            className="w-full px-4 py-3 bg-gray-900/80 border border-gray-700/50 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20"
+            className={`w-full px-4 py-3 bg-gray-900/80 border rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg ${
+              getFieldError("code_reviews")
+                ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+            }`}
             required
           />
+          {getFieldError("code_reviews") && (
+            <div className="flex items-center gap-1 mt-1 text-red-400 text-xs">
+              <AlertCircle className="w-3 h-3" />
+              {getFieldError("code_reviews")}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -89,6 +147,7 @@ export default function BasicInfo({
   setFormData,
   packageData,
   setPackageData,
+  validationErrors,
 }) {
   const [activePackageTab, setActivePackageTab] = useState("basic");
   const [gigImageFile, setGigImageFile] = useState(null);
@@ -105,6 +164,86 @@ export default function BasicInfo({
 
   const handlePackageChange = (pkgName, field, value) => {
     dispatch(setPackageData({ pkgName, field, value }));
+  };
+
+  const getFieldError = (field) => {
+    return validationErrors[field];
+  };
+
+  const renderField = (
+    label,
+    field,
+    type = "text",
+    placeholder = "",
+    required = false,
+    options = null
+  ) => {
+    const error = getFieldError(field);
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-cyan-300 mb-2 tracking-wide">
+          {label} {required && <span className="text-red-400">*</span>}
+        </label>
+        {type === "select" ? (
+          <select
+            value={formData[field] || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, [field]: e.target.value })
+            }
+            className={`w-full px-4 py-3 bg-gray-900/80 border rounded-lg text-white text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg ${
+              error
+                ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+            }`}
+            required={required}
+          >
+            <option value="">Select {label.toLowerCase()}</option>
+            {options?.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        ) : type === "textarea" ? (
+          <textarea
+            value={formData[field] || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, [field]: e.target.value })
+            }
+            placeholder={placeholder}
+            rows={4}
+            className={`w-full px-4 py-3 bg-gray-900/80 border rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg resize-none ${
+              error
+                ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+            }`}
+            required={required}
+          />
+        ) : (
+          <input
+            type={type}
+            value={formData[field] || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, [field]: e.target.value })
+            }
+            placeholder={placeholder}
+            className={`w-full px-4 py-3 bg-gray-900/80 border rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:ring-2 backdrop-blur-sm transition-all duration-300 shadow-lg ${
+              error
+                ? "border-red-500 focus:ring-red-500/50 focus:border-red-400/50"
+                : "border-gray-700/50 focus:ring-cyan-500/50 focus:border-cyan-400/50 hover:border-cyan-500/30 focus:shadow-cyan-500/20"
+            }`}
+            required={required}
+          />
+        )}
+        {error && (
+          <div className="flex items-center gap-1 mt-1 text-red-400 text-xs">
+            <AlertCircle className="w-3 h-3" />
+            {error}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const handleGigImageChange = (e) => {
@@ -168,7 +307,7 @@ export default function BasicInfo({
           ),
         ],
       };
-      setFormData(updatedFormData); // Dispatch the updated object
+      setFormData(updatedFormData);
 
       setAllImagePreviews((prev) => {
         const newPreviews = prev.filter((p) => p.type !== "gig");
@@ -208,7 +347,7 @@ export default function BasicInfo({
           "https://api.cloudinary.com/v1_1/dd33ovgv1/image/upload",
           uploadFormData
         );
-        uploadedUrls.push({ url: res.data.secure_url });
+        uploadedUrls.push(res.data.secure_url);
       }
 
       const updatedFormData = {
@@ -217,17 +356,17 @@ export default function BasicInfo({
           ...formData.images.filter(
             (img) => img.url && img.url !== formData.gigimage
           ),
-          ...uploadedUrls,
+          ...uploadedUrls.map((url) => ({ url })),
         ],
       };
-      setFormData(updatedFormData); // Dispatch the updated object
+      setFormData(updatedFormData);
 
       setAllImagePreviews((prev) => {
-        const newPreviews = prev.filter((p) => p.type !== "gig");
+        const newPreviews = prev.filter((p) => p.type !== "showcase");
         return [
           ...newPreviews,
-          ...uploadedUrls.map((img) => ({
-            url: img.url,
+          ...uploadedUrls.map((url) => ({
+            url,
             type: "showcase",
             uploaded: true,
           })),
@@ -243,449 +382,306 @@ export default function BasicInfo({
       setIsUploadingShowcase(false);
     }
   };
-  // Remove a previewed/showcased image
-  const removePreview = (index) => {
-    const preview = allImagePreviews[index];
-    if (!preview) return;
 
-    // Remove from previews
-    const updatedPreviews = allImagePreviews.filter((_, i) => i !== index);
-    setAllImagePreviews(updatedPreviews);
-
-    // If the preview corresponds to an uploaded showcase (exists in formData.images), remove it
-    if (preview.type === "showcase") {
-      setFormData((prev) => ({
-        ...prev,
-        images: prev.images
-          ? prev.images.filter((img) => img.url !== preview.url)
-          : [],
-      }));
-    }
-
-    // If it was a local (not uploaded) file in showcaseImageFiles, remove it from that array
-    if (!preview.uploaded && preview.file) {
-      setShowcaseImageFiles((prev) =>
-        prev.filter(
-          (f) => f.name !== preview.file.name || f.size !== preview.file.size
-        )
-      );
-    }
+  const removeImage = (index) => {
+    const updatedImages = formData.images.filter((_, i) => i !== index);
+    setFormData({ ...formData, images: updatedImages });
+    setAllImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Trigger replace flow: set index and open hidden input
-  const triggerReplace = (index) => {
+  const replaceImage = (index) => {
     setReplaceIndex(index);
-    if (replaceInputRef.current) replaceInputRef.current.value = null;
-    replaceInputRef.current?.click();
+    setIsReplacing(true);
+    if (replaceInputRef.current) {
+      replaceInputRef.current.click();
+    }
   };
 
-  // Handle replacement file selection -> upload -> replace URL in previews & formData
-  const handleReplaceFile = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file || replaceIndex === null || replaceIndex === undefined) return;
+  const handleReplaceImage = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
     setIsReplacing(true);
-    try {
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-      uploadFormData.append("upload_preset", "Freelance_Website");
-      uploadFormData.append("cloud_name", "dd33ovgv1");
+    const uploadFormData = new FormData();
+    uploadFormData.append("file", file);
+    uploadFormData.append("upload_preset", "Freelance_Website");
+    uploadFormData.append("cloud_name", "dd33ovgv1");
 
+    try {
       const res = await axios.post(
         "https://api.cloudinary.com/v1_1/dd33ovgv1/image/upload",
         uploadFormData
       );
       const secureUrl = res.data.secure_url;
 
-      // Update previews
-      setAllImagePreviews((prev) =>
-        prev.map((p, i) =>
-          i === replaceIndex
-            ? { url: secureUrl, type: p.type, uploaded: true }
-            : p
-        )
-      );
+      const updatedImages = [...formData.images];
+      updatedImages[replaceIndex] = { url: secureUrl };
+      setFormData({ ...formData, images: updatedImages });
 
-      // If the replaced item is a showcase that exists in formData.images, replace it there too.
-      const replacedPreview = allImagePreviews[replaceIndex];
-      if (replacedPreview?.type === "showcase") {
-        setFormData((prev) => ({
-          ...prev,
-          images: prev.images.map((img) =>
-            img.url === replacedPreview.url ? { url: secureUrl } : img
-          ),
-        }));
-      } else if (replacedPreview?.type === "gig") {
-        // If the replaced item is the gig image, update gigimage and images[0]
-        setFormData((prev) => ({
-          ...prev,
-          gigimage: secureUrl,
-          images: [
-            { url: secureUrl },
-            ...prev.images.filter((img) => img.url !== prev.gigimage),
-          ],
-        }));
-      }
+      setAllImagePreviews((prev) => {
+        const newPreviews = [...prev];
+        newPreviews[replaceIndex] = {
+          url: secureUrl,
+          type: "showcase",
+          uploaded: true,
+        };
+        return newPreviews;
+      });
 
       alert("Image replaced successfully!");
     } catch (err) {
-      
-      alert("Replacing image failed. Please try again.");
+      console.error("Image replacement failed:", err);
+      alert("Image replacement failed. Please try again.");
     } finally {
-      setReplaceIndex(null);
       setIsReplacing(false);
+      setReplaceIndex(null);
     }
   };
 
-  // Initialize previews from formData on component mount / when formData changes
-  useEffect(() => {
-    const initialPreviews = [];
-
-    // gigimage first (if present)
-    if (formData.gigimage) {
-      initialPreviews.push({
-        url: formData.gigimage,
-        type: "gig",
-        uploaded: true,
-      });
-    }
-
-    // other images (excluding gig image to avoid duplicates)
-    if (Array.isArray(formData.images) && formData.images.length > 0) {
-      const showcaseImages = formData.images.filter(
-        (img) => img.url !== formData.gigimage
-      );
-      initialPreviews.push(
-        ...showcaseImages.map((img) => ({
-          url: img.url,
-          type: "showcase",
-          uploaded: true,
-        }))
-      );
-    }
-
-    // Only update if the previews have actually changed
-    setAllImagePreviews((prev) => {
-      const currentUploaded = prev.filter((p) => p.uploaded);
-      const currentLocal = prev.filter((p) => !p.uploaded);
-
-      // Check if uploaded previews have changed
-      const uploadedChanged =
-        currentUploaded.length !== initialPreviews.length ||
-        !currentUploaded.every(
-          (p, i) => initialPreviews[i] && p.url === initialPreviews[i].url
-        );
-
-      if (uploadedChanged) {
-        return [...initialPreviews, ...currentLocal];
-      }
-
-      return prev;
-    });
-  }, [formData.gigimage, formData.images]);
-
-  // Clean up object URLs to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      allImagePreviews.forEach((preview) => {
-        if (preview.url && preview.url.startsWith("blob:")) {
-          URL.revokeObjectURL(preview.url);
-        }
-      });
-    };
-  }, [allImagePreviews]);
+  const categoryOptions = [
+    { value: "Web Development", label: "Web Development" },
+    { value: "Mobile Development", label: "Mobile Development" },
+    { value: "UI/UX Design", label: "UI/UX Design" },
+    { value: "Graphic Design", label: "Graphic Design" },
+    { value: "Digital Marketing", label: "Digital Marketing" },
+    { value: "Content Writing", label: "Content Writing" },
+    { value: "Video Editing", label: "Video Editing" },
+    { value: "Data Analysis", label: "Data Analysis" },
+    { value: "Other", label: "Other" },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 text-white p-4 sm:p-6 lg:p-8">
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text mb-6 text-center drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">
-        Basic Information
-      </h2>
+    <div className="space-y-8">
+      {/* Basic Information Section */}
+      <div className="space-y-6">
+        <div className="border-b border-gray-700/50 pb-4">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Basic Information
+          </h2>
+          <p className="text-gray-400">
+            Provide the essential details about your gig
+          </p>
+        </div>
 
-      {/* Hidden single file input used for replace */}
-      <input
-        ref={replaceInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleReplaceFile}
-        className="hidden"
-      />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {renderField(
+            "Username",
+            "username",
+            "text",
+            "Enter your username",
+            true
+          )}
+          {renderField("Title", "title", "text", "Enter your gig title", true)}
+          {renderField(
+            "Category",
+            "category",
+            "select",
+            "",
+            true,
+            categoryOptions
+          )}
+          {renderField(
+            "Price",
+            "price",
+            "number",
+            "Enter your base price",
+            true
+          )}
+          {renderField(
+            "Delivery Time",
+            "deliveryTime",
+            "text",
+            "e.g., 3-5 days",
+            true
+          )}
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-8">
-        <div className="space-y-2">
-          <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-2 tracking-wide">
-            Gig Title *
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            placeholder="e.g., I will create a stunning web application"
-            className="w-full px-4 py-3 sm:py-4 bg-gray-900/80 border border-gray-700/50 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20 text-sm sm:text-base"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-2 tracking-wide">
-            Username *
-          </label>
-          <input
-            type="text"
-            value={formData.username}
-            onChange={(e) =>
-              setFormData({ ...formData, username: e.target.value })
-            }
-            placeholder="e.g., yourusername"
-            className="w-full px-4 py-3 sm:py-4 bg-gray-900/80 border border-gray-700/50 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20 text-sm sm:text-base"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-2 tracking-wide">
-            Category *
-          </label>
-          <div className="relative group">
-            <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-5 h-5 group-focus-within:text-cyan-300 transition-colors duration-300" />
-            <input
-              type="text"
-              value={formData.category}
-              onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
-              }
-              placeholder="e.g., Web Development, Graphic Design"
-              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-gray-900/80 border border-gray-700/50 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20 text-sm sm:text-base"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-2 tracking-wide">
-            Price *
-          </label>
-          <div className="relative group">
-            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-5 h-5 group-focus-within:text-cyan-300 transition-colors duration-300" />
-            <input
-              type="text"
-              value={formData.price}
-              onChange={(e) =>
-                setFormData({ ...formData, price: e.target.value })
-              }
-              placeholder="Price"
-              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-gray-900/80 border border-gray-700/50 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20 text-sm sm:text-base"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2 lg:col-span-2">
-          <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-2 tracking-wide">
-            Delivery Time (Days) *
-          </label>
-          <div className="relative group max-w-md">
-            <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 w-5 h-5 group-focus-within:text-cyan-300 transition-colors duration-300" />
-            <input
-              type="number"
-              value={formData.deliveryTime}
-              onChange={(e) =>
-                setFormData({ ...formData, deliveryTime: e.target.value })
-              }
-              placeholder="e.g., 3"
-              className="w-full pl-12 pr-4 py-3 sm:py-4 bg-gray-900/80 border border-gray-700/50 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20 text-sm sm:text-base"
-              required
-            />
-          </div>
+        <div className="col-span-full">
+          {renderField(
+            "Description",
+            "description",
+            "textarea",
+            "Describe your gig in detail...",
+            true
+          )}
         </div>
       </div>
 
-      <div className="space-y-6 mb-8">
-        <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-          Configure All Packages *
-        </h3>
-        <div className="relative bg-gray-900/50 rounded-xl p-2 border border-gray-700/50 backdrop-blur-sm shadow-lg">
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-xl"></div>
-          <div className="flex relative z-10">
+      {/* Gig Image Section */}
+      <div className="space-y-6">
+        <div className="border-b border-gray-700/50 pb-4">
+          <h2 className="text-2xl font-bold text-white mb-2">Gig Image</h2>
+          <p className="text-gray-400">Upload a main image for your gig</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleGigImageChange}
+              className="hidden"
+              id="gig-image-input"
+            />
+            <label
+              htmlFor="gig-image-input"
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg cursor-pointer transition-colors duration-300"
+            >
+              <Upload className="w-4 h-4" />
+              Choose Image
+            </label>
+            {gigImageFile && (
+              <button
+                onClick={handleGigImageUpload}
+                disabled={isUploadingGig}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-300 disabled:opacity-50"
+              >
+                {isUploadingGig ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4" />
+                )}
+                {isUploadingGig ? "Uploading..." : "Upload"}
+              </button>
+            )}
+          </div>
+
+          {formData.gigimage && (
+            <div className="relative inline-block">
+              <img
+                src={formData.gigimage}
+                alt="Gig"
+                className="w-32 h-32 object-cover rounded-lg border-2 border-cyan-500/30"
+              />
+              <div className="absolute top-2 right-2 bg-green-500 text-white p-1 rounded-full">
+                <CheckCircle className="w-4 h-4" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Package Information Section */}
+      <div className="space-y-6">
+        <div className="border-b border-gray-700/50 pb-4">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Package Information
+          </h2>
+          <p className="text-gray-400">Configure your three service packages</p>
+        </div>
+
+        <div className="space-y-6">
+          {/* Package Tabs */}
+          <div className="flex space-x-1 bg-gray-800/50 p-1 rounded-lg">
             {["basic", "standard", "pro"].map((pkgName) => (
               <button
                 key={pkgName}
-                type="button"
                 onClick={() => setActivePackageTab(pkgName)}
-                className={`flex-1 text-center py-3 px-4 rounded-lg font-semibold text-sm sm:text-base transition-all duration-300 relative overflow-hidden
-                  ${
-                    activePackageTab === pkgName
-                      ? "bg-gradient-to-r from-cyan-600/80 via-blue-600/80 to-purple-600/80 text-white shadow-lg shadow-cyan-500/25 border border-cyan-400/30"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800/50"
-                  }`}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
+                  activePackageTab === pkgName
+                    ? "bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700/50"
+                }`}
               >
-                {activePackageTab === pkgName && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 animate-pulse"></div>
-                )}
-                <span className="relative z-10">
-                  {pkgName.charAt(0).toUpperCase() + pkgName.slice(1)}
-                </span>
+                {pkgName.charAt(0).toUpperCase() + pkgName.slice(1)} Package
               </button>
             ))}
           </div>
-        </div>
 
-        <div className="relative p-6 bg-gray-900/50 border border-gray-700/50 rounded-xl backdrop-blur-sm shadow-lg">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-500/5 rounded-xl"></div>
-          <div className="relative z-10">
-            {activePackageTab === "basic" && (
-              <PackageFields
-                pkgName="basic"
-                pkg={packageData.basic}
-                handlePackageChange={handlePackageChange}
-              />
-            )}
-            {activePackageTab === "standard" && (
-              <PackageFields
-                pkgName="standard"
-                pkg={packageData.standard}
-                handlePackageChange={handlePackageChange}
-              />
-            )}
-            {activePackageTab === "pro" && (
-              <PackageFields
-                pkgName="pro"
-                pkg={packageData.pro}
-                handlePackageChange={handlePackageChange}
-              />
-            )}
+          {/* Package Fields */}
+          <div className="bg-gray-800/30 rounded-lg p-6 border border-gray-700/30">
+            <PackageFields
+              pkgName={activePackageTab}
+              pkg={packageData[activePackageTab]}
+              handlePackageChange={handlePackageChange}
+              validationErrors={validationErrors}
+            />
           </div>
         </div>
       </div>
 
-      <div className="mb-8">
-        <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-3 tracking-wide">
-          Gig Image
-        </label>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleGigImageChange}
-            className="block w-full sm:flex-1 text-sm text-gray-300 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-800   file:text-cyan-400 hover:file:from-cyan-500/20 hover:file:to-blue-500/20 file:transition-all file:duration-300 file:shadow-lg hover:file:shadow-cyan-500/20"
-          />
-          <button
-            type="button"
-            onClick={handleGigImageUpload}
-            disabled={isUploadingGig || !gigImageFile}
-            className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 shadow-lg min-w-fit ${
-              isUploadingGig || !gigImageFile
-                ? "bg-gray-700/50 text-gray-500 cursor-not-allowed border border-gray-600/50"
-                : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white border border-cyan-400/30 shadow-cyan-500/25 hover:shadow-cyan-500/40"
-            }`}
-          >
-            <Upload className="w-4 h-4" />
-            {isUploadingGig ? "Uploading..." : "Upload"}
-          </button>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <label className="block text-sm sm:text-base font-medium text-cyan-300 mb-3 tracking-wide">
-          Images to Showcase
-        </label>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleShowcaseImagesChange}
-            className="block w-full sm:flex-1 text-sm text-gray-300 file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-cyan-400 hover:file:from-cyan-500/20 hover:file:to-blue-500/20 file:transition-all file:duration-300 file:shadow-lg hover:file:shadow-cyan-500/20"
-          />
-          <button
-            type="button"
-            onClick={handleShowcaseImagesUpload}
-            disabled={isUploadingShowcase || showcaseImageFiles.length === 0}
-            className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-2 shadow-lg min-w-fit ${
-              isUploadingShowcase || showcaseImageFiles.length === 0
-                ? "bg-gray-700/50 text-gray-500 cursor-not-allowed border border-gray-600/50"
-                : "bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white border border-cyan-400/30 shadow-cyan-500/25 hover:shadow-cyan-500/40"
-            }`}
-          >
-            <Upload className="w-4 h-4" />
-            {isUploadingShowcase ? "Uploading..." : "Upload"}
-          </button>
+      {/* Showcase Images Section */}
+      <div className="space-y-6">
+        <div className="border-b border-gray-700/50 pb-4">
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Showcase Images
+          </h2>
+          <p className="text-gray-400">
+            Add additional images to showcase your work
+          </p>
         </div>
 
-        {allImagePreviews.length > 0 && (
-          <div className="space-y-4">
-            <span className="block text-sm text-cyan-300 font-medium tracking-wide">
-              Showcase Images Preview:
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {allImagePreviews.map((preview, index) => (
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleShowcaseImagesChange}
+              className="hidden"
+              id="showcase-images-input"
+            />
+            <label
+              htmlFor="showcase-images-input"
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg cursor-pointer transition-colors duration-300"
+            >
+              <Upload className="w-4 h-4" />
+              Choose Images
+            </label>
+            {showcaseImageFiles.length > 0 && (
+              <button
+                onClick={handleShowcaseImagesUpload}
+                disabled={isUploadingShowcase}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-300 disabled:opacity-50"
+              >
+                {isUploadingShowcase ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Upload className="w-4 h-4" />
+                )}
+                {isUploadingShowcase ? "Uploading..." : "Upload All"}
+              </button>
+            )}
+          </div>
+
+          {/* Image Grid */}
+          {formData.images.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {formData.images.map((img, index) => (
                 <div key={index} className="relative group">
-                  <div className="relative overflow-hidden rounded-xl border border-gray-700/50 shadow-lg hover:shadow-cyan-500/20 transition-all duration-300">
-                    <img
-                      src={preview.url || "/placeholder.svg"}
-                      alt={`${
-                        preview.type === "gig" ? "Gig" : "Showcase"
-                      } image ${index + 1}`}
-                      className="w-full h-32 sm:h-40 object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        e.target.src = "/placeholder.svg";
-                      }}
-                    />
-
-                    {/* Overlay actions */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => triggerReplace(index)}
-                        disabled={isReplacing}
-                        title="Replace image"
-                        className="bg-cyan-600/80 hover:bg-cyan-500 backdrop-blur-sm px-3 py-2 rounded-lg flex items-center gap-2 text-xs text-white transition-all duration-300 shadow-lg hover:shadow-cyan-500/30 border border-cyan-400/30"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                        <span className="hidden sm:inline">
-                          {isReplacing && replaceIndex === index
-                            ? "Replacing..."
-                            : "Replace"}
-                        </span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => removePreview(index)}
-                        title="Remove image"
-                        className="bg-red-600/80 hover:bg-red-500 backdrop-blur-sm px-3 py-2 rounded-lg flex items-center gap-2 text-xs text-white transition-all duration-300 shadow-lg hover:shadow-red-500/30 border border-red-400/30"
-                      >
-                        <X className="w-3 h-3" />
-                        <span className="hidden sm:inline">Remove</span>
-                      </button>
-                    </div>
-
-                    <span className="absolute top-2 left-2 bg-gray-900/90 backdrop-blur-sm text-cyan-300 text-xs px-2 py-1 rounded-md border border-cyan-500/30">
-                      {preview.type === "gig" ? "Gig Image" : "Showcase"}
-                    </span>
-
-                    <span className="absolute top-2 right-2 bg-gray-800/90 backdrop-blur-sm text-xs text-gray-200 px-2 py-1 rounded-md border border-gray-600/50">
-                      {preview.uploaded ? "Saved" : "Local"}
-                    </span>
+                  <img
+                    src={img.url}
+                    alt={`Showcase ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border-2 border-gray-600/30 group-hover:border-cyan-500/50 transition-colors duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => removeImage(index)}
+                      className="p-1 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors duration-300"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => replaceImage(index)}
+                      className="p-1 bg-cyan-500 hover:bg-cyan-600 text-white rounded-full transition-colors duration-300"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
-      </div>
+          )}
 
-      <div className="space-y-3">
-        <label className="block text-sm sm:text-base font-medium text-cyan-300 tracking-wide">
-          Gig Description *
-        </label>
-        <textarea
-          value={formData.description}
-          onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
-          }
-          placeholder="Describe your gig in detail..."
-          rows={6}
-          className="w-full px-4 py-4 bg-gray-900/80 border border-gray-700/50 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-400/50 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 shadow-lg focus:shadow-cyan-500/20 resize-none text-sm sm:text-base leading-relaxed"
-          required
-        />
+          {/* Hidden input for image replacement */}
+          <input
+            ref={replaceInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleReplaceImage}
+            className="hidden"
+          />
+        </div>
       </div>
     </div>
   );

@@ -129,7 +129,7 @@ export const validateStoredToken = createAsyncThunk(
 
       // Get user profile using the validated token
       const userResponse = await fetch(
-        `https://cryptolance-server.onrender.com/api/users/${address}`,
+        `https://cryptolance-server.onrender.com/api/portfolio/me`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -141,9 +141,20 @@ export const validateStoredToken = createAsyncThunk(
       let currentUser = null;
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        currentUser = userData;
+        if (userData.success && userData.data) {
+          // Use portfolio data to create user object
+          currentUser = {
+            _id: userData.data.heroSection.walletAddress,
+            name: userData.data.heroSection.name,
+            profile: userData.data.heroSection.profile,
+            email: userData.data.contactInfo?.email,
+          };
+        } else {
+          // If portfolio data is not available, create a basic user object
+          currentUser = { _id: address.toLowerCase() };
+        }
       } else {
-        // If user profile doesn't exist, create a basic user object
+        // If portfolio profile doesn't exist, create a basic user object
         currentUser = { _id: address.toLowerCase() };
       }
 

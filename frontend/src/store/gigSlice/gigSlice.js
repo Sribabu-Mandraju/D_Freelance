@@ -204,6 +204,9 @@ const gigSlice = createSlice({
     setCurrentGigId: (state, action) => {
       state.currentGigId = action.payload;
     },
+    setCurrentStep: (state, action) => {
+      state.currentStep = action.payload;
+    },
     resetGig: () => initialState,
   },
   extraReducers: (builder) => {
@@ -339,6 +342,7 @@ export const {
   nextStep,
   prevStep,
   setCurrentGigId,
+  setCurrentStep,
   resetGig,
 } = gigSlice.actions;
 export default gigSlice.reducer;

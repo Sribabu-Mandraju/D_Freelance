@@ -9,7 +9,7 @@ const Step2TechDetails = ({
   onUpdateCurrentStatus,
   onUpdateTechHighlight
 }) => {
-  const colorOptions = ["purple", "blue", "cyan", "indigo", "violet", "pink"];
+  const colorOptions = ["purple", "blue", "cyan", "green","red","violet", "pink"];
 
   const renderStars = (rating, onChange) => {
     return (

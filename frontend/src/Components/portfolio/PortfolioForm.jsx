@@ -12,7 +12,7 @@ import {
   createPortfolio,
   updateCurrentStatusCreation,
 } from "../../store/portfolioSlice/portfolioSlice";
-import PortfolioWizard from "../../Components/portfolio/wizard/PortfolioWizard"
+import PortfolioWizard from "../../Components/portfolio/wizard/PortfolioWizard";
 
 function PortfolioForm() {
   const dispatch = useDispatch();

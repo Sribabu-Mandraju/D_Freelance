@@ -15,9 +15,13 @@ import {
 function OtpVerification() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { otp, isVerifying, isResending, verificationMessage, email } = useSelector(
-    (state) => state.portfolio
-  );
+  const {
+    otp,
+    isVerifying,
+    isResending,
+    verificationMessage,
+    email,
+  } = useSelector((state) => state.portfolio);
   const inputRefs = useRef([]);
   const [searchParams] = useSearchParams();
 
@@ -26,7 +30,10 @@ function OtpVerification() {
     if (emailParam) {
       dispatch(setEmail(decodeURIComponent(emailParam)));
     } else {
-      dispatch({ type: "portfolio/setVerificationMessage", payload: "Error: Email not found in URL" });
+      dispatch({
+        type: "portfolio/setVerificationMessage",
+        payload: "Error: Email not found in URL",
+      });
       toast.error("Email not found in URL");
     }
 
@@ -54,7 +61,10 @@ function OtpVerification() {
     const otpString = otp.join("");
 
     if (otpString.length !== 6) {
-      dispatch({ type: "portfolio/setVerificationMessage", payload: "Please enter all 6 digits" });
+      dispatch({
+        type: "portfolio/setVerificationMessage",
+        payload: "Please enter all 6 digits",
+      });
       toast.error("Please enter all 6 digits");
       return;
     }
@@ -77,7 +87,10 @@ function OtpVerification() {
 
   const handleResend = async () => {
     if (!email) {
-      dispatch({ type: "portfolio/setVerificationMessage", payload: "Email not found. Please go back and try again." });
+      dispatch({
+        type: "portfolio/setVerificationMessage",
+        payload: "Email not found. Please go back and try again.",
+      });
       toast.error("Email not found. Please go back and try again.");
       return;
     }

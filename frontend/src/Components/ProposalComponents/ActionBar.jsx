@@ -403,7 +403,7 @@ export default function ActionBar({ dbId, proposalId, state, onChainSuccess }) {
         {stages.map((stage, index) => (
           <div key={stage.id} className="flex items-start gap-4">
             {/* Left: Stage Button */}
-            <div className="flex flex-col items-center flex-shrink-0">
+            <div className="flex flex-col  mt-[-25px] items-center flex-shrink-0">
               <StageButton
                 onClick={stage.handler}
                 disabled={stage.isDisabled || stage.isPending || disabled}
@@ -419,7 +419,7 @@ export default function ActionBar({ dbId, proposalId, state, onChainSuccess }) {
                 <VerticalConnector
                   isCompleted={stage.isCompleted}
                   isActive={stage.isActive}
-                  height="h-12"
+                  height="h-[120px]"
                 />
               )}
             </div>

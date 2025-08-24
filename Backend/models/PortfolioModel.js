@@ -85,7 +85,7 @@ const portfolioSchema = new mongoose.Schema({
     color: {
       type: String,
       required: true,
-      enum: ['green', 'yellow', 'red', 'blue', 'purple', 'orange']
+      enum: ['green', 'pink', 'red', 'blue', 'purple','cyan','violet']
     },
     isActive: {
       type: Boolean,
