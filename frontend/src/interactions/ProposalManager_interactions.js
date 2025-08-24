@@ -13,7 +13,7 @@ import { useRef } from "react";
 import { parseEventLogs } from "viem"; // Add this import
 import toast from "react-hot-toast";
 
-const PROPOSAL_MANAGER_ADDRESS = "0x9e002323F46D6908EC4ef5444f1Bd0F67AF9Cf10"; // ProposalManager contract address
+const PROPOSAL_MANAGER_ADDRESS = "0xc127810479D1366AA3672066C737C98c97735134"; // ProposalManager contract address
 const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // USDC contract address
 const USDC_ABI = [
   {

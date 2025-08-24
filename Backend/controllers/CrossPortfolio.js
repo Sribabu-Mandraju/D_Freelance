@@ -6,7 +6,7 @@ import ProposalManager_ABI from '../abis/ProposalManager_ABI.json' with { type: 
 
 // Contract configuration
 const provider = new ethers.JsonRpcProvider("https://base-sepolia.g.alchemy.com/v2/vt_tNAcA-byKs7AxeH4Ze");
-const ProposalManager_contractAddress = "0x9e002323F46D6908EC4ef5444f1Bd0F67AF9Cf10";
+const ProposalManager_contractAddress = "0xc127810479D1366AA3672066C737C98c97735134";
 const ProposalManager_contract = new ethers.Contract(
   ProposalManager_contractAddress,
   ProposalManager_ABI,

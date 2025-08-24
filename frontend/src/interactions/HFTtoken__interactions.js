@@ -9,7 +9,7 @@ import { baseSepolia } from "wagmi/chains";
 import { useEffect } from "react";
 
 // Replace with your deployed contract address
-const HFT_TOKEN_ADDRESS = "0xd0D1B6E1dE2F705701FE370e91f8fb4731161d5a"; // Update with actual address
+const HFT_TOKEN_ADDRESS = "0x0feBB9594586Fd1626E33e63AB8B966b58eC9682"; // Update with actual address
 
 const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 const USDC_ABI = [

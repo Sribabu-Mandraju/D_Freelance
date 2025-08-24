@@ -467,12 +467,6 @@ export default function Navbar() {
             Portfolio
           </button>
 
-          {/* Watchlist */}
-          <button className="md:flex hidden text-sm items-center text-gray-300 hover:text-cyan-400 transition-all duration-300 py-2 rounded-lg group">
-            <Star className="w-4 h-4 mr-2 group-hover:text-cyan-400 transition-colors duration-300" />
-            Watchlist
-          </button>
-
           <div className="flex flex-row gap-1 items-center">
             {/* Log in Button with neon effect */}
             <WalletConnect onAuthSuccess={() => {}} />

@@ -70,8 +70,30 @@ export const validateStoredToken = createAsyncThunk(
         throw new Error("No stored authentication data");
       }
 
+      console.log("Validating stored token for address:", address);
+
+      // First check if the backend is accessible
+      try {
+        const healthResponse = await fetch(
+          `https://cryptolance-server.onrender.com/api/auth/health`
+        );
+        if (!healthResponse.ok) {
+          console.warn(
+            "Backend health check failed, but preserving localStorage"
+          );
+          throw new Error("Backend service unavailable");
+        }
+      } catch (healthError) {
+        console.warn(
+          "Backend health check failed, but preserving localStorage:",
+          healthError.message
+        );
+        throw new Error("Backend service unavailable");
+      }
+
+      // Use the proper token validation endpoint
       const response = await fetch(
-        `https://cryptolance-server.onrender.com/api/messages/users`,
+        `https://cryptolance-server.onrender.com/api/auth/validate-token`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -81,38 +103,75 @@ export const validateStoredToken = createAsyncThunk(
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to fetch user profile");
+        // Only clear localStorage if it's an authentication error (401)
+        if (response.status === 401) {
+          console.log("Token is invalid (401), clearing localStorage");
+          localStorage.removeItem("authToken");
+          localStorage.removeItem("authAddress");
+          throw new Error("Token is invalid or expired");
+        }
+        // For other errors, don't clear localStorage immediately
+        console.warn(
+          "Token validation failed with status:",
+          response.status,
+          "but preserving localStorage"
+        );
+        throw new Error("Failed to validate token");
       }
 
-      // API might return { data: [...]} or array directly. handle both.
-      const allUsers = await response.json();
-      const usersArray = Array.isArray(allUsers)
-        ? allUsers
-        : allUsers.data || [];
+      const data = await response.json();
 
-      // Support both shapes: _id === wallet OR heroSection.walletAddress
-      const normalizedAddress = address.toLowerCase();
-      const currentUser = usersArray.find(
-        (u) =>
-          (u._id && u._id.toLowerCase() === normalizedAddress) ||
-          (u.heroSection &&
-            u.heroSection.walletAddress &&
-            u.heroSection.walletAddress.toLowerCase() === normalizedAddress)
+      if (!data.success) {
+        throw new Error(data.message || "Token validation failed");
+      }
+
+      console.log("Token validation successful, fetching user profile");
+
+      // Get user profile using the validated token
+      const userResponse = await fetch(
+        `https://cryptolance-server.onrender.com/api/users/${address}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (!currentUser) {
-        throw new Error("User profile not found after token validation");
+      let currentUser = null;
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        currentUser = userData;
+      } else {
+        // If user profile doesn't exist, create a basic user object
+        currentUser = { _id: address.toLowerCase() };
       }
+
+      console.log("User profile retrieved successfully");
 
       return {
         token,
         user: currentUser,
-        userExists: true,
+        userExists: !!currentUser._id,
       };
     } catch (error) {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("authAddress");
+      console.error("Error in validateStoredToken:", error.message);
+
+      // Only clear localStorage for authentication errors, not network errors
+      if (
+        error.message.includes("Token is invalid") ||
+        error.message.includes("No stored authentication data")
+      ) {
+        console.log("Clearing localStorage due to authentication error");
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("authAddress");
+      } else {
+        console.log(
+          "Preserving localStorage for non-authentication error:",
+          error.message
+        );
+      }
+
       return rejectWithValue(error.message);
     }
   }
