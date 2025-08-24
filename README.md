@@ -9,10 +9,56 @@ Here is an effective and professional `README.md` for CryptoLance, structured fo
 > "Where Talent Meets Trust—Freelance, Bid, and Get Paid Securely on Chain."
 
 ***
+# Problem Statement  
 
-## 📌 Problem Statement
+Traditional freelancing platforms operate in a **centralized** manner, where all interactions—such as posting jobs, submitting proposals, managing payments, and resolving disputes—are controlled by the platform itself. While this model provides structure, it comes with several significant drawbacks:  
 
-Traditional freelance platforms are centralized, charge high platform fees, and hold user funds, resulting in delays, lack of transparency, and potential censorship. Freelancers and clients deserve direct, auditable, and lightning-fast gig management—without middlemen.
+## 🔴 Issues with Centralized Freelance Platforms  
+
+1. **High Fees and Hidden Charges**  
+   Freelancers and clients are burdened with service fees ranging from 10% to 30% of earnings. These costs cut directly into freelancers’ hard-earned income and increase expenses for clients, making the process less rewarding for both parties.  
+
+2. **Fund Locking and Delays**  
+   User payments are often held in escrow or subjected to withdrawal restrictions, leading to long delays before freelancers receive their money. This creates financial stress, especially for individuals who depend on freelancing as their primary income source.  
+
+3. **Lack of Transparency**  
+   The centralized nature of these platforms means users have little visibility into how funds are managed, how disputes are resolved, or how algorithms decide which jobs or freelancers are prioritized. This black-box system undermines trust between clients and freelancers.  
+
+4. **Censorship and Control**  
+   Since platforms act as gatekeepers, accounts can be suspended or terminated at any time, sometimes without clear justification. This lack of ownership over user identity and work history limits true professional independence.  
+
+5. **Slow and Inefficient Processes**  
+   Despite operating in the digital era, payments, verifications, and gig management often involve multiple layers of bureaucracy, slowing down the process of starting, managing, and completing gigs.  
+
+---
+## ⚡ The Core Problem  
+
+Freelancers and clients are currently trapped in systems that **diminish autonomy, reduce earnings, and create unnecessary friction**. Centralized platforms act as middlemen, profiting from each interaction while controlling the flow of work and funds. This not only discourages fair participation but also slows down the freelancing ecosystem as a whole.  
+
+To truly empower freelancers and clients, a better model is needed—one that removes unnecessary intermediaries and restores trust, speed, and fairness.  
+
+---
+
+## ✅ What’s Missing Today  
+
+A next-generation freelancing ecosystem should be:  
+
+1. **Fast ⚡ – Instant Payments and Gig Management**  
+   Transactions should settle in real-time, allowing freelancers to get paid immediately after completing a gig and clients to confirm work without delays. No more waiting days—or even weeks—for withdrawals.  
+
+2. **Transparent 🔍 – Fully Auditable and Fair Processes**  
+   Every action, from proposal creation to payment release, should be verifiable and accessible on a shared ledger. Transparency ensures trust: freelancers know they will be paid, and clients know their funds are secure.  
+
+3. **Decentralized 🌍 – No Single Point of Control or Censorship**  
+   Instead of relying on one authority to manage accounts, disputes, or visibility, the system should operate on decentralized infrastructure. This ensures no account can be unfairly blocked, no funds can be frozen, and no single entity controls opportunities.  
+
+4. **Fair 🤝 – Value Stays with Freelancers and Clients**  
+   Rather than losing up to 30% of their income to platform fees, freelancers and clients should retain the majority of their value. A fair system means both sides benefit from lower costs, higher trust, and greater autonomy.  
+
+---
+
+⚡ In short: The freelancing world doesn’t need more gatekeepers—it needs a **trustless, efficient, and fair platform** where freelancers and clients can directly collaborate with speed, security, and transparency.  
+
 
 ***
 
@@ -49,18 +95,70 @@ CryptoLance offers a decentralized platform for clients and freelancers to post 
 
 ***
 
-## ✨ Key Features
+## ## ✨ Key Features  
 
-- 🚀 **Decentralized Jobs/Gigs:** Clients create jobs/gigs, freelancers bid with tokens  
-- 💰 **Milestone-Based Escrow:** 40%, 70%, and final 100% payouts after client verification  
-- 🛡️ **Budget Security:** Clients escrow full budget before project start; payouts only via client sign-off  
-- 🏦 **Automated Platform Fee:** 1% of job budget, routed to treasury contract  
-- 🪙 **Token System:**  
-  - 150 HFT tokens airdropped monthly  
-  - Bids cost 25 HFT tokens  
-  - Additional tokens purchasable (150 HFT / 10 USDC)  
-- 📁 **Portfolio & Gig Management:** Create/edit gigs, record completed work for reputation  
-- 🔍 **Transparent On-Chain Activity:** All transactions are viewable and auditable
+Our decentralized freelancing platform offers a seamless, transparent, and trustless workflow from job creation to final payment.  
+
+---
+
+### 🚀 Decentralized Jobs/Gigs  
+Clients can create jobs or gigs directly on-chain, and freelancers can place bids using tokens.  
+![Decentralized Jobs](./frontend/src/assets/getStart.png)  
+![Wallet Connection](./frontend/src/assets/wallet.png)  
+![Create Proposal](./frontend/src/assets/createProposal.png)  
+![Initialize Proposal](./frontend/src/assets/initialiseProposal.png)  
+![Open for Bidding](./frontend/src/assets/openBid.png)  
+![Bid Submission](./frontend/src/assets/bid.png)  
+
+---
+
+### 💰 Milestone-Based Escrow  
+Payments are secured through milestone-based escrow. Freelancers receive payouts as work progresses:  
+- **40%** after first milestone approval  
+- **70%** after second milestone approval  
+- **100%** on final completion  
+
+This ensures both client satisfaction and freelancer security.  
+![Bid Acceptance](./frontend/src/assets/accept.png)  
+![Deposit Escrow](./frontend/src/assets/deposit.png)  
+![Start Work](./frontend/src/assets/start.png)  
+![First Milestone Payment](./frontend/src/assets/firstPay.png)  
+![Second Milestone Payment](./frontend/src/assets/secondPay.png)  
+![Final Payment](./frontend/src/assets/finalPay.png)  
+
+---
+
+### 🛡️ Budget Security  
+Before a project begins, the client must escrow the **entire project budget** on-chain. Funds are only released through milestone approvals, guaranteeing payment assurance.  
+![Project Completion](./frontend/src/assets/complete.png)  
+![Project Cancellation](./frontend/src/assets/cancel.png)  
+
+---
+
+### 🏦 Automated Platform Fee  
+A minimal **1% fee** is automatically deducted from the job’s budget and routed to the **treasury contract**, ensuring sustainability without burdening freelancers.  
+
+---
+
+### 🪙 Token System  
+- 🎁 **150 HFT tokens** are airdropped monthly to active users  
+- 💸 **25 HFT tokens** are required per bid submission  
+- 🛒 Additional tokens can be purchased at **150 HFT / 10 USDC**  
+
+This tokenized bidding system ensures fairness and reduces spam bidding.  
+
+---
+
+### 📁 Portfolio & Gig Management  
+Freelancers can **create and manage their gigs**, showcase completed projects, and build on-chain reputation, helping clients identify trusted professionals.  
+
+---
+
+### 🔍 Transparent On-Chain Activity  
+All transactions, proposals, bids, and payments are recorded **directly on-chain**. Anyone can audit the activity, ensuring **fairness, trust, and accountability** across the ecosystem.  
+
+---
+
 
 ***
 
