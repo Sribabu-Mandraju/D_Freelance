@@ -13,7 +13,7 @@ export const checkWithGemini = async (text) => {
   if (cachedResult !== undefined) {
     return cachedResult;
   }
-
+//
   const prompt = `Does this message contain vulgar, abusive, or inappropriate language? Only reply "vulgar" or "clean".\n\nMessage: "${text}"`;
 
   try {
