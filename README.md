@@ -109,6 +109,17 @@ Each step is secured on-chain and fully transparent.
 
 ---
 
+### Website Flow
+
+
+
+<p align="center">
+  <img src="./frontend/src/assets/flowDiagram1.png" width="45%" />
+  <img src="./frontend/src/assets/flowDiagram2.png" width="45%" />
+</p>  
+
+---
+
 ### 1️⃣ Connect Wallet  
 Authenticate by connecting your wallet to access the platform.  
 
