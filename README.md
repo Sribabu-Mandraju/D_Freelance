@@ -76,6 +76,7 @@ We are a passionate team of builders, innovators, and dreamers bringing decentra
 | **Sribabu Mandraju** | [🔗 GitHub](https://github.com/Sribabu-Mandraju) | [🔗 LinkedIn](https://www.linkedin.com/in/sribabu-mandraju-590524233/) | [🔗 X](https://x.com/5R1B4BU) |
 | **Sireesha Sibbala** | [🔗 GitHub](https://github.com/sibbalas) | [🔗 LinkedIn](https://www.linkedin.com/in/sireesha-sibbala-b2467631b) | [🔗 X](https://x.com/SireeshaSibbala) |
 | **Nakshatra Yeluri** | [🔗 GitHub](https://github.com/Yeluri-Nakshatra) | [🔗 LinkedIn](https://www.linkedin.com/in/nakshatra-yeluri) | [🔗 X](https://x.com/nakshatrayeluri) |
+| **Bindu palukurthi** | [🔗 GitHub](https://github.com/BinduSree-18) | [🔗 LinkedIn](https://www.linkedin.com/in/palukurthi-bindu-sree-737697325/) | [🔗 X](https://x.com/BinduPalukurthi ) |
 
 ---
 
