@@ -229,7 +229,7 @@ All transactions, proposals, bids, and payments are recorded **directly on-chain
 
 ## 📽️ Demo & Deliverables
 
-- **Web App:** [CryptoLance_deployed_link](#)  
+- **Web App:** [CryptoLance_deployed_link](#https://crypto-lance-gamma.vercel.app/)  
 - **Demo Video:** [CryptoLance_YouTube_demo_link](#)  
 - **Pitch Deck:** [CryptoLance_ppt_link](#)
 
