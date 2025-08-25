@@ -31,33 +31,48 @@
     "category": "productivity",
     "audience": "freelancers_and_clients"
   },
-  "integration": {
-    "farcaster": {
-      "cast_actions": [
-        {
-          "name": "Share Job",
-          "description": "Share a freelance job posting on Farcaster",
-          "action": "share_job"
-        },
-        {
-          "name": "Share Portfolio",
-          "description": "Share your portfolio on Farcaster",
-          "action": "share_portfolio"
-        }
-      ],
-      "frame_actions": [
-        {
-          "name": "View Job",
-          "description": "View job details in a Farcaster frame",
-          "action": "view_job"
-        },
-        {
-          "name": "Apply to Job",
-          "description": "Apply to a job directly from Farcaster",
-          "action": "apply_job"
-        }
-      ]
-    }
+  "miniapp": {
+    "name": "HFT Freelance Platform",
+    "description": "A decentralized freelance platform built on blockchain technology with HFT token integration",
+    "icon": "/logoForWeb.png",
+    "url": "https://crypto-lance-gamma.vercel.app/",
+    "permissions": [
+      "cast",
+      "reactions",
+      "user_data_basic",
+      "user_data_profile"
+    ],
+    "features": [
+      "freelance_jobs",
+      "bidding_system",
+      "portfolio_management",
+      "escrow_payments",
+      "hft_token_integration"
+    ],
+    "cast_actions": [
+      {
+        "name": "Share Job",
+        "description": "Share a freelance job posting on Farcaster",
+        "action": "share_job"
+      },
+      {
+        "name": "Share Portfolio",
+        "description": "Share your portfolio on Farcaster",
+        "action": "share_portfolio"
+      }
+    ],
+    "frame_actions": [
+      {
+        "name": "View Job",
+        "description": "View job details in a Farcaster frame",
+        "action": "view_job"
+      },
+      {
+        "name": "Apply to Job",
+        "description": "Apply to a job directly from Farcaster",
+        "action": "apply_job"
+      }
+    ]
   },
   "contact": {
     "support": "support@crypto-lance-gamma.vercel.app",
