@@ -3,6 +3,28 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import MarketCard from "../../Components/main/marketSection/MarketCard";
 
+// Custom loading component with neon theme
+const NeonLoader = ({ size = "md", caption = "" }) => {
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-8 h-8",
+    lg: "w-12 h-12",
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center space-y-3">
+      <div className={`${sizeClasses[size]} relative`}>
+        <div className="absolute inset-0 rounded-full border-2 border-gray-700"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-neon-primary animate-spin"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-r-neon-secondary animate-pulse"></div>
+      </div>
+      {caption && (
+        <p className="text-sm text-gray-400 font-medium">{caption}</p>
+      )}
+    </div>
+  );
+};
+
 const YourGigs = ({ yourgigs = [] }) => {
   const navigate = useNavigate();
   const [gigs, setGigs] = useState([]); // fetched gig objects
@@ -92,8 +114,7 @@ const YourGigs = ({ yourgigs = [] }) => {
   }, [yourgigs, API_BASE]);
 
   // UI states
-  if (loading)
-    return <div className="p-4 text-cyan-300">Loading your gigs…</div>;
+  if (loading) return <NeonLoader size="lg" caption="Loading your gigs..." />;
   if (error) return <div className="p-4 text-red-400">{error}</div>;
 
   return (

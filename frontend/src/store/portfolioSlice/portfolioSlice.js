@@ -40,7 +40,7 @@ const initialState = {
   },
   loading: false,
   error: null,
-  activeTab: "overview",
+  activeTab: "Created Proposals",
   isSubmitting: false,
   submitMessage: "",
   portfolioId: null,

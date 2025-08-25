@@ -33,6 +33,7 @@ import {
   setPortfolioData,
 } from "../../store/portfolioSlice/portfolioSlice"; // Adjust path
 import BiddedProposals from "../UserDetails/BiddedProposals";
+import Loader from "../../Components/Loader";
 
 function Portfolio() {
   const dispatch = useDispatch();
@@ -68,7 +69,6 @@ function Portfolio() {
           asideRef.current.style.height = `${maxHeight}px`;
         }
       } catch (err) {
-        
         toast.error("Failed to adjust layout heights");
       }
     };
@@ -79,19 +79,15 @@ function Portfolio() {
   }, [portfolioData, activeTab]);
 
   const tabs = [
+    { id: "Created Proposals", label: "Created Proposals", icon: Briefcase },
     { id: "Bidded Proposals", label: "Bidded Proposals", icon: User },
     { id: "Gigs", label: "Your Gigs", icon: Code },
     { id: "Accepted Proposals", label: "Accepted Proposals", icon: Briefcase },
-        { id: "Created Proposals", label: "Created Proposals", icon: Briefcase },
-
-
   ];
 
   if (loading) {
     return (
-      <div className={`${styles.container} flex items-center justify-center`}>
-        <p>Loading portfolio...</p>
-      </div>
+     <Loader  caption={"Loading Portfolio"} />
     );
   }
 
@@ -154,19 +150,12 @@ function Portfolio() {
               setActiveTab={(tab) => dispatch(setActiveTab(tab))}
             />
             <div className="space-y-8">
-              
-              {activeTab === "Bidded Proposals" && (
-                <BiddedProposals/>
-              )}
+              {activeTab === "Bidded Proposals" && <BiddedProposals />}
               {activeTab === "Gigs" && (
                 <YourGigs yourgigs={portfolioData.userGigs || []} />
               )}
-              {activeTab === "Accepted Proposals" && (
-                <AcceptedProposals/>
-              )}
-              {activeTab === "Created Proposals" && (
-                <CreatedProposals/>
-              )}
+              {activeTab === "Accepted Proposals" && <AcceptedProposals />}
+              {activeTab === "Created Proposals" && <CreatedProposals />}
             </div>
             {/* <div className="space-y-6 mt-6">
                   <FeaturedProjects

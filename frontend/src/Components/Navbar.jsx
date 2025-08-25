@@ -51,7 +51,7 @@ import {
   useClaimTokens,
   usePurchaseTokens,
 } from "../interactions/HFTtoken__interactions";
-
+import logo from "../assets/logoForWeb.png";
 export default function Navbar() {
   const [searchValue, setSearchValue] = useState("");
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -63,6 +63,7 @@ export default function Navbar() {
   const [hasTriggeredAutoPurchase, setHasTriggeredAutoPurchase] = useState(
     false
   );
+  const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
   const { address, isConnected, chain } = useAccount();
   const { portfolioData } = useSelector((state) => state.portfolio);
   const location = useLocation();
@@ -120,6 +121,14 @@ export default function Navbar() {
   // Auto-purchase tokens (approve + purchase in sequence)
   const handlePurchaseTokens = async () => {
     try {
+      // Prevent multiple simultaneous calls
+      if (isApprovePending || isPurchasePending || isTransactionInProgress) {
+        return;
+      }
+
+      // Set transaction in progress flag
+      setIsTransactionInProgress(true);
+
       // Reset the auto-purchase flag for new transactions
       setHasTriggeredAutoPurchase(false);
 
@@ -136,6 +145,11 @@ export default function Navbar() {
     } catch (error) {
       console.error("Purchase failed:", error);
       toast.error("Failed to purchase tokens");
+      // Reset the flag on error
+      setHasTriggeredAutoPurchase(false);
+    } finally {
+      // Always reset transaction in progress flag
+      setIsTransactionInProgress(false);
     }
   };
 
@@ -208,12 +222,37 @@ export default function Navbar() {
     }
   }, [isPurchaseConfirmed]);
 
+  // Reset auto-purchase flag when approval is completed
+  useEffect(() => {
+    if (isApprovePending === false && hasTriggeredAutoPurchase) {
+      // If approval is no longer pending and we haven't triggered purchase yet,
+      // this means approval was completed, so we can proceed with purchase
+      if (allowance > BigInt(0)) {
+        setHasTriggeredAutoPurchase(true);
+        setTimeout(() => {
+          purchaseToken();
+        }, 100);
+      }
+    }
+  }, [isApprovePending, allowance, hasTriggeredAutoPurchase]);
+
   // Fetch token data when address changes
   useEffect(() => {
     if (address) {
       fetchHftTokenData();
+      // Reset auto-purchase flag when address changes
+      setHasTriggeredAutoPurchase(false);
+      setIsTransactionInProgress(false);
     }
   }, [address]);
+
+  // Cleanup effect to reset transaction state when component unmounts
+  useEffect(() => {
+    return () => {
+      setHasTriggeredAutoPurchase(false);
+      setIsTransactionInProgress(false);
+    };
+  }, []);
 
   // Click outside handler for profile dropdown
   useEffect(() => {
@@ -237,17 +276,40 @@ export default function Navbar() {
 
   // Auto-purchase after USDC approval - only once when allowance changes from 0 to > 0
   useEffect(() => {
+    // Only proceed if we have allowance and haven't already triggered purchase
     if (
       allowance > BigInt(0) &&
       !isPurchasePending &&
       !isPurchaseConfirmed &&
-      !hasTriggeredAutoPurchase
+      !hasTriggeredAutoPurchase &&
+      !isApprovePending &&
+      !isTransactionInProgress
     ) {
-      // Only auto-purchase once after approval to prevent infinite loops
+      // Set flag first to prevent re-triggering
       setHasTriggeredAutoPurchase(true);
-      purchaseToken();
+
+      // Use a small delay to ensure state updates are processed
+      const timer = setTimeout(() => {
+        if (
+          !isPurchasePending &&
+          !isPurchaseConfirmed &&
+          !isTransactionInProgress
+        ) {
+          purchaseToken();
+        }
+      }, 200);
+
+      // Cleanup timer if component unmounts or dependencies change
+      return () => clearTimeout(timer);
     }
-  }, [allowance]);
+  }, [
+    allowance,
+    isPurchasePending,
+    isPurchaseConfirmed,
+    hasTriggeredAutoPurchase,
+    isApprovePending,
+    isTransactionInProgress,
+  ]);
 
   const navigationItems = [
     {
@@ -382,7 +444,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-2">
             <Link to="/" className="flex items-center gap-2 group">
               <div className="relative overflow-hidden rounded-full w-8 h-8 bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
-                <Briefcase className="w-4 h-4 text-white" />
+                <img src={logo} alt="" />
               </div>
               <span className="font-bold font-orbitron hidden sm:block text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-500">
                 CryptoLance
@@ -717,9 +779,15 @@ export default function Navbar() {
                       </button>
                       <button
                         onClick={handlePurchaseTokens}
-                        disabled={isApprovePending || isPurchasePending}
+                        disabled={
+                          isApprovePending ||
+                          isPurchasePending ||
+                          isTransactionInProgress
+                        }
                         className={`px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed ${
-                          isApprovePending || isPurchasePending
+                          isApprovePending ||
+                          isPurchasePending ||
+                          isTransactionInProgress
                             ? "opacity-50"
                             : "hover:bg-gray-700"
                         }`}
@@ -729,6 +797,8 @@ export default function Navbar() {
                           ? "Approving USDC..."
                           : isPurchasePending
                           ? "Purchasing HFT..."
+                          : isTransactionInProgress
+                          ? "Transaction in Progress..."
                           : allowance >= BigInt(10 * 10 ** 6)
                           ? "Purchase HFT (Approved)"
                           : "Purchase HFT"}
@@ -1262,9 +1332,15 @@ export default function Navbar() {
                   </button>
                   <button
                     onClick={handlePurchaseTokens}
-                    disabled={isApprovePending || isPurchasePending}
+                    disabled={
+                      isApprovePending ||
+                      isPurchasePending ||
+                      isTransactionInProgress
+                    }
                     className={`px-3 w-1/2 py-2 bg-gray-800 border border-gray-700 text-sm rounded-md disabled:opacity-50 disabled:cursor-not-allowed ${
-                      isApprovePending || isPurchasePending
+                      isApprovePending ||
+                      isPurchasePending ||
+                      isTransactionInProgress
                         ? "opacity-50"
                         : "hover:bg-gray-700"
                     }`}
@@ -1274,6 +1350,8 @@ export default function Navbar() {
                       ? "Approving USDC..."
                       : isPurchasePending
                       ? "Purchasing HFT..."
+                      : isTransactionInProgress
+                      ? "Transaction in Progress..."
                       : allowance >= BigInt(10 * 10 ** 6)
                       ? "Purchase HFT (Approved)"
                       : "Purchase HFT"}
@@ -1309,3 +1387,34 @@ export default function Navbar() {
     </header>
   );
 }
+
+
+
+// {
+//   "_id": {
+//     "$oid": "68aa85cb1bd73987e8fadeb7"
+//   },
+//   "title": "React Landing Page",
+//   "description": "I am looking for an experienced React.js developer to design and develop a responsive, modern, and visually appealing landing page for my project.\n\nThe landing page should be clean, fast-loading, SEO-friendly, and mobile-responsive. It will serve as the main entry point for users, so design and user experience are very important.\n\nRequirements:\n\nStrong experience with React.js (Vite/CRA/Next.js acceptable)\n\nExperience with Tailwind CSS / modern UI frameworks for styling\n\nKnowledge of responsive design (mobile, tablet, desktop)\n\nAbility to integrate images, animations, and icons for a professional look\n\nClean and reusable code (component-based structure)\n\nPixel-perfect design implementation (from Figma/PSD or custom design if provided)\n\nBasic understanding of SEO optimization for landing pages",
+//   "budget": 10000000,
+//   "project_duration": "1_2_weeks",
+//   "userWalletAddress": "0x30217a8c17ef5571639948d118d086c73f823058",
+//   "tags": [
+//     "Landingpage"
+//   ],
+//   "skills_requirement": [
+//     "react",
+//     "tailwindcss"
+//   ],
+//   "bids": [],
+//   "accepted_bidder": null,
+//   "isEditable": true,
+//   "createdAt": {
+//     "$date": "2025-08-24T03:23:55.514Z"
+//   },
+//   "updatedAt": {
+//     "$date": "2025-08-24T03:25:26.245Z"
+//   },
+//   "__v": 0,
+//   "proposalId": "1"
+// }

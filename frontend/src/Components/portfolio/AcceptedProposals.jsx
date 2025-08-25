@@ -1,7 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JobCard from "../ProposalComponents/JobCard";
-import Loader from "../Loader";
+
+// Custom loading component with neon theme
+const NeonLoader = ({ size = "md", caption = "" }) => {
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-8 h-8",
+    lg: "w-12 h-12",
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center space-y-3">
+      <div className={`${sizeClasses[size]} relative`}>
+        <div className="absolute inset-0 rounded-full border-2 border-gray-700"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-neon-primary animate-spin"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-r-neon-secondary animate-pulse"></div>
+      </div>
+      {caption && (
+        <p className="text-sm text-gray-400 font-medium">{caption}</p>
+      )}
+    </div>
+  );
+};
+
 // If your backend returns USDC in micro units (1e6), use this.
 // Safe even if you pass a plain number/string budget.
 const USDC_DECIMALS = 6;
@@ -20,6 +42,7 @@ const AcceptedProposals = () => {
   const [savedJobs, setSavedJobs] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savingJob, setSavingJob] = useState(null);
   const navigate = useNavigate();
 
   const fetchProposals = async () => {
@@ -120,12 +143,17 @@ const AcceptedProposals = () => {
     fetchProposals();
   }, []);
 
-  const toggleSaveJob = (jobId) => {
+  const toggleSaveJob = async (jobId) => {
+    setSavingJob(jobId);
+    // Simulate a small delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     setSavedJobs((prev) => {
       const next = new Set(prev);
       next.has(jobId) ? next.delete(jobId) : next.add(jobId);
       return next;
     });
+    setSavingJob(null);
   };
 
   const handleJobClick = (job) => {
@@ -133,7 +161,7 @@ const AcceptedProposals = () => {
     navigate(`/job/${job.id}`);
   };
 
-  if (loading) return <Loader caption="Loading proposals" />;
+  if (loading) return <NeonLoader size="lg" caption="Loading proposals" />;
 
   if (error)
     return (
@@ -165,6 +193,7 @@ const AcceptedProposals = () => {
             toggleSaveJob(job.id);
           }}
           onClick={() => handleJobClick(job)}
+          isLoading={savingJob === job.id}
         />
       ))}
     </div>

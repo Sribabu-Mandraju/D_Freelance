@@ -3,6 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { useAccount } from "wagmi";
 import JobCard from "../../Components/ProposalComponents/JobCard";
 
+// Custom loading component with neon theme
+const NeonLoader = ({ size = "md", caption = "" }) => {
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-8 h-8",
+    lg: "w-12 h-12",
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center space-y-3">
+      <div className={`${sizeClasses[size]} relative`}>
+        <div className="absolute inset-0 rounded-full border-2 border-gray-700"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-neon-primary animate-spin"></div>
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-r-neon-secondary animate-pulse"></div>
+      </div>
+      {caption && (
+        <p className="text-sm text-gray-400 font-medium">{caption}</p>
+      )}
+    </div>
+  );
+};
+
 // USDC decimals if your backend stores in micro-units
 const USDC_DECIMALS = 6;
 function formatUsdcFromMicro(value) {
@@ -21,6 +43,7 @@ const BiddedProposals = () => {
   const [savedJobs, setSavedJobs] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savingJob, setSavingJob] = useState(null);
   const navigate = useNavigate();
 
   // Keep address in localStorage if needed
@@ -134,12 +157,17 @@ const BiddedProposals = () => {
     }
   }, [isConnected, address]);
 
-  const toggleSaveJob = (jobId) => {
+  const toggleSaveJob = async (jobId) => {
+    setSavingJob(jobId);
+    // Simulate a small delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     setSavedJobs((prev) => {
       const next = new Set(prev);
       next.has(jobId) ? next.delete(jobId) : next.add(jobId);
       return next;
     });
+    setSavingJob(null);
   };
 
   const handleJobClick = (job) => {
@@ -152,7 +180,8 @@ const BiddedProposals = () => {
     );
   }
 
-  if (loading) return <div className="p-4">Loading accepted proposals…</div>;
+  if (loading)
+    return <NeonLoader size="lg" caption="Loading bidded proposals..." />;
 
   if (error)
     return (
@@ -183,6 +212,7 @@ const BiddedProposals = () => {
             toggleSaveJob(job.id);
           }}
           onClick={() => handleJobClick(job)}
+          isLoading={savingJob === job.id}
         />
       ))}
     </div>

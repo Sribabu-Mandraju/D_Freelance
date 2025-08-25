@@ -46,6 +46,7 @@ import UserDetails from "./Pages/UserDetails/UserDetails";
 import PortfolioForm from "./Components/portfolio/PortfolioForm"
 // import { fetchPortfolio } from "./store/portfolioSlice/portfolioSlice";
 import { useAccount } from "wagmi";
+import Cloudinary from "./Components/main/Cloudinary";
 
 // import ActiveFreelancers from "./Components/main/ActigitveFreelancers";
 
@@ -97,6 +98,7 @@ const App = () => {
             <Route path="/help" element={<HelpDocs />} />
             <Route path="/gigs" element={<Gigs />} />
             <Route path="/adminDashboard" element={<AdminDashboard />} />
+            <Route path="/cloudinary" element={<Cloudinary />} />
 
             <Route path="/jobDetails/:id" element={<JobDetails />} />
             <Route
