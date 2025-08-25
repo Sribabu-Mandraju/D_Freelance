@@ -72,7 +72,13 @@
         "description": "Apply to a job directly from Farcaster",
         "action": "apply_job"
       }
-    ]
+    ],
+    "accountAssociation": {
+      "type": "wallet",
+      "description": "Connect your wallet to associate your Farcaster account with your freelance profile",
+      "required": true,
+      "networks": ["ethereum", "polygon", "arbitrum"]
+    }
   },
   "contact": {
     "support": "support@crypto-lance-gamma.vercel.app",
