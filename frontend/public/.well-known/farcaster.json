@@ -1,32 +1,32 @@
 {
   "frame": {
-    "name": "Streamly",
+    "name": "D-Freelance",
     "version": "1",
-    "iconUrl": "https://crypto-lance-gamma.vercel.app/icon.png",
+    "iconUrl": "https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197017/fha53uw6n9hnros32gcx.png",
     "homeUrl": "https://crypto-lance-gamma.vercel.app",
-    "imageUrl": "https://crypto-lance-gamma.vercel.app/image.png",
-    "buttonTitle": "Open Streamly",
-    "splashImageUrl": "https://crypto-lance-gamma.vercel.app/splash.png",
+    "imageUrl": "https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197017/fha53uw6n9hnros32gcx.png",
+    "buttonTitle": "Open D-Freelance",
+    "splashImageUrl": "https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197017/fha53uw6n9hnros32gcx.png",
     "splashBackgroundColor": "#ffffff",
     "webhookUrl": "https://crypto-lance-gamma.vercel.app/api/webhook",
-    "subtitle": "Go live.Connect with everyone",
-    "description": "Instant live streaming for creators and viewers.",
-    "primaryCategory": "social",
-    "screenshotUrls": ["https://crypto-lance-gamma.vercel.app/screenshot.png"],
-    "heroImageUrl": "https://crypto-lance-gamma.vercel.app/hero.png",
-    "tags": ["social", "livestream", "community", "connect", "engage"],
-    "tagline": "Share live moments",
-    "ogTitle": "Streamly",
-    "ogDescription": "Go live in seconds. Connect with everyone.",
-    "ogImageUrl": "https://crypto-lance-gamma.vercel.app/hero.png",
-    "castShareUrl": "https://crypto-lance-gamma.vercel.app/share"
+    "subtitle": "Hire and work on-chain",
+    "description": "Decentralized freelancing with escrow, proposals, and crypto payments.",
+    "primaryCategory": "productivity",
+    "screenshotUrls": ["https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197063/eiekileshebqm0faoqam.png"],
+    "heroImageUrl": "https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197063/eiekileshebqm0faoqam.png",
+    "tags": ["freelance", "escrow", "crypto", "jobs", "web3"],
+    "tagline": "Trust-minimized work, paid in crypto",
+    "ogTitle": "D-Freelance",
+    "ogDescription": "Web3 freelancing with secure escrow and proposals.",
+    "ogImageUrl": "https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197063/eiekileshebqm0faoqam.png",
+    "castShareUrl": "https://res.cloudinary.com/dd33ovgv1/image/upload/v1756197063/eiekileshebqm0faoqam.png"
   },
   "accountAssociation": {
-    "header": "eyJmaWQiOjExNDQ0NjYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhiNUEyNjllODg1Njc3OWFkNDc5NTY0RTMyMmMzRUZFN2IzQmJhNzk1In0",
+    "header": "eyJmaWQiOjEyOTkxMDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHg5M2M3MmE0ZjYyZTQxYTEzZGNhOWZjZTc1NTA0MDZiYjllMjhjYzlkYWI1YTJhNGJhYmNhOThjM2NkOThmZGRiIn0",
     "payload": "eyJkb21haW4iOiJjcnlwdG8tbGFuY2UtZ2FtbWEudmVyY2VsLmFwcCJ9",
-    "signature": "IblxXtgXSNzH2iXYCSKR+ka93xKCIus5iPZKXaYuiLI4f9THdzbq9sueqYuzK4t3apxWkzipVoFeMkghuQLraxs="
+    "signature": "tN/4wvmt6V7cZZig2lsxUKx1vNrWPebnoHjugYkRLWXYf1y5O+gH/L2o9i2e2zBxDVLtkG73HZBk2Kr5MtHTCg=="
   },
   "baseBuilder": {
-    "allowedAddresses": ["0xb92dce42912bf89611e7fd840bbf0c2045f500f3"]
+    "allowedAddresses": ["0x30217A8C17EF5571639948D118D086c73f823058"]
   }
 }

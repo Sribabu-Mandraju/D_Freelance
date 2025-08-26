@@ -1,8 +1,11 @@
-import { AuthClient } from '@farcaster/auth-kit';
+import { AuthClient } from "@farcaster/auth-kit";
 
 const client = new AuthClient({
   rpcUrl: "https://hub.farcaster.xyz", // or Neynar hub
-  domain: "crypto-lance-gamma.vercel.app"
+  domain:
+    typeof window !== "undefined" && window.location?.host
+      ? window.location.host
+      : "crypto-lance-gamma.vercel.app",
 });
 
 // When user signs in:
