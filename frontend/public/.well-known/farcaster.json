@@ -1,56 +1,29 @@
 {
-  "accountAssociation": {
-    "type": "wallet",
-    "description": "Connect your wallet to associate your Farcaster account with your freelance profile",
-    "required": true,
-    "networks": ["ethereum", "polygon", "arbitrum"]
-  },
   "frame": {
-    "name": "HFT Freelance Platform",
-    "description": "A decentralized freelance platform built on blockchain technology with HFT token integration",
-    "icon": "/logoForWeb.png",
-    "url": "https://crypto-lance-gamma.vercel.app/",
-    "permissions": [
-      "cast",
-      "reactions",
-      "user_data_basic",
-      "user_data_profile"
-    ],
-    "features": [
-      "freelance_jobs",
-      "bidding_system",
-      "portfolio_management",
-      "escrow_payments",
-      "hft_token_integration"
-    ],
-    "cast_actions": [
-      {
-        "name": "Share Job",
-        "description": "Share a freelance job posting on Farcaster",
-        "action": "share_job"
-      },
-      {
-        "name": "Share Portfolio",
-        "description": "Share your portfolio on Farcaster",
-        "action": "share_portfolio"
-      }
-    ],
-    "frame_actions": [
-      {
-        "name": "View Job",
-        "description": "View job details in a Farcaster frame",
-        "action": "view_job"
-      },
-      {
-        "name": "Apply to Job",
-        "description": "Apply to a job directly from Farcaster",
-        "action": "apply_job"
-      }
-    ]
+    "name": "Streamly",
+    "version": "1",
+    "iconUrl": "https://streamly-app.vercel.app/icon.png",
+    "homeUrl": "https://streamly-app.vercel.app",
+    "imageUrl": "https://streamly-app.vercel.app/image.png",
+    "buttonTitle": "Open Streamly",
+    "splashImageUrl": "https://streamly-app.vercel.app/splash.png",
+    "splashBackgroundColor": "#ffffff",
+    "webhookUrl": "https://streamly-app.vercel.app/api/webhook",
+    "subtitle": "Go live.Connect with everyone",
+    "description": "Instant live streaming for creators and viewers.",
+    "primaryCategory": "social",
+    "screenshotUrls": ["https://streamly-app.vercel.app/screenshot.png"],
+    "heroImageUrl": "https://streamly-app.vercel.app/hero.png",
+    "tags": ["social", "livestream", "community", "connect", "engage"],
+    "tagline": "Share live moments",
+    "ogTitle": "Streamly",
+    "ogDescription": "Go live in seconds. Connect with everyone.",
+    "ogImageUrl": "https://streamly-app.vercel.app/hero.png",
+    "castShareUrl": "https://streamly-app.vercel.app/share"
   },
-  "baseBuilder": {
-    "allowedAddresses": ["0xb92dce42912bf89611e7fd840bbf0c2045f500f3"]
+  "accountAssociation": {
+    "header": "eyJmaWQiOjExNDQ0NjYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhiNUEyNjllODg1Njc3OWFkNDc5NTY0RTMyMmMzRUZFN2IzQmJhNzk1In0",
+    "payload": "eyJkb21haW4iOiJzdHJlYW1seS1hcHAudmVyY2VsLmFwcCJ9",
+    "signature": "IblxXtgXSNzH2iXYCSKR+ka93xKCIus5iPZKXaYuiLI4f9THdzbq9sueqYuzK4t3apxWkzipVoFeMkghuQLraxs="
   }
 }
-
-
