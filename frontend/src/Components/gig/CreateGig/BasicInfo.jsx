@@ -583,7 +583,7 @@ export default function BasicInfo({
                     : "text-gray-400 hover:text-white hover:bg-gray-700/50"
                 }`}
               >
-                {pkgName.charAt(0).toUpperCase() + pkgName.slice(1)} Package
+                {pkgName.charAt(0).toUpperCase() + pkgName.slice(1)} <span className="hidden md:block">Package</span>
               </button>
             ))}
           </div>

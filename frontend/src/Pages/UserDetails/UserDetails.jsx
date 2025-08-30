@@ -29,7 +29,8 @@ function UserDetails() {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/portfolio/${id}`
+          `
+https://cryptolance-server.onrender.com/api/portfolio/${id}`
         );
 
         if (!response.ok) {

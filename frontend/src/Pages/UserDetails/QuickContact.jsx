@@ -1,6 +1,7 @@
-
 "use client";
 import { Mail, Phone, Linkedin } from "lucide-react";
+import { Link } from "react-router-dom";
+import { BsChatLeftTextFill } from "react-icons/bs";
 
 function QuickContact({ contactInfo }) {
   // Fallbacks for missing contact fields
@@ -19,40 +20,35 @@ function QuickContact({ contactInfo }) {
       </h3>
       <div className="space-y-2">
         {/* Email */}
-        {email ?(
-  <a
-    href={`mailto:${email}`}
-    className="flex items-center gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-blue-500/10 transition-all duration-300 group border border-transparent hover:border-cyan-500/20"
-  >
-    <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30 group-hover:border-cyan-500/50 transition-colors duration-300">
-      <Mail className="w-4 h-4 text-cyan-400" />
-    </div>
-    
-    <div className="max-w-xs flex-1 min-w-0">
-      <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-300 block">
-        Email
-      </span>
-      <p 
-        title={email}
-        className="text-xs text-gray-500 truncate group-hover:text-gray-400 transition-colors duration-300 block w-full"
-      >
-        {email}
-      </p>
-    </div>
-  </a>
-)
- : (
+        {email ? (
+          <a
+            href={`mailto:${email}`}
+            className="flex items-center gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-blue-500/10 transition-all duration-300 group border border-transparent hover:border-cyan-500/20"
+          >
+            <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30 group-hover:border-cyan-500/50 transition-colors duration-300">
+              <Mail className="w-4 h-4 text-cyan-400" />
+            </div>
+
+            <div className="max-w-xs flex-1 min-w-0">
+              <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-300 block">
+                Email
+              </span>
+              <p
+                title={email}
+                className="text-xs text-gray-500 truncate group-hover:text-gray-400 transition-colors duration-300 block w-full"
+              >
+                {email}
+              </p>
+            </div>
+          </a>
+        ) : (
           <div className="flex items-center gap-4 p-3 rounded-xl opacity-50">
             <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-lg border border-cyan-500/30">
               <Mail className="w-4 h-4 text-cyan-400" />
             </div>
             <div>
-              <span className="text-sm font-medium text-gray-300">
-                Email
-              </span>
-              <p className="text-xs text-gray-500">
-                Not provided
-              </p>
+              <span className="text-sm font-medium text-gray-300">Email</span>
+              <p className="text-xs text-gray-500">Not provided</p>
             </div>
           </div>
         )}
@@ -81,12 +77,8 @@ function QuickContact({ contactInfo }) {
               <Phone className="w-4 h-4 text-green-400" />
             </div>
             <div>
-              <span className="text-sm font-medium text-gray-300">
-                Call
-              </span>
-              <p className="text-xs text-gray-500">
-                Not provided
-              </p>
+              <span className="text-sm font-medium text-gray-300">Call</span>
+              <p className="text-xs text-gray-500">Not provided</p>
             </div>
           </div>
         )}
@@ -120,12 +112,31 @@ function QuickContact({ contactInfo }) {
               <span className="text-sm font-medium text-gray-300">
                 LinkedIn
               </span>
-              <p className="text-xs text-gray-500">
-                Not provided
-              </p>
+              <p className="text-xs text-gray-500">Not provided</p>
             </div>
           </div>
         )}
+
+        <Link
+          to="#"
+          href="https://crypto-lance-seven.vercel.app/"
+          onClick={() =>
+            (window.location.href = "https://crypto-lance-seven.vercel.app/")
+          }
+          className="flex items-center gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-teal-500/10 transition-all duration-300 group border border-transparent hover:border-cyan-500/20"
+        >
+          <div className="p-2 bg-gradient-to-r from-cyan-500/20 to-teal-500/20 rounded-lg border border-cyan-500/30 group-hover:border-cyan-500/50 transition-colors duration-300">
+            <BsChatLeftTextFill className="w-4 h-4 text-cyan-400" />
+          </div>
+          <div>
+            <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors duration-300">
+              Live Chat
+            </span>
+            <p className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
+              Connect instantly
+            </p>
+          </div>
+        </Link>
       </div>
     </div>
   );

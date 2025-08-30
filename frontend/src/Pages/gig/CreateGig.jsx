@@ -241,7 +241,7 @@ export default function CreateGig() {
             </div>
 
             {/* Step Indicator */}
-            <div className="px-6 sm:px-8 py-6">
+            <div className="px-6 sm:px-8 py-6 w-full ">
               <div className="flex items-center justify-between mb-8">
                 {steps.map((step, index) => {
                   const status = getStepStatus(step.id);
@@ -354,7 +354,7 @@ export default function CreateGig() {
                 </div>
 
                 {/* Navigation Buttons */}
-                <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-700/50">
+                <div className="flex flex-col md:flex-row gap-2   justify-between items-center mt-8 pt-6 border-t border-gray-700/50">
                   <button
                     type="button"
                     onClick={handlePrevious}
