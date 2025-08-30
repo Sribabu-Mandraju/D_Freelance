@@ -45,9 +45,9 @@ const ServiceTiersTable = ({ basic, standard, pro }) => {
             <tbody>
               <tr className="border-b border-cyan-500/20 hover:bg-cyan-500/10 transition-colors">
                 <td className="py-4 px-6 text-gray-300 font-medium">Delivery Time</td>
-                <td className="text-center py-4 px-6 text-gray-300">{basic.duration} days</td>
-                <td className="text-center py-4 px-6 text-gray-300">{standard.duration} days</td>
-                <td className="text-center py-4 px-6 text-gray-300">{pro.duration} days</td>
+                <td className="text-center py-4 px-6 text-gray-300">{basic.duration}</td>
+                <td className="text-center py-4 px-6 text-gray-300">{standard.duration}</td>
+                <td className="text-center py-4 px-6 text-gray-300">{pro.duration}</td>
               </tr>
               <tr className="border-b border-cyan-500/20 hover:bg-cyan-500/10 transition-colors">
                 <td className="py-4 px-6 text-gray-300 underline font-medium">Number of Revisions</td>

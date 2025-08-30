@@ -1,7 +1,6 @@
-
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { User, Code, Briefcase } from "lucide-react";
 import { toast } from "react-hot-toast";
 import HeroSection from "./HeroSection";
@@ -17,19 +16,55 @@ import styles from "./Portfolio.module.css";
 
 function UserDetails() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { freelancer } = location.state || {};
+  const { id } = useParams();
+  const [freelancer, setFreelancer] = useState(null);
+  const [loading, setLoading] = useState(true);
   const mainRef = useRef(null);
   const asideRef = useRef(null);
   const [activeTab, setActiveTab] = useState("Bidded Proposals");
 
+  // Fetch portfolio data by ID
+  useEffect(() => {
+    const fetchPortfolio = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `http://localhost:3001/api/portfolio/${id}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch portfolio");
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setFreelancer(data.data);
+        } else {
+          throw new Error(data.message || "Failed to fetch portfolio");
+        }
+      } catch (error) {
+        console.error("Error fetching portfolio:", error);
+        toast.error(
+          error.message || "Failed to fetch user data. Redirecting..."
+        );
+        navigate("/freelancers");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchPortfolio();
+    }
+  }, [id, navigate]);
+
   // Redirect if no freelancer data
   useEffect(() => {
-    if (!freelancer || !freelancer.heroSection) {
+    if (!loading && (!freelancer || !freelancer.heroSection)) {
       toast.error("No user data available. Redirecting...");
       navigate("/freelancers");
     }
-  }, [freelancer, navigate]);
+  }, [freelancer, loading, navigate]);
 
   // Adjust main and aside heights for responsive layout
   useEffect(() => {
@@ -53,9 +88,22 @@ function UserDetails() {
     return () => window.removeEventListener("resize", adjustHeights);
   }, [freelancer, activeTab]);
 
-  const tabs = [
-    { id: "Gigs", label: "Gigs", icon: Code },
-  ];
+  const tabs = [{ id: "Gigs", label: "Gigs", icon: Code }];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+            <p className="text-cyan-400 text-lg">Loading portfolio...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (!freelancer || !freelancer.heroSection) {
     return null; // Will redirect via useEffect
@@ -93,17 +141,18 @@ function UserDetails() {
           >
             <HeroSection personalInfo={personalInfo} />
             <div className="text-center my-4">
-            <span className="text-3xl relative
+              <span
+                className="text-3xl relative
   before:absolute before:left-[-150px] before:w-32 before:h-1 before:bg-gradient-to-r before:from-purple-400 before:to-cyan-400 before:mx-auto before:mt-4 before:rounded-full 
   after:absolute after:right-[-150px] after:w-32 after:h-1 after:bg-gradient-to-r after:from-cyan-400 after:to-purple-400 after:mx-auto after:mt-4 after:rounded-full
   text-center font-bold font-orbitron 
-  bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6">
-  Gigs
-</span>
-</div>
+  bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-6"
+              >
+                Gigs
+              </span>
+            </div>
 
-
-           <YourGigs yourgigs={userGigs}/>
+            <YourGigs yourgigs={userGigs} />
             <div className="space-y-6 mt-6">
               <FeaturedProjects featuredProjects={featuredProjects} />
             </div>

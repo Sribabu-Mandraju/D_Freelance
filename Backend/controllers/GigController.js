@@ -52,12 +52,9 @@ export const createGig = async (req, res) => {
 
     // New validation: all three packages (basic, standard, pro) are required
     if (!hasPayload(basic) || !hasPayload(standard) || !hasPayload(pro)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "All three packages (basic, standard, and pro) are required.",
-        });
+      return res.status(400).json({
+        message: "All three packages (basic, standard, and pro) are required.",
+      });
     }
 
     const walletAddress = req.user.address;
@@ -241,7 +238,22 @@ export const getGigById = async (req, res) => {
       return res.status(404).json({ message: "Gig not found" });
     }
 
-    return res.json(gig);
+    // Find the Portfolio document that matches the gig's walletAddress
+    let freelancerId = null;
+    if (gig.walletAddress) {
+      const portfolio = await Portfolio.findOne({
+        "heroSection.walletAddress": gig.walletAddress,
+      });
+      if (portfolio) {
+        freelancerId = portfolio._id;
+      }
+    }
+
+    // Return gig data along with freelancerId
+    return res.json({
+      ...gig.toObject(),
+      freelancerId,
+    });
   } catch (error) {
     console.error("❌ Get gig by ID error:", error);
     return res.status(500).json({ message: "Server error while fetching gig" });
@@ -251,13 +263,25 @@ export const getGigById = async (req, res) => {
 export const getAllGigs = async (req, res) => {
   try {
     const query = {};
-    const { search, category, minPrice, maxPrice, minRating, maxDeliveryTime, status, location, minSuccessRate, tags, skills } = req.query;
+    const {
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      minRating,
+      maxDeliveryTime,
+      status,
+      location,
+      minSuccessRate,
+      tags,
+      skills,
+    } = req.query;
 
     // Search by title or description
     if (search) {
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -290,7 +314,7 @@ export const getAllGigs = async (req, res) => {
 
     // Filter by location
     if (location) {
-      query.location = { $regex: location, $options: 'i' };
+      query.location = { $regex: location, $options: "i" };
     }
 
     // Filter by success rate
@@ -300,17 +324,21 @@ export const getAllGigs = async (req, res) => {
 
     // Filter by tags (partial match for any tag in the array)
     if (tags) {
-      const tagsArray = tags.split(',').map(tag => tag.trim());
-      query.tags = { $in: tagsArray.map(tag => new RegExp(tag, 'i')) };
+      const tagsArray = tags.split(",").map((tag) => tag.trim());
+      query.tags = { $in: tagsArray.map((tag) => new RegExp(tag, "i")) };
     }
 
     // Filter by skills (partial match for any skill in the array)
     if (skills) {
-      const skillsArray = skills.split(',').map(skill => skill.trim());
-      query.skills = { $in: skillsArray.map(skill => new RegExp(skill, 'i')) };
+      const skillsArray = skills.split(",").map((skill) => skill.trim());
+      query.skills = {
+        $in: skillsArray.map((skill) => new RegExp(skill, "i")),
+      };
     }
 
-    const gigs = await Gig.find(query).populate("walletAddress", "name email").sort({createdAt:-1})
+    const gigs = await Gig.find(query)
+      .populate("walletAddress", "name email")
+      .sort({ createdAt: -1 });
     return res.json(gigs);
   } catch (error) {
     console.error("❌ Get all gigs error:", error);

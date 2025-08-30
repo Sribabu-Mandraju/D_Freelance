@@ -15,10 +15,10 @@ const ProjectSteps = ({ username }) => {
               After purchasing the project, send requirements so {username} can start the project.
             </h3>
             <p className="text-gray-400 mb-4">Delivery time starts when {username} receives requirements from you.</p>
-            <button className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 transition-colors">
+            {/* <button className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 transition-colors">
               <span>View requirements</span>
               <ChevronDown className="w-4 h-4" />
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="flex items-start space-x-6">
@@ -51,10 +51,10 @@ const ProjectSteps = ({ username }) => {
                 </div>
               </div>
             </div>
-            <button className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 mt-6 transition-colors">
+            {/* <button className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 mt-6 transition-colors">
               <span>Show all</span>
               <ChevronDown className="w-4 h-4" />
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="flex items-start space-x-6">
@@ -65,9 +65,9 @@ const ProjectSteps = ({ username }) => {
             <h3 className="font-semibold text-white mb-3 text-lg">
               Review the work, release payment, and leave feedback to {username}.
             </h3>
-            <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+            {/* <a href="#" className="text-cyan-400 hover:text-cyan-300 transition-colors">
               What if I'm not happy with the work?
-            </a>
+            </a> */}
           </div>
         </div>
       </div>

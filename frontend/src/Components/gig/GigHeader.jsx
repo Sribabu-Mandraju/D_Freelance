@@ -1,14 +1,42 @@
-import { Heart, Share2, Star } from "lucide-react"
+import { Heart, Share2, Star } from "lucide-react";
+import { useState } from "react";
+import { FaHeart } from "react-icons/fa";
 
 const GigHeader = ({ title, avatar, username, rating, about, badges }) => {
-  const safeRating = Math.max(0, Math.floor(Number(rating) || 0))
+  const safeRating = Math.max(0, Math.floor(Number(rating) || 0));
+  const [isSaved, setIsSaved] = useState(false);
+  const handleShare = async () => {
+    const url = window.location.href; // current page URL
 
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: document.title,
+          text: "Check this out!",
+          url: url,
+        });
+        console.log("Shared successfully!");
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      // Fallback: copy link to clipboard
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard!");
+      } catch (error) {
+        console.error("Clipboard write failed:", error);
+      }
+    }
+  };
   return (
     <div className="bg-gray-900/95 backdrop-blur-xl border border-cyan-500/30 rounded-xl p-6 mb-8 shadow-xl relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-blue-500"></div>
 
       {/* Top Section: Title */}
-      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight">{title}</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 tracking-tight">
+        {title}
+      </h1>
 
       {/* Main Content Row */}
       <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
@@ -47,11 +75,19 @@ const GigHeader = ({ title, avatar, username, rating, about, badges }) => {
         <div className="flex flex-col items-end gap-4">
           {/* Buttons */}
           <div className="flex space-x-3">
-            <button className="flex items-center space-x-2 bg-gray-900/50 border border-cyan-500/50 text-cyan-300 px-4 py-2 rounded-lg hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300">
-              <Heart className="w-5 h-5" />
+            <button
+              className="flex items-center space-x-2 bg-gray-900/50 border border-cyan-500/50 text-cyan-300 px-4 py-2 rounded-lg hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300"
+              onClick={() => setIsSaved(!isSaved)}
+            >
+              {isSaved ? (
+                <FaHeart className="w-5 h-5 text-cyan-500" />
+              ) : (
+                <Heart className="w-5 h-5 text-gray-500" />
+              )}
+
               <span>Save</span>
             </button>
-            <button className="flex items-center space-x-2 bg-gray-900/50 border border-purple-500/50 text-purple-300 px-4 py-2 rounded-lg hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300">
+            <button className="flex items-center space-x-2 bg-gray-900/50 border border-purple-500/50 text-purple-300 px-4 py-2 rounded-lg hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300" onClick={handleShare}>
               <Share2 className="w-5 h-5" />
               <span>Share</span>
             </button>
@@ -73,7 +109,7 @@ const GigHeader = ({ title, avatar, username, rating, about, badges }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default GigHeader
+export default GigHeader;

@@ -17,10 +17,10 @@ const ProHandleSection = () => {
             </a>{" "}
             services from Sribabu, priced and ready to go.
           </p>
-          <button className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25">
+          {/* <button className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-cyan-500/25">
             <Play className="w-4 h-4" />
             <span>How it works</span>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

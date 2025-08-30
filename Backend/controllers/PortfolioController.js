@@ -803,3 +803,37 @@ export const addUserGig = async (req, res) => {
     });
   }
 };
+
+// Get Portfolio by ID
+export const getPortfolioById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Portfolio _id is required",
+      });
+    }
+
+    const portfolio = await Portfolio.findById(id);
+
+    if (!portfolio) {
+      return res.status(404).json({
+        success: false,
+        message: "Portfolio not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: portfolio,
+    });
+  } catch (error) {
+    console.error("Get portfolio by ID error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error fetching portfolio",
+    });
+  }
+};

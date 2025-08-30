@@ -41,11 +41,11 @@ const ImageShowcase = ({ images = [] }) => {
 
   return (
     <div className="mb-8">
-      <div className="relative bg-gray-900/80 border border-gray-700/50 rounded-xl overflow-hidden mb-6 h-[450px]">
+      <div className="relative bg-gray-900/80 border border-gray-700/50 rounded-xl overflow-hidden mb-6 md:h-[450px]">
         <img
           src={sources[current] || "/placeholder.svg"}
           alt="Service showcase"
-          className="w-full h-full object-cover"
+          className="w-full h-full md:object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
@@ -53,17 +53,17 @@ const ImageShowcase = ({ images = [] }) => {
           <>
             <button
               onClick={handlePrevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-gray-900/90 p-3 rounded-full hover:bg-gray-800 transition-all duration-300 border border-gray-700/50"
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-gray-900/90 md:p-3 rounded-full hover:bg-gray-800 transition-all duration-300 border border-gray-700/50"
               aria-label="Previous image"
             >
-              <ChevronLeft className="w-6 h-6 text-cyan-400" />
+              <ChevronLeft className="md:w-6 md:h-6 h-4 w-4 text-cyan-400" />
             </button>
             <button
               onClick={handleNextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-900/90 p-3 rounded-full hover:bg-gray-800 transition-all duration-300 border border-gray-700/50"
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-900/90 md:p-3 rounded-full hover:bg-gray-800 transition-all duration-300 border border-gray-700/50"
               aria-label="Next image"
             >
-              <ChevronRight className="w-6 h-6 text-cyan-400" />
+              <ChevronRight className="md:w-6 md:h-6 h-4 w-4 text-cyan-400" />
             </button>
           </>
         )}
@@ -77,7 +77,7 @@ const ImageShowcase = ({ images = [] }) => {
               key={`${src}-${i}`}
               src={src || "/placeholder.svg"}
               alt={`Portfolio ${i + 1}`}
-              className={`w-full h-24 object-cover rounded-lg cursor-pointer transition-all duration-300 ${
+              className={`w-full h-24 md:object-cover rounded-lg cursor-pointer transition-all duration-300 ${
                 isActive
                   ? "border-2 border-cyan-400 shadow-lg shadow-cyan-400/25"
                   : "border border-gray-700/50 hover:border-cyan-400/50 hover:-translate-y-1"

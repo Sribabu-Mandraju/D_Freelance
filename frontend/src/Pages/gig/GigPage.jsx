@@ -24,10 +24,11 @@ const GigPage = () => {
   const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchGig(id));
+    console.log(formData);
   }, [id, dispatch]);
 
   if (loading) {
-    return <Loader caption="Gig Details"/>;
+    return <Loader caption="Gig Details" />;
   }
 
   const handleBack = () => {
@@ -61,6 +62,9 @@ const GigPage = () => {
     pro: packageData.pro,
   };
 
+
+  console.log("gigProps",gigProps)
+
   return (
     <>
       <Navbar />
@@ -71,17 +75,17 @@ const GigPage = () => {
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
         </div>
-      
+
         <div className="max-w-7xl mt-[100px] mx-auto px-4 sm:px-6  relative z-10">
-            <button
-          onClick={handleBack}
-          className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 mb-6 transition-colors duration-200 hover:shadow-lg hover:shadow-cyan-500/20 p-2 rounded-lg group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-2px] transition-transform duration-200" />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:from-cyan-300 group-hover:to-blue-300">
-            Back to Gigs
-          </span>
-        </button>
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 mb-6 transition-colors duration-200 hover:shadow-lg hover:shadow-cyan-500/20 p-2 rounded-lg group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:translate-x-[-2px] transition-transform duration-200" />
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-400 group-hover:from-cyan-300 group-hover:to-blue-300">
+              Back to Gigs
+            </span>
+          </button>
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Content */}
             <div className="flex-1">
