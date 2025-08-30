@@ -1,10 +1,11 @@
-const AboutSection = ({ username, tags, skills, avatar, about, location }) => {
+
+const AboutSection = ({ username, tags, skills, avatar, about, location ,id}) => {
   return (
     <div className="bg-slate-900/80 backdrop-blur-xl border border-cyan-500/20 rounded-2xl p-6 mb-8 shadow-2xl shadow-cyan-500/10 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-bold text-white">About {username}</h3>
-        <a href="#profile" className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 transition-colors">
+        <a href={`/user/${id}`} className="text-cyan-400 hover:text-cyan-300 flex items-center space-x-2 transition-colors">
           <span>View profile</span>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

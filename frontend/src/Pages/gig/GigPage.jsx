@@ -7,25 +7,49 @@ import FAQSection from "../../Components/gig/FAQSection";
 import ProjectSteps from "../../Components/gig/ProjectSteps";
 import AboutSection from "../../Components/gig/AboutSection";
 import ServiceSidebar from "../../Components/gig/ServiceSidebar";
-import { useEffect } from "react";
-import { Navigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Navbar from "../../Components/Navbar";
-import { fetchGig } from "../../store/gigSlice/gigSlice"; // Adjust path
 import Loader from "../../Components/Loader";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+
 const GigPage = () => {
   const { id } = useParams();
-  const dispatch = useDispatch();
-  const { formData, packageData, loading, error } = useSelector(
-    (state) => state.gig
-  );
   const navigate = useNavigate();
+  const [gigData, setGigData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch gig data directly from API
   useEffect(() => {
-    dispatch(fetchGig(id));
-    console.log(formData);
-  }, [id, dispatch]);
+    const fetchGigData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch(
+          `https://cryptolance-server.onrender.com/api/gigs/${id}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setGigData(data);
+      } catch (error) {
+        console.error("Error fetching gig:", error);
+        setError(error.message || "Failed to fetch gig data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchGigData();
+    }
+  }, [id]);
 
   if (loading) {
     return <Loader caption="Gig Details" />;
@@ -34,8 +58,7 @@ const GigPage = () => {
   const handleBack = () => {
     navigate("/gigs");
   };
-  if (error || !formData.title) {
-    // Check if formData is populated
+  if (error || !gigData || !gigData.title) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center text-red-500 text-xl">
         Error loading gig: {error || "No gig data available"}
@@ -43,27 +66,27 @@ const GigPage = () => {
     );
   }
 
-  // Map Redux state to props expected by child components
+  // Map API data to props expected by child components
   const gigProps = {
-    username: formData.username,
-    avatar: formData.avatar,
+    username: gigData.username,
+    avatar: gigData.avatar,
     rating: 0, // Placeholder; replace with actual rating logic if available
-    title: formData.title,
-    about: formData.about || formData.description, // Use about or fall back to description
-    badges: formData.badges || [],
-    images: formData.images || [{ url: "" }],
-    description: formData.description,
-    skills: formData.skills || [],
-    tags: formData.tags || [],
-    faqs: formData.faqs || [],
-    location: formData.location,
-    basic: packageData.basic,
-    standard: packageData.standard,
-    pro: packageData.pro,
+    title: gigData.title,
+    about: gigData.about || gigData.description, // Use about or fall back to description
+    badges: gigData.badges || [],
+    images: gigData.images || [{ url: "" }],
+    description: gigData.description,
+    skills: gigData.skills || [],
+    tags: gigData.tags || [],
+    faqs: gigData.faqs || [],
+    location: gigData.location,
+    basic: gigData.basic,
+    standard: gigData.standard,
+    pro: gigData.pro,
+    freelancerId: gigData.freelancerId, // Include freelancerId from API response
   };
 
-
-  console.log("gigProps",gigProps)
+  console.log("gigProps", gigProps);
 
   return (
     <>
@@ -112,6 +135,7 @@ const GigPage = () => {
               <FAQSection faqs={gigProps.faqs} />
               <ProjectSteps username={gigProps.username} />
               <AboutSection
+                id={gigProps.freelancerId}
                 avatar={gigProps.avatar}
                 username={gigProps.username}
                 tags={gigProps.tags}
